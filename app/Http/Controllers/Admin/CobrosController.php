@@ -1,0 +1,99 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\Athlete;
+use App\Models\Payment;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+class CobrosController extends Controller
+{
+    /** Panel principal de cobros */
+    public function index()
+    {
+        return view('admin.cobros.index');
+    }
+
+    /** Búsqueda AJAX por nombre o CI */
+    public function search(Request $request)
+    {
+        $q = trim($request->get('q', ''));
+        if (strlen($q) < 2) return response()->json([]);
+
+        $atletas = Athlete::with('category')
+            ->where(function ($query) use ($q) {
+                $query->where('ci', 'like', "%{$q}%")
+                      ->orWhere('nombre', 'like', "%{$q}%")
+                      ->orWhere('apellido_paterno', 'like', "%{$q}%")
+                      ->orWhere('apellido_materno', 'like', "%{$q}%")
+                      ->orWhereRaw("CONCAT(nombre,' ',apellido_paterno,' ',COALESCE(apellido_materno,'')) LIKE ?", ["%{$q}%"])
+                      ->orWhere('id_alfanumerico_unico', 'like', "%{$q}%");
+            })
+            ->limit(8)->get()
+            ->map(fn(Athlete $a) => [
+                'id'             => $a->id,
+                'ci'             => $a->ci,
+                'codigo'         => $a->id_alfanumerico_unico,
+                'nombre_completo'=> trim("{$a->nombre} {$a->apellido_paterno} {$a->apellido_materno}"),
+                'iniciales'      => strtoupper(substr($a->nombre,0,1).substr($a->apellido_paterno??'',0,1)),
+                'foto'           => $a->foto,
+                'categoria'      => $a->category->nombre ?? '—',
+                'ultimo_pago'    => $a->payments()->latest()->first()?->created_at?->format('M Y'),
+            ]);
+
+        return response()->json($atletas);
+    }
+
+    /** Devuelve datos del atleta para el panel de cobro (AJAX) */
+    public function getAtleta(Athlete $athlete)
+    {
+        $athlete->load('category');
+        $ultimoPago = $athlete->payments()->latest()->first();
+        return response()->json([
+            'id'             => $athlete->id,
+            'nombre_completo'=> trim("{$athlete->nombre} {$athlete->apellido_paterno} {$athlete->apellido_materno}"),
+            'ci'             => $athlete->ci,
+            'codigo'         => $athlete->id_alfanumerico_unico,
+            'categoria'      => $athlete->category->nombre ?? '—',
+            'foto'           => $athlete->foto,
+            'ultimo_pago'    => $ultimoPago
+                ? ['mes' => $ultimoPago->mes_correspondiente, 'monto' => $ultimoPago->monto, 'fecha' => $ultimoPago->created_at->format('d/m/Y')]
+                : null,
+        ]);
+    }
+
+    /** Procesar el cobro */
+    public function cobrar(Request $request)
+    {
+        $validated = $request->validate([
+            'athlete_id'          => 'required|exists:athletes,id',
+            'concepto'            => 'required|in:mensualidad,articulo_deportivo',
+            'mes_correspondiente' => 'required_if:concepto,mensualidad|nullable|string|max:7',
+            'descripcion'         => 'nullable|string|max:255',
+            'monto'               => 'required|numeric|min:0.01',
+            'metodo_pago'         => 'required|in:efectivo,qr,tarjeta',
+        ]);
+
+        $payment = Payment::create([
+            'athlete_id'          => $validated['athlete_id'],
+            'concepto'            => $validated['concepto'],
+            'mes_correspondiente' => $validated['mes_correspondiente'] ?? now()->format('Y-m'),
+            'descripcion'         => $validated['descripcion'] ?? null,
+            'monto'               => $validated['monto'],
+            'metodo_pago'         => $validated['metodo_pago'],
+            'estado_pago'         => 'pagado',
+            'cobrado_por'         => Auth::id(),
+        ]);
+
+        return redirect()->route('cobros.nota', $payment->id);
+    }
+
+    /** Nota de venta */
+    public function nota(Payment $payment)
+    {
+        $payment->load('athlete.category', 'cobrador');
+        return view('admin.cobros.nota', compact('payment'));
+    }
+}

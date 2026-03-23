@@ -1,0 +1,19 @@
+Cannot use spatie/laravel-permission's latest version 7.2.4 as it requires php ^8.4 which is not satisfied by your platform.
+./composer.json has been updated
+Running composer update spatie/laravel-permission
+Loading composer repositories with package information
+Updating dependencies
+Your requirements could not be resolved to an installable set of packages.
+
+  Problem 1
+    - filament/filament is locked to version v5.4.0 and an update of this package was not requested.
+    - filament/filament v5.4.0 requires filament/support v5.4.0 -> satisfiable by filament/support[v5.4.0].
+    - filament/support v5.4.0 requires ext-intl * -> it is missing from your system. Install or enable PHP's intl extension.
+
+To enable extensions, verify that they are enabled in your .ini files:
+    - C:\xampp\php\php.ini
+You can also run `php --ini` in a terminal to see which files are used by PHP in CLI mode.
+Alternatively, you can run Composer with `--ignore-platform-req=ext-intl` to temporarily ignore these required extensions.
+You can also try re-running composer require with an explicit version constraint, e.g. "composer require spatie/laravel-permission:*" to figure out if any version is installable, or "composer require spatie/laravel-permission:^2.1" if you know which you need.
+
+Installation failed, reverting ./composer.json and ./composer.lock to their original content.

@@ -1,0 +1,169 @@
+@startuml DiagramaBD_OlimpicSC
+
+skinparam linetype ortho
+skinparam roundcorner 8
+skinparam class {
+    BackgroundColor #F8F9FA
+    BorderColor #343A40
+    HeaderBackgroundColor #1B4F72
+    HeaderFontColor #FFFFFF
+    FontSize 12
+}
+skinparam ArrowColor #1B4F72
+
+title Diagrama de Base de Datos — OlimpicSC
+
+' ─────────────────────────────
+'  TABLAS DE NEGOCIO
+' ─────────────────────────────
+
+entity "usuarios" as users {
+    * id : BIGINT <<PK>>
+    --
+    * nombre : VARCHAR
+    * nombre_usuario : VARCHAR <<unique>>
+    correo : VARCHAR <<nullable>>
+    contrasena : VARCHAR
+    apellido_paterno : VARCHAR <<nullable>>
+    apellido_materno : VARCHAR <<nullable>>
+    ci : VARCHAR <<nullable>>
+    apellido : VARCHAR <<nullable>>
+    activo : BOOLEAN = false
+    correo_verificado_en : TIMESTAMP <<nullable>>
+    token_recordar : VARCHAR <<nullable>>
+    creado_en : TIMESTAMP
+    actualizado_en : TIMESTAMP
+}
+
+entity "categorias" as categories {
+    * id : BIGINT <<PK>>
+    --
+    * nombre : VARCHAR
+    * edad_min : INT
+    * edad_max : INT
+    creado_en : TIMESTAMP
+    actualizado_en : TIMESTAMP
+}
+
+entity "atletas" as athletes {
+    * id : BIGINT <<PK>>
+    --
+    categoria_id : BIGINT <<FK, nullable>>
+    * ci : VARCHAR <<unique>>
+    * nombre : VARCHAR
+    apellido_paterno : VARCHAR <<nullable>>
+    apellido_materno : VARCHAR <<nullable>>
+    foto : VARCHAR <<nullable>>
+    * fecha_nacimiento : DATE
+    habilitado : BOOLEAN = false
+    id_alfanumerico_unico : VARCHAR <<unique>>
+    genero : VARCHAR <<nullable>>
+    contactos_padres : TEXT <<nullable>>
+    seguro_medico : VARCHAR <<nullable>>
+    alergias : TEXT <<nullable>>
+    nombre_padre : VARCHAR <<nullable>>
+    apellido_paterno_padre : VARCHAR <<nullable>>
+    apellido_materno_padre : VARCHAR <<nullable>>
+    telefono_padre : VARCHAR <<nullable>>
+    creado_en : TIMESTAMP
+    actualizado_en : TIMESTAMP
+}
+
+entity "entrenamientos" as trainings {
+    * id : BIGINT <<PK>>
+    --
+    * coach_id : BIGINT <<FK>>
+    * categoria_id : BIGINT <<FK>>
+    archivo_pdf : VARCHAR <<nullable>>
+    * fecha : DATE
+    creado_en : TIMESTAMP
+    actualizado_en : TIMESTAMP
+}
+
+entity "pagos" as payments {
+    * id : BIGINT <<PK>>
+    --
+    * atleta_id : BIGINT <<FK>>
+    * monto : DECIMAL(10,2)
+    * mes_correspondiente : VARCHAR
+    * estado_pago : VARCHAR = "pendiente"
+    creado_en : TIMESTAMP
+    actualizado_en : TIMESTAMP
+}
+
+' ─────────────────────────────
+'  PERMISOS (Spatie)
+' ─────────────────────────────
+
+entity "permisos" as permissions {
+    * id : BIGINT <<PK>>
+    --
+    * nombre : VARCHAR
+    * guard_name : VARCHAR
+    creado_en : TIMESTAMP
+    actualizado_en : TIMESTAMP
+}
+
+entity "roles" as roles {
+    * id : BIGINT <<PK>>
+    --
+    * nombre : VARCHAR
+    * guard_name : VARCHAR
+    creado_en : TIMESTAMP
+    actualizado_en : TIMESTAMP
+}
+
+entity "modelo_tiene_permisos" as model_has_permissions {
+    * permiso_id : BIGINT <<FK>>
+    * tipo_modelo : VARCHAR
+    * modelo_id : BIGINT
+}
+
+entity "modelo_tiene_roles" as model_has_roles {
+    * rol_id : BIGINT <<FK>>
+    * tipo_modelo : VARCHAR
+    * modelo_id : BIGINT
+}
+
+entity "rol_tiene_permisos" as role_has_permissions {
+    * permiso_id : BIGINT <<FK>>
+    * rol_id : BIGINT <<FK>>
+}
+
+' ─────────────────────────────
+'  TABLAS LARAVEL BASE
+' ─────────────────────────────
+
+entity "tokens_reset_contrasena" as password_reset_tokens {
+    * correo : VARCHAR <<PK>>
+    --
+    * token : VARCHAR
+    creado_en : TIMESTAMP <<nullable>>
+}
+
+entity "sesiones" as sessions {
+    * id : VARCHAR <<PK>>
+    --
+    usuario_id : BIGINT <<nullable>>
+    ip : VARCHAR <<nullable>>
+    agente : TEXT <<nullable>>
+    payload : LONGTEXT
+    ultima_actividad : INT
+}
+
+' ─────────────────────────────
+'  RELACIONES
+' ─────────────────────────────
+
+categories ||--o{ athletes : "tiene >"
+categories ||--o{ trainings : "agrupa >"
+users ||--o{ trainings : "dirige (coach) >"
+athletes ||--o{ payments : "realiza >"
+users ||--o{ sessions : "tiene >"
+
+permissions ||--o{ model_has_permissions : ""
+permissions ||--o{ role_has_permissions : ""
+roles ||--o{ model_has_roles : ""
+roles ||--o{ role_has_permissions : ""
+
+@enduml
