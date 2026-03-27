@@ -19,7 +19,7 @@ class PaymentController extends Controller
         // Filtro por mes (default: mes actual)
         $mes = $request->get('mes', now()->format('Y-m'));
         if ($mes) {
-            $query->where('mes_correspondiente', 'like', $mes . '%')
+            $query->where('mes_correspondiente', 'ilike', $mes . '%')
                   ->orWhereBetween('created_at', [
                       \Carbon\Carbon::createFromFormat('Y-m', $mes)->startOfMonth(),
                       \Carbon\Carbon::createFromFormat('Y-m', $mes)->endOfMonth(),
@@ -29,9 +29,14 @@ class PaymentController extends Controller
         if ($request->filled('search')) {
             $search = $request->search;
             $query->whereHas('athlete', fn($q) =>
-                $q->where('nombre', 'like', "%$search%")
-                  ->orWhere('apellido_paterno', 'like', "%$search%")
-                  ->orWhere('ci', 'like', "%$search%")
+                $q->where(function($sub) use ($search) {
+                    $sub->where('nombre', 'ilike', "%$search%")
+                        ->orWhere('apellido_paterno', 'ilike', "%$search%")
+                        ->orWhere('apellido_materno', 'ilike', "%$search%")
+                        ->orWhere('ci', 'ilike', "%$search%")
+                        ->orWhere('id_alfanumerico_unico', 'ilike', "%$search%")
+                        ->orWhereRaw("CONCAT(nombre, ' ', apellido_paterno, ' ', COALESCE(apellido_materno,'')) ILIKE ?", ["%$search%"]);
+                })
             );
         }
 
@@ -78,16 +83,21 @@ class PaymentController extends Controller
             $start = \Carbon\Carbon::createFromFormat('Y-m', $mes)->startOfMonth();
             $end   = \Carbon\Carbon::createFromFormat('Y-m', $mes)->endOfMonth();
             $query->where(fn($q) =>
-                $q->where('mes_correspondiente', 'like', $mes . '%')
+                $q->where('mes_correspondiente', 'ilike', $mes . '%')
                   ->orWhereBetween('created_at', [$start, $end])
             );
         }
         if ($request->filled('search')) {
             $s = $request->search;
             $query->whereHas('athlete', fn($q) =>
-                $q->where('nombre', 'like', "%$s%")
-                  ->orWhere('apellido_paterno', 'like', "%$s%")
-                  ->orWhere('ci', 'like', "%$s%")
+                $q->where(function($sub) use ($s) {
+                    $sub->where('nombre', 'ilike', "%$s%")
+                        ->orWhere('apellido_paterno', 'ilike', "%$s%")
+                        ->orWhere('apellido_materno', 'ilike', "%$s%")
+                        ->orWhere('ci', 'ilike', "%$s%")
+                        ->orWhere('id_alfanumerico_unico', 'ilike', "%$s%")
+                        ->orWhereRaw("CONCAT(nombre, ' ', apellido_paterno, ' ', COALESCE(apellido_materno,'')) ILIKE ?", ["%$s%"]);
+                })
             );
         }
         if ($request->filled('metodo'))  $query->where('metodo_pago', $request->metodo);

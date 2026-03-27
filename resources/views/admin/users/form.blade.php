@@ -18,14 +18,14 @@
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             @foreach($roles as $role)
                 <label class="relative flex items-center p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer transition-colors">
-                    <input type="radio" name="roles[]" value="{{ $role->name }}"
-                        {{ $user->hasRole($role->name) ? 'checked' : '' }}
+                    <input type="radio" name="role" value="{{ $role->name }}"
+                        {{ old('role', $user->roles->first()?->name) === $role->name ? 'checked' : '' }}
                         class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 role-checkbox">
                     <span class="ml-3 text-sm font-medium text-slate-700">{{ $role->name }}</span>
                 </label>
             @endforeach
         </div>
-        @error('roles') <p class="mt-1 text-xs text-red-600 font-medium">{{ $message }}</p> @enderror
+        @error('role') <p class="mt-1 text-xs text-red-600 font-medium">{{ $message }}</p> @enderror
     </div>
 
     {{-- Categoría (solo para Coach) --}}
@@ -74,14 +74,14 @@
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             @foreach($roles as $role)
                 <label class="relative flex items-center p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer transition-colors">
-                    <input type="radio" name="roles[]" value="{{ $role->name }}"
-                        {{ (is_array(old('roles')) && in_array($role->name, old('roles'))) ? 'checked' : '' }}
+                    <input type="radio" name="role" value="{{ $role->name }}"
+                        {{ old('role') === $role->name ? 'checked' : '' }}
                         class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 role-checkbox">
                     <span class="ml-3 text-sm font-medium text-slate-700">{{ $role->name }}</span>
                 </label>
             @endforeach
         </div>
-        @error('roles') <p class="mt-1 text-xs text-red-600 font-medium">{{ $message }}</p> @enderror
+        @error('role') <p class="mt-1 text-xs text-red-600 font-medium">{{ $message }}</p> @enderror
     </div>
 
     {{-- Categoría (solo para Coach) --}}

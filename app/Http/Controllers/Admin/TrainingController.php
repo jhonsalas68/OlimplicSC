@@ -12,6 +12,10 @@ class TrainingController extends Controller
 {
     public function index(Request $request)
     {
+        if (auth()->user()->hasRole('Coach')) {
+            return redirect()->route('coach.planificaciones');
+        }
+
         $query = Training::with(['category', 'coach']);
 
         if ($request->filled('category_id')) {
@@ -50,7 +54,8 @@ class TrainingController extends Controller
 
         Training::create($data);
 
-        return redirect()->route('trainings.index')->with('success', 'Planificación registrada correctamente.');
+        $route = auth()->user()->hasRole('Coach') ? 'coach.planificaciones' : 'trainings.index';
+        return redirect()->route($route)->with('success', 'Planificación registrada correctamente.');
     }
 
     public function edit(Training $training)
@@ -81,7 +86,8 @@ class TrainingController extends Controller
 
         $training->update($data);
 
-        return redirect()->route('trainings.index')->with('success', 'Planificación actualizada correctamente.');
+        $route = auth()->user()->hasRole('Coach') ? 'coach.planificaciones' : 'trainings.index';
+        return redirect()->route($route)->with('success', 'Planificación actualizada correctamente.');
     }
 
     public function destroy(Training $training)
@@ -90,6 +96,8 @@ class TrainingController extends Controller
             Storage::disk('public')->delete($training->file_path_pdf);
         }
         $training->delete();
-        return redirect()->route('trainings.index')->with('success', 'Planificación eliminada.');
+
+        $route = auth()->user()->hasRole('Coach') ? 'coach.planificaciones' : 'trainings.index';
+        return redirect()->route($route)->with('success', 'Planificación eliminada.');
     }
 }

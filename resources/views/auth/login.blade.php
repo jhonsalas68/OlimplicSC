@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="utf-8">
@@ -18,88 +18,36 @@
 
         /* Panel izquierdo — decorativo */
         .left-panel {
-            flex: 1;
-            background: linear-gradient(145deg, #1e3a8a 0%, #1e1b4b 50%, #7f1d1d 100%);
+            width: 70%;
+            background-color: #ffffff; /* Fondo blanco para fusionarse con la imagen */
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 48px;
             position: relative;
-            overflow: hidden;
         }
-        .left-panel::before {
-            content: '';
-            position: absolute;
-            width: 400px; height: 400px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.04);
-            top: -100px; left: -100px;
+        .left-panel-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Asegura que la imagen completa se vea sin cortes */
+            object-position: center;
         }
-        .left-panel::after {
-            content: '';
-            position: absolute;
-            width: 300px; height: 300px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.04);
-            bottom: -80px; right: -80px;
-        }
-        .left-logo {
-            position: relative; z-index: 1;
-            margin-bottom: 28px;
-        }
-        .left-logo img {
-            width: 200px;
-            height: auto;
-            object-fit: contain;
-            filter: drop-shadow(0 4px 16px rgba(0,0,0,0.4));
-        }
-        .left-title {
-            color: white;
-            font-size: 32px;
-            font-weight: 800;
-            text-align: center;
-            line-height: 1.2;
-            position: relative; z-index: 1;
-        }
-        .left-title span { color: #fca5a5; }
-        .left-sub {
-            color: rgba(255,255,255,0.6);
-            font-size: 14px;
-            text-align: center;
-            margin-top: 12px;
-            line-height: 1.6;
-            max-width: 280px;
-            position: relative; z-index: 1;
-        }
-        .left-badges {
-            display: flex; gap: 10px; margin-top: 36px;
-            position: relative; z-index: 1;
-            flex-wrap: wrap; justify-content: center;
-        }
-        .badge {
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.15);
-            color: rgba(255,255,255,0.8);
-            font-size: 11px;
-            font-weight: 600;
-            padding: 6px 14px;
-            border-radius: 20px;
-            backdrop-filter: blur(6px);
-        }
-
+        
         /* Panel derecho — formulario */
         .right-panel {
-            width: 440px;
+            width: 30%;
+            min-width: 400px;
             flex-shrink: 0;
             background: #ffffff;
             display: flex;
             flex-direction: column;
             justify-content: center;
             padding: 48px 40px;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.1);
+            z-index: 10;
         }
-        .form-header { margin-bottom: 36px; }
-        .form-header h1 { font-size: 24px; font-weight: 800; color: #0f172a; }
+        .form-header { margin-bottom: 36px; text-align: center; }
+        .form-header img { width: auto; max-width: 160px; height: auto; margin: 0 auto 16px; display: block; }
+        .form-header h1 { font-size: 24px; font-weight: 800; color: #0b2d69; }
         .form-header p { font-size: 13px; color: #64748b; margin-top: 6px; }
 
         .form-group { margin-bottom: 20px; }
@@ -133,9 +81,9 @@
             outline: none;
         }
         .input-wrap input:focus {
-            border-color: #2563eb;
+            border-color: #0b2d69;
             background: #fff;
-            box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+            box-shadow: 0 0 0 3px rgba(11,45,105,0.1);
         }
         .input-wrap input::placeholder { color: #94a3b8; }
 
@@ -153,7 +101,7 @@
         }
         .remember-row input[type="checkbox"] {
             width: 16px; height: 16px;
-            accent-color: #2563eb;
+            accent-color: #0b2d69;
             cursor: pointer;
         }
         .remember-row label {
@@ -163,7 +111,7 @@
         .btn-submit {
             width: 100%;
             padding: 14px;
-            background: linear-gradient(135deg, #1d4ed8, #1e3a8a);
+            background: linear-gradient(135deg, #0b2d69, #091a3a);
             color: white;
             font-size: 14px;
             font-weight: 700;
@@ -175,9 +123,9 @@
             letter-spacing: 0.3px;
         }
         .btn-submit:hover {
-            background: linear-gradient(135deg, #1e40af, #1e1b4b);
+            background: linear-gradient(135deg, #c61c2c, #a01522);
             transform: translateY(-1px);
-            box-shadow: 0 4px 16px rgba(29,78,216,0.35);
+            box-shadow: 0 4px 16px rgba(198,28,44,0.35);
         }
         .btn-submit:active { transform: translateY(0); }
 
@@ -222,13 +170,10 @@
         }
 
         /* Responsive */
-        @media (max-width: 768px) {
+        @media (max-width: 900px) {
             body { flex-direction: column; }
-            .left-panel { padding: 36px 24px; min-height: 220px; flex: none; }
-            .left-title { font-size: 24px; }
-            .left-sub { display: none; }
-            .left-badges { display: none; }
-            .right-panel { width: 100%; padding: 32px 24px; }
+            .left-panel { width: 100%; height: 250px; background-position: center; }
+            .right-panel { width: 100%; min-width: auto; padding: 32px 24px; border-radius: 24px 24px 0 0; margin-top: -24px; box-shadow: 0 -10px 30px rgba(0,0,0,0.1); }
         }
     </style>
 </head>
@@ -236,16 +181,7 @@
 
     {{-- PANEL IZQUIERDO --}}
     <div class="left-panel">
-        <div class="left-logo">
-            <img src="{{ asset('images/logo-olimpicsc-full.png') }}" alt="OlimpicSC">
-        </div>
-        <div class="left-title">Club<br><span>OlimpicSC</span></div>
-        <p class="left-sub">Sistema de gestión deportiva para atletas, entrenadores y administración del club.</p>
-        <div class="left-badges">
-            <span class="badge">Atletas</span>
-            <span class="badge">Planificaciones</span>
-            <span class="badge">Tesorería</span>
-        </div>
+        <img src="{{ asset('images/banner-login.jpg') }}" alt="Banner OlimpicSC" class="left-panel-img">
     </div>
 
     {{-- PANEL DERECHO --}}

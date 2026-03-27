@@ -31,37 +31,47 @@
     {{-- Card perfil --}}
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden mb-4">
 
-        {{-- Header con foto y nombre --}}
-        <div class="bg-gradient-to-r from-blue-900 to-red-800 px-6 pt-6 pb-10"></div>
-        <div class="px-6 -mt-8 mb-5 flex items-end gap-4">
-            <div class="w-20 h-20 rounded-2xl border-4 border-white shadow-lg overflow-hidden bg-blue-50 flex-shrink-0">
-                @if($athlete->foto)
-                    <img src="{{ asset('storage/' . $athlete->foto) }}" class="w-full h-full object-cover">
-                @else
-                    <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-600 to-red-600 text-white font-bold text-2xl">
-                        {{ strtoupper(substr($athlete->nombre,0,1).substr($athlete->apellido_paterno??'',0,1)) }}
-                    </div>
-                @endif
-            </div>
-            <div class="pb-1 min-w-0">
-                <h1 class="text-lg font-bold text-slate-900 leading-tight">
-                    {{ $athlete->nombre }} {{ $athlete->apellido_paterno }} {{ $athlete->apellido_materno }}
-                </h1>
-                <div class="flex items-center gap-2 mt-1 flex-wrap">
-                    @if($athlete->id_alfanumerico_unico)
-                        <span class="text-xs font-mono text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100">
-                            {{ $athlete->id_alfanumerico_unico }}
-                        </span>
+        {{-- Header Cover Temático del Club --}}
+        <div class="h-32 w-full relative overflow-hidden bg-slate-100" 
+             style="background-image: url('{{ asset('images/banner-login.jpg') }}'); background-size: cover; background-position: center;">
+            {{-- Capa semi-transparente para mejorar el contraste --}}
+            <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+        </div>
+        <div class="px-6 mb-6 relative z-10">
+            <div class="flex flex-col sm:flex-row sm:items-end gap-5">
+                <div class="-mt-12 w-24 h-24 rounded-2xl border-4 border-white shadow-md overflow-hidden bg-slate-50 flex-shrink-0 relative">
+                    @if($athlete->foto)
+                        <img src="{{ asset('storage/' . $athlete->foto) }}" class="w-full h-full object-cover">
+                    @else
+                        <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#0b2d69] to-[#c61c2c] text-white font-black text-3xl">
+                            {{ strtoupper(substr($athlete->nombre,0,1).substr($athlete->apellido_paterno??'',0,1)) }}
+                        </div>
                     @endif
-                    <span class="text-xs text-slate-600 bg-slate-100 px-2 py-0.5 rounded-md">
-                        {{ $athlete->category->nombre ?? 'Sin categoría' }}
-                    </span>
+                </div>
+                <div class="pb-1 min-w-0 flex-1">
+                    <h1 class="text-2xl font-black text-slate-900 tracking-tight mb-1">
+                        {{ $athlete->nombre }} {{ $athlete->apellido_paterno }} {{ $athlete->apellido_materno }}
+                    </h1>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        @if($athlete->id_alfanumerico_unico)
+                            <span class="text-xs font-bold font-mono text-[#0b2d69] bg-blue-50 px-2.5 py-1 rounded-md border border-blue-100 shadow-sm">
+                                {{ $athlete->id_alfanumerico_unico }}
+                            </span>
+                        @endif
+                        <span class="text-xs font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-md shadow-sm border border-slate-200 cursor-default">
+                            {{ $athlete->category->nombre ?? 'Sin categoría' }}
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
 
         {{-- Datos --}}
         <div class="px-6 pb-6 grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-4 border-t border-slate-100 pt-5">
+            <div>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Código de Atleta</p>
+                <p class="text-sm font-semibold text-[#0b2d69] font-mono bg-blue-50 px-2 py-0.5 rounded border border-blue-100 inline-block">{{ $athlete->id_alfanumerico_unico ?? '—' }}</p>
+            </div>
             <div>
                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">C.I.</p>
                 <p class="text-sm font-semibold text-slate-800">{{ $athlete->ci }}</p>

@@ -24,12 +24,12 @@ class CobrosController extends Controller
 
         $atletas = Athlete::with('category')
             ->where(function ($query) use ($q) {
-                $query->where('ci', 'like', "%{$q}%")
-                      ->orWhere('nombre', 'like', "%{$q}%")
-                      ->orWhere('apellido_paterno', 'like', "%{$q}%")
-                      ->orWhere('apellido_materno', 'like', "%{$q}%")
-                      ->orWhereRaw("CONCAT(nombre,' ',apellido_paterno,' ',COALESCE(apellido_materno,'')) LIKE ?", ["%{$q}%"])
-                      ->orWhere('id_alfanumerico_unico', 'like', "%{$q}%");
+                $query->where('ci', 'ilike', "%{$q}%")
+                      ->orWhere('nombre', 'ilike', "%{$q}%")
+                      ->orWhere('apellido_paterno', 'ilike', "%{$q}%")
+                      ->orWhere('apellido_materno', 'ilike', "%{$q}%")
+                      ->orWhere('id_alfanumerico_unico', 'ilike', "%{$q}%")
+                      ->orWhereRaw("CONCAT(nombre, ' ', apellido_paterno, ' ', COALESCE(apellido_materno,'')) ILIKE ?", ["%{$q}%"]);
             })
             ->limit(8)->get()
             ->map(fn(Athlete $a) => [

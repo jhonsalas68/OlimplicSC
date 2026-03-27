@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -16,7 +16,7 @@
 
         /* ===== BARRA DE ACCIONES (solo pantalla) ===== */
         .action-bar {
-            background: #1e3a8a;
+            background: #0b2d69;
             padding: 12px 24px;
             display: flex;
             align-items: center;
@@ -45,7 +45,7 @@
         }
         .btn-back:hover { background: rgba(255,255,255,0.25); }
         .btn-print {
-            background: #dc2626;
+            background: #c61c2c;
             color: white;
             border: none;
             padding: 8px 20px;
@@ -58,7 +58,7 @@
             gap: 6px;
             transition: background 0.2s;
         }
-        .btn-print:hover { background: #b91c1c; }
+        .btn-print:hover { background: #9b1421; }
 
         /* ===== CONTENEDOR PANTALLA ===== */
         .screen-wrapper {
@@ -80,7 +80,7 @@
 
         /* ===== HEADER DE LA NOTA ===== */
         .nota-header {
-            background: linear-gradient(135deg, #1e3a8a 0%, #1e1b4b 100%);
+            background: linear-gradient(135deg, #0b2d69 0%, #06193b 100%);
             padding: 24px;
             display: flex;
             align-items: center;
@@ -88,7 +88,16 @@
             gap: 16px;
         }
         .nota-header-left { display: flex; align-items: center; gap: 14px; }
-        .nota-header-left img { height: 52px; width: auto; filter: brightness(0) invert(1); }
+        
+        /* Contenedor adaptado para el banner como logo */
+        .nota-logo-box { 
+            height: 54px; 
+            width: 140px; 
+            background-color: white; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        
         .nota-club-name { color: white; font-size: 17px; font-weight: 800; line-height: 1.2; }
         .nota-club-sub { color: #93c5fd; font-size: 10px; margin-top: 2px; }
         .nota-header-right { text-align: right; flex-shrink: 0; }
@@ -129,7 +138,7 @@
 
         /* Concepto box */
         .concepto-box {
-            background: linear-gradient(135deg, #1d4ed8, #1e40af);
+            background: linear-gradient(135deg, #c61c2c, #991220);
             border-radius: 12px;
             padding: 16px 18px;
             margin-bottom: 16px;
@@ -181,7 +190,7 @@
         .cobrador-avatar {
             width: 36px; height: 36px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #1d4ed8, #dc2626);
+            background: linear-gradient(135deg, #0b2d69, #c61c2c);
             display: flex; align-items: center; justify-content: center;
             color: white; font-weight: 700; font-size: 13px; flex-shrink: 0;
         }
@@ -202,7 +211,7 @@
             text-align: center;
         }
         .nota-footer p { font-size: 10px; color: #94a3b8; line-height: 1.6; }
-        .nota-footer .highlight { color: #1d4ed8; font-weight: 700; }
+        .nota-footer .highlight { color: #c61c2c; font-weight: 700; }
 
         /* ===== PRINT ===== */
         @media print {
@@ -259,7 +268,7 @@
         {{-- HEADER --}}
         <div class="nota-header">
             <div class="nota-header-left">
-                <img src="{{ asset('images/logo-olimpic-sc.svg') }}" alt="OlimpicSC">
+                <div class="nota-logo-box" style="background-image: url('{{ asset('images/banner-login.jpg') }}'); background-size: 280px auto; background-position: -8px center; background-repeat: no-repeat;"></div>
                 <div>
                     <div class="nota-club-name">Club OlimpicSC</div>
                     <div class="nota-club-sub">Santa Cruz, Bolivia</div>

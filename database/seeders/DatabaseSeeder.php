@@ -26,7 +26,7 @@ class DatabaseSeeder extends Seeder
         ], [
             'name' => 'Administrador',
             'last_name' => 'Principal',
-            'username' => 'adm01',
+            'username' => 'ADM01',
             'password' => Hash::make('adm123'),
             'is_active' => true,
         ]);
@@ -37,8 +37,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'username' => 'testuser',
             'email' => 'test@example.com',
-            'password' => Hash::make('password'),
+            'password' => Hash::make('1234567'),
         ]);
     }
 }
-

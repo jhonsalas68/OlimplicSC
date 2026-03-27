@@ -15,9 +15,16 @@
                     <select name="category_id" required class="block w-full px-4 py-2.5 border border-slate-200 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all sm:text-sm bg-white">
                         <option value="">Seleccionar categoría...</option>
                         @foreach($categories as $category)
-                            <option value="{{ $category->id }}" {{ (old('category_id', $training->category_id ?? '') == $category->id) ? 'selected' : '' }}>
-                                {{ $category->nombre }}
-                            </option>
+                            @php
+                                $user = auth()->user();
+                                $isCoach = $user->hasRole('Coach');
+                                $shouldShow = !$isCoach || ($user->category_id == $category->id);
+                            @endphp
+                            @if($shouldShow)
+                                <option value="{{ $category->id }}" {{ (old('category_id', $training->category_id ?? ($isCoach ? $user->category_id : '')) == $category->id) ? 'selected' : '' }}>
+                                    {{ $category->nombre }}
+                                </option>
+                            @endif
                         @endforeach
                     </select>
                     @error('category_id') <p class="mt-1 text-xs text-red-600 font-medium">{{ $message }}</p> @enderror
@@ -33,10 +40,10 @@
                                 <svg class="w-8 h-8 mb-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                                 </svg>
-                                <p class="mb-2 text-sm text-slate-500 font-medium">Haga clic o arrastre el archivo PDF aquí</p>
+                                <p class="mb-2 text-sm text-slate-500 font-medium" id="pdf-filename">Haga clic o arrastre el archivo PDF aquí</p>
                                 <p class="text-xs text-slate-400">Sólo PDF (Máx. 5MB)</p>
                             </div>
-                            <input id="pdf" name="pdf" type="file" class="hidden" accept="application/pdf" />
+                            <input id="pdf" name="pdf" type="file" class="hidden" accept="application/pdf" onchange="document.getElementById('pdf-filename').textContent = this.files.length ? this.files[0].name : 'Haga clic o arrastre el archivo PDF aquí';" />
                         </label>
                     </div>
                     @if(isset($training) && $training->file_path_pdf)
@@ -52,7 +59,7 @@
             </div>
 
             <div class="flex items-center justify-end space-x-4 pt-8 border-t border-slate-100">
-                <x-admin.button type="button" variant="secondary" onclick="window.location.href='{{ route('trainings.index') }}'">
+                <x-admin.button type="button" variant="secondary" onclick="window.location.href='{{ auth()->user()->hasRole('Coach') ? route('coach.planificaciones') : route('trainings.index') }}'">
                     Cancelar
                 </x-admin.button>
                 <x-admin.button type="submit">

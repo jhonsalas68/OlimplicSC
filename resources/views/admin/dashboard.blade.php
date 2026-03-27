@@ -28,7 +28,7 @@
             <span class="text-sm font-semibold text-slate-400 bg-slate-50 px-2 py-1 rounded-full">Mes Actual</span>
         </div>
         <h3 class="text-slate-500 text-sm font-medium">Recaudación</h3>
-        <p class="text-2xl font-bold text-slate-800 mt-1">${{ number_format(\App\Models\Payment::sum('monto'), 2) }}</p>
+        <p class="text-2xl font-bold text-slate-800 mt-1">Bs. {{ number_format(\App\Models\Payment::sum('monto'), 2) }}</p>
     </div>
 
     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">

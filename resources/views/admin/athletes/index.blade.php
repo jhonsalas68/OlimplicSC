@@ -99,6 +99,7 @@
 <x-admin.table>
     <x-slot name="header">
         <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Atleta</th>
+        <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Código</th>
         <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">C.I.</th>
         <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Categoría</th>
         <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Género</th>
@@ -124,6 +125,9 @@
                         <div class="text-xs text-slate-500">{{ $athlete->fecha_nacimiento?->format('d/m/Y') ?? 'Sin fecha' }}</div>
                     </div>
                 </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-bold text-[#0b2d69]">
+                {{ $athlete->id_alfanumerico_unico ?? '—' }}
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 font-medium">
                 {{ $athlete->ci }}

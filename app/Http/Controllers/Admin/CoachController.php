@@ -16,10 +16,9 @@ class CoachController extends Controller
         $user = Auth::user();
         $category = $user->category;
 
-        $planificaciones = Training::where('coach_id', $user->id)
-            ->orWhere('category_id', $user->category_id)
-            ->latest()
-            ->get();
+        $planificaciones = $category
+            ? Training::where('category_id', $category->id)->latest()->get()
+            : collect();
 
         $atletas = $category
             ? Athlete::where('category_id', $category->id)->orderBy('apellido_paterno')->get()
@@ -47,10 +46,9 @@ class CoachController extends Controller
         $user = Auth::user();
         $category = $user->category;
 
-        $planificaciones = Training::where('coach_id', $user->id)
-            ->orWhere('category_id', $user->category_id)
-            ->latest()
-            ->get();
+        $planificaciones = $category
+            ? Training::where('category_id', $category->id)->latest()->get()
+            : collect();
 
         return view('coach.planificaciones', compact('category', 'planificaciones'));
     }

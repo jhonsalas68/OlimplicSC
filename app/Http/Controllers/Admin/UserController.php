@@ -16,8 +16,8 @@ class UserController extends Controller
         $query = User::query();
 
         if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%')
-                  ->orWhere('username', 'like', '%' . $request->search . '%');
+            $query->where('name', 'ilike', '%' . $request->search . '%')
+                  ->orWhere('username', 'ilike', '%' . $request->search . '%');
         }
 
         $users = $query->with('roles')->latest()->paginate(10);
@@ -26,7 +26,7 @@ class UserController extends Controller
 
     public function create()
     {
-        $roles = Role::all();
+        $roles = Role::where('name', '!=', 'SuperAdmin')->get();
         $categories = Category::orderBy('edad_min')->get();
         return view('admin.users.create', compact('roles', 'categories'));
     }
@@ -40,7 +40,7 @@ class UserController extends Controller
             'ci'              => 'required|string|max:20|unique:users,ci',
             'email'           => 'required|email|unique:users,email',
             'is_active'       => 'boolean',
-            'roles'           => 'required|array|size:1',
+            'role'            => 'required|string|exists:roles,name|not_in:SuperAdmin',
             'category_id'     => 'nullable|exists:categories,id',
         ]);
 
@@ -67,20 +67,28 @@ class UserController extends Controller
             'category_id'      => $validated['category_id'] ?? null,
         ]);
 
-        $user->syncRoles($validated['roles']);
+        $user->syncRoles([$validated['role']]);
 
         return redirect()->route('users.index')->with('success', "Usuario creado. Username: $username | Clave inicial: " . $validated['ci']);
     }
 
     public function edit(User $user)
     {
-        $roles = Role::all();
+        if ($user->hasRole('SuperAdmin')) {
+            return back()->with('error', 'La cuenta de SuperAdmin es intocable y no puede ser editada.');
+        }
+
+        $roles = Role::where('name', '!=', 'SuperAdmin')->get();
         $categories = Category::orderBy('edad_min')->get();
         return view('admin.users.edit', compact('user', 'roles', 'categories'));
     }
 
     public function update(Request $request, User $user)
     {
+        if ($user->hasRole('SuperAdmin')) {
+            return back()->with('error', 'La cuenta de SuperAdmin es intocable y no puede ser editada.');
+        }
+
         $validated = $request->validate([
             'name'             => 'required|string|max:255',
             'apellido_paterno' => 'required|string|max:255',
@@ -88,7 +96,7 @@ class UserController extends Controller
             'email'            => 'required|email|unique:users,email,' . $user->id,
             'ci'               => 'required|string|max:20|unique:users,ci,' . $user->id,
             'password'         => 'nullable|string|min:6|confirmed',
-            'roles'            => 'required|array|size:1',
+            'role'             => 'required|string|exists:roles,name|not_in:SuperAdmin',
             'category_id'      => 'nullable|exists:categories,id',
         ]);
 
@@ -107,13 +115,16 @@ class UserController extends Controller
         }
 
         $user->update($userData);
-        $user->syncRoles($validated['roles']);
+        $user->syncRoles([$validated['role']]);
 
         return redirect()->route('users.index')->with('success', 'Usuario actualizado correctamente.');
     }
 
     public function destroy(User $user)
     {
+        if ($user->hasRole('SuperAdmin')) {
+            return back()->with('error', 'La cuenta de SuperAdmin es intocable y no puede ser eliminada.');
+        }
         if ($user->id === auth()->id()) {
             return back()->with('error', 'No puedes eliminarte a ti mismo.');
         }

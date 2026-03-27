@@ -36,8 +36,15 @@ class AthleteController extends Controller
         $query = Athlete::query();
 
         if ($request->filled('search')) {
-            $query->where('nombre', 'like', '%' . $request->search . '%')
-                  ->orWhere('ci', 'like', '%' . $request->search . '%');
+            $s = $request->search;
+            $query->where(function ($q) use ($s) {
+                $q->where('nombre', 'ilike', "%{$s}%")
+                  ->orWhere('apellido_paterno', 'ilike', "%{$s}%")
+                  ->orWhere('apellido_materno', 'ilike', "%{$s}%")
+                  ->orWhere('ci', 'ilike', "%{$s}%")
+                  ->orWhere('id_alfanumerico_unico', 'ilike', "%{$s}%")
+                  ->orWhereRaw("CONCAT(nombre, ' ', apellido_paterno, ' ', COALESCE(apellido_materno,'')) ILIKE ?", ["%{$s}%"]);
+            });
         }
 
         $athletes = $query->with('category')->latest()->paginate(10);
