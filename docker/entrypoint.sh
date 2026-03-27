@@ -1,20 +1,13 @@
 #!/bin/sh
-
-# Exit on error
 set -e
 
-# Clear caches
-php artisan config:clear
-php artisan route:clear
-php artisan view:clear
-
-# Cache configuration
+# Optimizaciones de Laravel
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
-# Run migrations and seeders (safe since we made seeders idempotent)
-php artisan migrate --force --seed
+# Migraciones
+php artisan migrate --force
 
-# Start Supervisor
-exec supervisord -c /etc/supervisor/conf.d/supervisord.conf
+# Arrancar Supervisor (Esto lanza Nginx y PHP)
+exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf

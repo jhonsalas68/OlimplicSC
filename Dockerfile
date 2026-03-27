@@ -31,52 +31,26 @@ RUN apk add --no-cache \
 # Install PHP extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) \
-    gd \
-    bcmath \
-    zip \
-    intl \
-    pdo_mysql \
-    pdo_pgsql \
-    mbstring \
-    exif \
-    pcntl \
-    opcache \
-    sockets
+    gd bcmath zip intl pdo_pgsql mbstring exif pcntl opcache sockets
 
-# Set working directory
 WORKDIR /var/www/html
 
-# Copy project files from host
+# Copiar todo el proyecto
 COPY . .
 
-# Copy vendors and assets from build stages
+# Copiar vendors y assets desde las etapas anteriores
 COPY --from=composer_build /app/vendor ./vendor
 COPY --from=node_build /app/public/build ./public/build
 
-# Copy configuration files
-COPY docker/nginx.conf /etc/nginx/nginx.conf
+# COPIAR CONFIGURACIONES (Asegúrate de que estos archivos existan en tu carpeta docker/)
+COPY docker/nginx.conf /etc/nginx/http.d/default.conf
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 
-# Create necessary directories and set permissions
-RUN mkdir -p storage/framework/sessions \
-    && mkdir -p storage/framework/views \
-    && mkdir -p storage/framework/cache \
-    && chmod +x /usr/local/bin/entrypoint.sh \
+# Permisos
+RUN chmod +x /usr/local/bin/entrypoint.sh \
     && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Expose port (Railway usually looks for this)
 EXPOSE 8080
 
-# Use optimized opcache settings for production
-RUN { \
-    echo 'opcache.memory_consumption=128'; \
-    echo 'opcache.interned_strings_buffer=8'; \
-    echo 'opcache.max_accelerated_files=4000'; \
-    echo 'opcache.revalidate_freq=2'; \
-    echo 'opcache.fast_shutdown=1'; \
-    echo 'opcache.enable_cli=1'; \
-    } > /usr/local/etc/php/conf.d/opcache-recommended.ini
-
-# Entrypoint
-ENTRYPOINT ["entrypoint.sh"]
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
