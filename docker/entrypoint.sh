@@ -13,8 +13,8 @@ php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
-# Run migrations
-php artisan migrate --force
+# Run migrations and seeders (safe since we made seeders idempotent)
+php artisan migrate --force --seed
 
 # Start Supervisor
 exec supervisord -c /etc/supervisor/conf.d/supervisord.conf

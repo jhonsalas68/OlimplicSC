@@ -33,10 +33,11 @@ class DatabaseSeeder extends Seeder
         $admin->assignRole('SuperAdmin');
 
         // Usuario de prueba adicional (opcional)
-        User::factory()->create([
+        User::firstOrCreate([
+            'email' => 'test@example.com',
+        ], [
             'name' => 'Test User',
             'username' => 'testuser',
-            'email' => 'test@example.com',
             'password' => Hash::make('1234567'),
         ]);
     }
