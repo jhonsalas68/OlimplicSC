@@ -2,13 +2,15 @@
 FROM composer:2 AS composer_build
 WORKDIR /app
 COPY composer.json composer.lock ./
-# Ejecutamos install antes para que la carpeta vendor esté disponible para Node
-RUN composer install --no-dev --optimize-autoloader --ignore-platform-reqs
+# Añadimos --no-scripts para evitar el error "Could not open input file: artisan"
+RUN composer install --no-dev --optimize-autoloader --no-scripts --ignore-platform-reqs
+COPY . .
+RUN composer dump-autoload --optimize --no-dev
 
 # Stage 2: Frontend assets
 FROM node:20-alpine AS node_build
 WORKDIR /app
-# Copiamos vendor desde la etapa anterior porque Vite/Tailwind lo necesitan para escanear clases
+# Copiamos vendor para que Vite/Tailwind escaneen las clases de los paquetes (como Filament)
 COPY --from=composer_build /app/vendor ./vendor
 COPY package.json package-lock.json ./
 RUN npm install
@@ -42,7 +44,7 @@ WORKDIR /var/www/html
 # Copiar el código del proyecto
 COPY . .
 
-# Copiar los resultados de las etapas de construcción
+# Copiar los resultados de las etapas anteriores
 COPY --from=composer_build /app/vendor ./vendor
 COPY --from=node_build /app/public/build ./public/build
 
