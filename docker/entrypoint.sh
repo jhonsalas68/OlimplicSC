@@ -6,8 +6,9 @@ php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
-# Migraciones
+# ESTO CREARÁ TU ADMIN AUTOMÁTICAMENTE
 php artisan migrate --force
+php artisan db:seed --force
 
-# Arrancar Supervisor (Esto lanza Nginx y PHP)
+# Arrancar el servidor
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
