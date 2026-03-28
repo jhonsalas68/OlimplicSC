@@ -5,7 +5,7 @@
         <div class="flex-shrink-0 h-24 w-24 relative">
             @if(isset($athlete) && $athlete->foto)
                 <img id="preview" class="h-24 w-24 rounded-full object-cover border-2 border-slate-100"
-                     src="{{ asset('storage/' . $athlete->foto) }}" alt="">
+                     src="{{ str_starts_with($athlete->foto, 'http') ? $athlete->foto : asset('storage/' . $athlete->foto) }}" alt="">
             @else
                 <div id="preview-placeholder" class="h-24 w-24 rounded-full bg-slate-100 flex items-center justify-center text-slate-300">
                     <svg class="h-12 w-12" fill="currentColor" viewBox="0 0 24 24">

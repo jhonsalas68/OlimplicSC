@@ -12,9 +12,6 @@ class TrainingController extends Controller
 {
     public function index(Request $request)
     {
-        if (auth()->user()->hasRole('Coach')) {
-            return redirect()->route('coach.planificaciones');
-        }
 
         $query = Training::with(['category', 'coach']);
 

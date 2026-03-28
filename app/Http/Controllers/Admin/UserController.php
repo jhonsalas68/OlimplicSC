@@ -42,6 +42,7 @@ class UserController extends Controller
             'is_active'       => 'boolean',
             'role'            => 'required|string|exists:roles,name|not_in:SuperAdmin',
             'category_id'     => 'nullable|exists:categories,id',
+            'avatar'          => 'nullable|image|max:2048',
         ]);
 
         $initials = collect([$validated['name'], $validated['apellido_paterno'], $validated['apellido_materno']])
@@ -65,6 +66,9 @@ class UserController extends Controller
             'password'         => Hash::make($validated['ci']),
             'is_active'        => $request->boolean('is_active', true),
             'category_id'      => $validated['category_id'] ?? null,
+            'avatar'           => $request->hasFile('avatar') 
+                ? $request->file('avatar')->storeOnCloudinary('avatars')->getSecurePath()
+                : null,
         ]);
 
         $user->syncRoles([$validated['role']]);
@@ -98,6 +102,7 @@ class UserController extends Controller
             'password'         => 'nullable|string|min:6|confirmed',
             'role'             => 'required|string|exists:roles,name|not_in:SuperAdmin',
             'category_id'      => 'nullable|exists:categories,id',
+            'avatar'           => 'nullable|image|max:2048',
         ]);
 
         $userData = [
@@ -109,6 +114,10 @@ class UserController extends Controller
             'is_active'        => $request->has('is_active'),
             'category_id'      => $validated['category_id'] ?? null,
         ];
+        
+        if ($request->hasFile('avatar')) {
+            $userData['avatar'] = $request->file('avatar')->storeOnCloudinary('avatars')->getSecurePath();
+        }
 
         if ($request->filled('password')) {
             $userData['password'] = Hash::make($validated['password']);

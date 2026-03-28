@@ -1,5 +1,21 @@
 @if(isset($user))
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+    <div class="md:col-span-2 flex items-center space-x-6 mb-4">
+        <div class="shrink-0">
+            <img class="h-16 w-16 object-cover rounded-full border-2 border-slate-100 shadow-sm" src="{{ $user->avatar_url }}" alt="Avatar">
+        </div>
+        <label class="block">
+            <span class="sr-only">Elegir avatar</span>
+            <input type="file" name="avatar" class="block w-full text-sm text-slate-500
+                file:mr-4 file:py-2 file:px-4
+                file:rounded-full file:border-0
+                file:text-sm file:font-semibold
+                file:bg-blue-50 file:text-blue-700
+                hover:file:bg-blue-100
+            "/>
+        </label>
+    </div>
+
     <x-admin.input label="Nombres" name="name" :value="$user->name ?? ''" required placeholder="Ej: Administrador" />
     <div class="grid grid-cols-2 gap-4">
         <x-admin.input label="Ape. Paterno" name="apellido_paterno" :value="$user->apellido_paterno ?? ''" required />
@@ -59,7 +75,25 @@
     </div>
 </div>
 @else
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+    <div class="md:col-span-2 flex items-center space-x-6 mb-4">
+        <div class="shrink-0">
+            <div class="h-16 w-16 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 border-2 border-dashed border-slate-200">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+            </div>
+        </div>
+        <label class="block">
+            <span class="sr-only">Elegir avatar</span>
+            <input type="file" name="avatar" class="block w-full text-sm text-slate-500
+                file:mr-4 file:py-2 file:px-4
+                file:rounded-full file:border-0
+                file:text-sm file:font-semibold
+                file:bg-blue-50 file:text-blue-700
+                hover:file:bg-blue-100
+            "/>
+        </label>
+    </div>
+
     <x-admin.input label="Nombres" name="name" :value="old('name')" required placeholder="Ej: Juan" />
     <div class="grid grid-cols-2 gap-4">
         <x-admin.input label="Ape. Paterno" name="apellido_paterno" :value="old('apellido_paterno')" required />

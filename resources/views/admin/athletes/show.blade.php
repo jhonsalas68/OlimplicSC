@@ -13,7 +13,7 @@
             Volver
         </a>
 
-        @if(auth()->user()->hasRole('Admin') || auth()->user()->hasRole('SuperAdmin') || auth()->user()->hasRole('Coach'))
+        @if(auth()->user()->hasRole('Admin') || auth()->user()->hasRole('SuperAdmin'))
         <button id="btn-toggle" onclick="toggleHabilitado({{ $athlete->id }})"
                 class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold border-2 transition-all
                        {{ $athlete->habilitado_booleano
@@ -25,6 +25,12 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
             </svg>
         </button>
+        @else
+        <div class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold border-2 
+                    {{ $athlete->habilitado_booleano ? 'bg-emerald-50 border-emerald-300 text-emerald-700' : 'bg-red-50 border-red-300 text-red-600' }}">
+            <span class="w-2.5 h-2.5 rounded-full {{ $athlete->habilitado_booleano ? 'bg-emerald-500' : 'bg-red-500' }}"></span>
+            <span>{{ $athlete->habilitado_booleano ? 'Habilitado' : 'Inhabilitado' }}</span>
+        </div>
         @endif
     </div>
 
@@ -41,7 +47,8 @@
             <div class="flex flex-col sm:flex-row sm:items-end gap-5">
                 <div class="-mt-12 w-24 h-24 rounded-2xl border-4 border-white shadow-md overflow-hidden bg-slate-50 flex-shrink-0 relative">
                     @if($athlete->foto)
-                        <img src="{{ asset('storage/' . $athlete->foto) }}" class="w-full h-full object-cover">
+                        <img src="{{ str_starts_with($athlete->foto, 'http') ? $athlete->foto : asset('storage/' . $athlete->foto) }}" 
+                             class="w-full h-full object-cover">
                     @else
                         <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#0b2d69] to-[#c61c2c] text-white font-black text-3xl">
                             {{ strtoupper(substr($athlete->nombre,0,1).substr($athlete->apellido_paterno??'',0,1)) }}
@@ -53,11 +60,6 @@
                         {{ $athlete->nombre }} {{ $athlete->apellido_paterno }} {{ $athlete->apellido_materno }}
                     </h1>
                     <div class="flex items-center gap-2 flex-wrap">
-                        @if($athlete->id_alfanumerico_unico)
-                            <span class="text-xs font-bold font-mono text-[#0b2d69] bg-blue-50 px-2.5 py-1 rounded-md border border-blue-100 shadow-sm">
-                                {{ $athlete->id_alfanumerico_unico }}
-                            </span>
-                        @endif
                         <span class="text-xs font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-md shadow-sm border border-slate-200 cursor-default">
                             {{ $athlete->category->nombre ?? 'Sin categoría' }}
                         </span>
@@ -68,10 +70,6 @@
 
         {{-- Datos --}}
         <div class="px-6 pb-6 grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-4 border-t border-slate-100 pt-5">
-            <div>
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Código de Atleta</p>
-                <p class="text-sm font-semibold text-[#0b2d69] font-mono bg-blue-50 px-2 py-0.5 rounded border border-blue-100 inline-block">{{ $athlete->id_alfanumerico_unico ?? '—' }}</p>
-            </div>
             <div>
                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">C.I.</p>
                 <p class="text-sm font-semibold text-slate-800">{{ $athlete->ci }}</p>
@@ -171,6 +169,7 @@
 
 </div>
 
+@if(auth()->user()->hasRole('Admin') || auth()->user()->hasRole('SuperAdmin'))
 <script>
 function toggleHabilitado(id) {
     fetch(`/admin/athletes/${id}/toggle-habilitado`, {
@@ -196,4 +195,5 @@ function toggleHabilitado(id) {
     });
 }
 </script>
+@endif
 @endsection

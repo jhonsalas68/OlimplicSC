@@ -1,4 +1,4 @@
-﻿@extends('layouts.admin')
+@extends('layouts.admin')
 
 @section('title', 'Panel del Coach')
 
@@ -82,7 +82,7 @@
             <div class="flex items-center gap-3 py-2.5 border-b border-slate-50 last:border-0">
                 <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-red-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0 overflow-hidden">
                     @if($atleta->foto)
-                        <img src="{{ Storage::url($atleta->foto) }}" class="w-full h-full object-cover">
+                        <img src="{{ str_starts_with($atleta->foto, 'http') ? $atleta->foto : asset('storage/' . $atleta->foto) }}" class="w-full h-full object-cover">
                     @else
                         {{ strtoupper(substr($atleta->nombre,0,1).substr($atleta->apellido_paterno??'',0,1)) }}
                     @endif
@@ -93,9 +93,6 @@
                     </p>
                     <p class="text-xs text-slate-400">CI: {{ $atleta->ci }}</p>
                 </div>
-                <span class="text-xs font-mono text-blue-600 bg-blue-50 px-2 py-0.5 rounded flex-shrink-0">
-                    {{ $atleta->id_alfanumerico_unico ?? '' }}
-                </span>
             </div>
         @empty
             <p class="text-sm text-slate-400 text-center py-6">No hay atletas en esta categoria.</p>

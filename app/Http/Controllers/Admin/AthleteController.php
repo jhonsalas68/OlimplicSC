@@ -10,12 +10,25 @@ use Illuminate\Support\Facades\Storage;
 use App\Exports\AthleteExport;
 use App\Imports\AthleteImport;
 use Maatwebsite\Excel\Facades\Excel;
+use Barryvdh\DomPDF\Facade\Pdf;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class AthleteController extends Controller
 {
     public function export()
     {
         return Excel::download(new AthleteExport, 'atletas_olimpicsc_' . date('Y-m-d') . '.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+    }
+
+    public function exportSelected(Request $request)
+    {
+        $ids = json_decode($request->ids, true);
+        if (!$ids) return back()->with('error', 'No se seleccionaron atletas.');
+
+        $athletes = Athlete::whereIn('id', $ids)->with('category')->get();
+        
+        $pdf = Pdf::loadView('admin.athletes.export_pdf', compact('athletes'));
+        return $pdf->download('convocados_' . date('Ymd_His') . '.pdf');
     }
 
     public function import(Request $request)
@@ -84,16 +97,29 @@ class AthleteController extends Controller
             'contacto_relacion'       => 'nullable|string|max:50',
         ]);
 
-        if ($request->hasFile('foto')) {
-            $validated['foto'] = $request->file('foto')->store('athletes/fotos', 'public');
+        try {
+            if ($request->hasFile('foto')) {
+                \Illuminate\Support\Facades\Log::info('Subiendo foto a Cloudinary...');
+                $response = Cloudinary::uploadApi()->upload($request->file('foto')->getRealPath(), [
+                    'folder' => 'athletes'
+                ]);
+                $validated['foto'] = $response['secure_url'];
+                \Illuminate\Support\Facades\Log::info('Foto subida: ' . $validated['foto']);
+            }
+
+            $validated['habilitado_booleano'] = $request->has('habilitado_booleano');
+            $validated['tiene_seguro']        = $request->has('tiene_seguro');
+
+            \Illuminate\Support\Facades\Log::info('Creando atleta en BD...', $validated);
+            $athlete = Athlete::create($validated);
+            \Illuminate\Support\Facades\Log::info('Atleta creado ID: ' . $athlete->id);
+
+            return redirect()->route('athletes.index')->with('success', 'Atleta registrado correctamente.');
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error en AthleteController@store: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::error($e->getTraceAsString());
+            return back()->withInput()->with('error', 'Error al registrar: ' . $e->getMessage());
         }
-
-        $validated['habilitado_booleano'] = $request->has('habilitado_booleano');
-        $validated['tiene_seguro']        = $request->has('tiene_seguro');
-
-        $athlete = Athlete::create($validated);
-
-        return redirect()->route('athletes.index')->with('success', 'Atleta registrado correctamente.');
     }
 
     public function show(Athlete $athlete)
@@ -136,17 +162,26 @@ class AthleteController extends Controller
             'contacto_relacion'       => 'nullable|string|max:50',
         ]);
 
-        if ($request->hasFile('foto')) {
-            if ($athlete->foto) Storage::disk('public')->delete($athlete->foto);
-            $validated['foto'] = $request->file('foto')->store('athletes/fotos', 'public');
+        try {
+            if ($request->hasFile('foto')) {
+                // No eliminamos aquí explícitamente de Cloudinary por ahora para evitar errores, 
+                // pero guardamos el nuevo link seguro.
+                $response = Cloudinary::uploadApi()->upload($request->file('foto')->getRealPath(), [
+                    'folder' => 'athletes'
+                ]);
+                $validated['foto'] = $response['secure_url'];
+            }
+
+            $validated['habilitado_booleano'] = $request->has('habilitado_booleano');
+            $validated['tiene_seguro']        = $request->has('tiene_seguro');
+
+            $athlete->update($validated);
+
+            return redirect()->route('athletes.index')->with('success', 'Atleta actualizado correctamente.');
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error en AthleteController@update: ' . $e->getMessage());
+            return back()->withInput()->with('error', 'Error al actualizar: ' . $e->getMessage());
         }
-
-        $validated['habilitado_booleano'] = $request->has('habilitado_booleano');
-        $validated['tiene_seguro']        = $request->has('tiene_seguro');
-
-        $athlete->update($validated);
-
-        return redirect()->route('athletes.index')->with('success', 'Atleta actualizado correctamente.');
     }
 
     public function destroy(Athlete $athlete)
@@ -160,6 +195,9 @@ class AthleteController extends Controller
 
     public function toggleHabilitado(Athlete $athlete)
     {
+        if (auth()->user()->hasRole('Coach')) {
+            return response()->json(['error' => 'No autorizado'], 403);
+        }
         $athlete->update(['habilitado_booleano' => !$athlete->habilitado_booleano]);
         return response()->json(['habilitado' => $athlete->habilitado_booleano]);
     }

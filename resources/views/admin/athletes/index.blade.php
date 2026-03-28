@@ -3,9 +3,9 @@
 @section('title', 'Atletas Olímpicos')
 
 @section('content')
-<div class="flex items-center justify-between mb-8">
-    <div class="flex items-center space-x-4">
-        <form action="{{ route('athletes.index') }}" method="GET" class="relative group">
+<div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-8">
+    <div class="flex items-center space-x-4 w-full lg:w-auto">
+        <form action="{{ route('athletes.index') }}" method="GET" class="relative group w-full">
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <svg class="h-5 w-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -17,24 +17,32 @@
         </form>
     </div>
 
-    <div class="flex items-center space-x-3">
+    <div class="flex flex-wrap items-center gap-3">
         <!-- Export Button -->
-        <a href="{{ route('athletes.export') }}" class="inline-flex items-center px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded-xl transition-colors shadow-sm border border-slate-200">
+        <a href="{{ route('athletes.export') }}" class="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded-xl transition-colors shadow-sm border border-slate-200">
             <svg class="w-4 h-4 mr-2 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
             Exportar
         </a>
+ 
+        <!-- Convocados Button (Selective Export) -->
+        <button id="btn-convocados" onclick="exportSelected()" class="hidden flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl transition-colors shadow-sm border border-blue-700">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+            Convocados (<span id="selected-count">0</span>)
+        </button>
 
         <!-- Import Button (Triggers Modal) -->
-        <button onclick="document.getElementById('importModal').classList.remove('hidden')" class="inline-flex items-center px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded-xl transition-colors shadow-sm border border-slate-200">
+        <button onclick="document.getElementById('importModal').classList.remove('hidden')" class="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded-xl transition-colors shadow-sm border border-slate-200">
             <svg class="w-4 h-4 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
             </svg>
             Importar
         </button>
 
-        <x-admin.button onclick="window.location.href='{{ route('athletes.create') }}'">
+        <x-admin.button onclick="window.location.href='{{ route('athletes.create') }}'" class="w-full sm:w-auto justify-center">
             <svg class="mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
             </svg>
@@ -98,8 +106,10 @@
 
 <x-admin.table>
     <x-slot name="header">
+        <th class="px-6 py-3 text-left">
+            <input type="checkbox" id="select-all" class="h-4 w-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500">
+        </th>
         <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Atleta</th>
-        <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Código</th>
         <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">C.I.</th>
         <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Categoría</th>
         <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Género</th>
@@ -110,10 +120,14 @@
     @forelse($athletes as $athlete)
         <tr class="hover:bg-slate-50/50 transition-colors">
             <td class="px-6 py-4 whitespace-nowrap">
+                <input type="checkbox" name="selected_athletes[]" value="{{ $athlete->id }}" class="athlete-checkbox h-4 w-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500">
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
                 <div class="flex items-center">
                     <div class="h-10 w-10 flex-shrink-0">
                         @if($athlete->foto)
-                            <img class="h-10 w-10 rounded-full object-cover shadow-sm border border-slate-100" src="{{ asset('storage/' . $athlete->foto) }}" alt="">
+                            <img class="h-10 w-10 rounded-full object-cover shadow-sm border border-slate-100" 
+                                 src="{{ str_starts_with($athlete->foto, 'http') ? $athlete->foto : asset('storage/' . $athlete->foto) }}" alt="">
                         @else
                             <div class="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold border border-blue-100">
                                 {{ substr($athlete->nombre, 0, 1) }}
@@ -125,9 +139,6 @@
                         <div class="text-xs text-slate-500">{{ $athlete->fecha_nacimiento?->format('d/m/Y') ?? 'Sin fecha' }}</div>
                     </div>
                 </div>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-bold text-[#0b2d69]">
-                {{ $athlete->id_alfanumerico_unico ?? '—' }}
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 font-medium">
                 {{ $athlete->ci }}
@@ -141,6 +152,7 @@
                 {{ $athlete->genero ?? '-' }}
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
+                @if(auth()->user()->hasRole('Admin') || auth()->user()->hasRole('SuperAdmin'))
                 <button onclick="toggleHabilitado({{ $athlete->id }}, this)"
                         data-habilitado="{{ $athlete->habilitado_booleano ? '1' : '0' }}"
                         class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all
@@ -150,6 +162,13 @@
                     <span class="w-1.5 h-1.5 rounded-full {{ $athlete->habilitado_booleano ? 'bg-emerald-500' : 'bg-red-500' }}"></span>
                     {{ $athlete->habilitado_booleano ? 'Habilitado' : 'Inhabilitado' }}
                 </button>
+                @else
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold
+                             {{ $athlete->habilitado_booleano ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-600' }}">
+                    <span class="w-1.5 h-1.5 rounded-full {{ $athlete->habilitado_booleano ? 'bg-emerald-500' : 'bg-red-500' }}"></span>
+                    {{ $athlete->habilitado_booleano ? 'Habilitado' : 'Inhabilitado' }}
+                </span>
+                @endif
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <div class="flex items-center justify-end space-x-3">
@@ -194,6 +213,49 @@
 </x-admin.table>
 
 <script>
+document.getElementById('select-all').addEventListener('change', function() {
+    const checked = this.checked;
+    document.querySelectorAll('.athlete-checkbox').forEach(cb => {
+        cb.checked = checked;
+    });
+    updateSelectedCount();
+});
+
+document.querySelectorAll('.athlete-checkbox').forEach(cb => {
+    cb.addEventListener('change', updateSelectedCount);
+});
+
+function updateSelectedCount() {
+    const selected = document.querySelectorAll('.athlete-checkbox:checked').length;
+    document.getElementById('selected-count').textContent = selected;
+    document.getElementById('btn-convocados').classList.toggle('hidden', selected === 0);
+}
+
+function exportSelected() {
+    const ids = Array.from(document.querySelectorAll('.athlete-checkbox:checked')).map(cb => cb.value);
+    if (ids.length === 0) return;
+    
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = "{{ route('athletes.export.selected') }}";
+    
+    const csrf = document.createElement('input');
+    csrf.type = 'hidden';
+    csrf.name = '_token';
+    csrf.value = "{{ csrf_token() }}";
+    form.appendChild(csrf);
+    
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'ids';
+    input.value = JSON.stringify(ids);
+    form.appendChild(input);
+    
+    document.body.appendChild(form);
+    form.submit();
+}
+
+@if(auth()->user()->hasRole('Admin') || auth()->user()->hasRole('SuperAdmin'))
 function toggleHabilitado(id, btn) {
     fetch(`/admin/athletes/${id}/toggle-habilitado`, {
         method: 'POST',
@@ -214,5 +276,6 @@ function toggleHabilitado(id, btn) {
                          ${habilitado ? 'Habilitado' : 'Inhabilitado'}`;
     });
 }
+@endif
 </script>
 @endsection

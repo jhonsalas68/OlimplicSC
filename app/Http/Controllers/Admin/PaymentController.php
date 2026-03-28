@@ -19,11 +19,13 @@ class PaymentController extends Controller
         // Filtro por mes (default: mes actual)
         $mes = $request->get('mes', now()->format('Y-m'));
         if ($mes) {
-            $query->where('mes_correspondiente', 'ilike', $mes . '%')
+            $query->where(function($q) use ($mes) {
+                $q->where('mes_correspondiente', 'ilike', $mes . '%')
                   ->orWhereBetween('created_at', [
                       \Carbon\Carbon::createFromFormat('Y-m', $mes)->startOfMonth(),
                       \Carbon\Carbon::createFromFormat('Y-m', $mes)->endOfMonth(),
                   ]);
+            });
         }
 
         if ($request->filled('search')) {

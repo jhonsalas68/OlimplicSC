@@ -31,6 +31,7 @@ class User extends Authenticatable
         'is_active',
         'ci',
         'category_id',
+        'avatar',
     ];
 
     /**
@@ -59,5 +60,13 @@ class User extends Authenticatable
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    /**
+     * Get the user's avatar URL or a default placeholder.
+     */
+    public function getAvatarUrlAttribute(): string
+    {
+        return $this->avatar ?: 'https://via.placeholder.com/150';
     }
 }

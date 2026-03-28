@@ -305,6 +305,10 @@
                         <label>Categoria</label>
                         <span>{{ $payment->athlete->category->nombre ?? '—' }}</span>
                     </div>
+                    <div class="info-item">
+                        <label>Concepto</label>
+                        <span class="text-blue-700">{{ $payment->concepto === 'mensualidad' ? 'Mensualidad' : 'Articulo Deportivo' }}</span>
+                    </div>
                 </div>
             </div>
 

@@ -1,14 +1,14 @@
-﻿@extends('layouts.admin')
+@extends('layouts.admin')
 
 @section('title', 'Cobros')
 
 @section('content')
-<div class="flex items-center justify-between mb-6">
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
     <div>
-        <h1 class="text-2xl font-bold text-slate-800">Panel de Cobros</h1>
-        <p class="text-sm text-slate-500 mt-0.5">Registra pagos de mensualidades y articulos deportivos</p>
+        <h1 class="text-xl sm:text-2xl font-bold text-slate-800">Panel de Cobros</h1>
+        <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Registra pagos de mensualidades y articulos deportivos</p>
     </div>
-    <a href="{{ route('payments.index') }}" class="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1">
+    <a href="{{ route('payments.index') }}" class="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1 font-medium">
         Ver historial de pagos
     </a>
 </div>

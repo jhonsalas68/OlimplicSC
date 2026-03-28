@@ -1,4 +1,4 @@
-﻿@extends('layouts.admin')
+@extends('layouts.admin')
 
 @section('title', 'Atletas de mi Categoria')
 
@@ -32,7 +32,7 @@
             {{-- Avatar --}}
             <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-600 to-red-600 flex items-center justify-center text-white font-bold text-lg flex-shrink-0 overflow-hidden">
                 @if($atleta->foto)
-                    <img src="{{ Storage::url($atleta->foto) }}" class="w-full h-full object-cover">
+                    <img src="{{ str_starts_with($atleta->foto, 'http') ? $atleta->foto : asset('storage/' . $atleta->foto) }}" class="w-full h-full object-cover">
                 @else
                     {{ strtoupper(substr($atleta->nombre,0,1).substr($atleta->apellido_paterno??'',0,1)) }}
                 @endif
@@ -53,11 +53,6 @@
 
                 <p class="text-xs text-slate-500 mt-1">CI: {{ $atleta->ci }}</p>
 
-                @if($atleta->id_alfanumerico_unico)
-                    <span class="inline-block mt-1 text-xs font-mono text-blue-600 bg-blue-50 px-2 py-0.5 rounded">
-                        {{ $atleta->id_alfanumerico_unico }}
-                    </span>
-                @endif
 
                 <div class="mt-1.5 flex flex-wrap gap-2">
                     @if($atleta->fecha_nacimiento)

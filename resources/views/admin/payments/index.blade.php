@@ -19,10 +19,10 @@
 {{-- FILTROS --}}
 <form action="{{ route('payments.index') }}" method="GET" id="filtros-form">
 <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 mb-5">
-    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 items-end">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 items-end">
 
         {{-- Búsqueda --}}
-        <div class="col-span-2">
+        <div class="lg:col-span-2">
             <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Atleta / CI</label>
             <div class="relative">
                 <svg class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -35,14 +35,14 @@
         </div>
 
         {{-- Mes --}}
-        <div>
+        <div class="sm:col-span-1">
             <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Mes</label>
             <input type="month" name="mes" value="{{ request('mes', now()->format('Y-m')) }}"
                    class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
         </div>
 
         {{-- Método de pago --}}
-        <div>
+        <div class="sm:col-span-1">
             <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Método</label>
             <select name="metodo" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <option value="">Todos</option>
@@ -53,7 +53,7 @@
         </div>
 
         {{-- Concepto --}}
-        <div>
+        <div class="sm:col-span-1">
             <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Concepto</label>
             <select name="concepto" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <option value="">Todos</option>
@@ -63,7 +63,7 @@
         </div>
 
         {{-- Botones --}}
-        <div class="flex gap-2">
+        <div class="flex gap-2 sm:col-span-1 lg:col-span-1">
             <button type="submit"
                     class="flex-1 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl transition-colors">
                 Filtrar

@@ -30,8 +30,13 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout')->midd
 Route::middleware(['auth', 'prevent-back-history'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
     
+    // Profile Management
+    Route::get('/profile', [\App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
+
     // Module Atletas
     Route::get('/athletes/export', [\App\Http\Controllers\Admin\AthleteController::class, 'export'])->name('athletes.export');
+    Route::post('/athletes/export/selected', [\App\Http\Controllers\Admin\AthleteController::class, 'exportSelected'])->name('athletes.export.selected');
     Route::post('/athletes/import', [\App\Http\Controllers\Admin\AthleteController::class, 'import'])->name('athletes.import');
     Route::post('/athletes/{athlete}/toggle-habilitado', [\App\Http\Controllers\Admin\AthleteController::class, 'toggleHabilitado'])->name('athletes.toggle-habilitado');
     Route::resource('athletes', \App\Http\Controllers\Admin\AthleteController::class);
@@ -53,6 +58,9 @@ Route::middleware(['auth', 'prevent-back-history'])->prefix('admin')->group(func
 
     // Module Planificaciones (Trainings)
     Route::resource('trainings', \App\Http\Controllers\Admin\TrainingController::class);
+
+    // Module Reportes
+    Route::get('/reports', [\App\Http\Controllers\Admin\ReportController::class, 'index'])->name('admin.reports.index');
 
     // Module Cobros (panel de venta independiente)
     Route::get('/cobros', [\App\Http\Controllers\Admin\CobrosController::class, 'index'])->name('cobros.index');

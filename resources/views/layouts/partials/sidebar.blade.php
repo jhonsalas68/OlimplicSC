@@ -1,4 +1,14 @@
-<aside class="sidebar-gradient flex-shrink-0 flex flex-col transition-all duration-300 overflow-hidden group/sidebar w-16 hover:w-64 hover:shadow-2xl absolute md:relative z-50 h-full bg-[#0b2d69]">
+<aside 
+    class="sidebar-gradient flex-shrink-0 flex flex-col transition-all duration-300 overflow-hidden group/sidebar absolute md:relative z-50 h-full bg-[#0b2d69] shadow-2xl"
+    :class="{ 
+        'w-64 left-0': sidebarOpen, 
+        '-left-64 md:left-0 w-16 md:hover:w-64': !sidebarOpen 
+    }"
+    @click.away="sidebarOpen = false"
+>
+    <!-- Overlay for mobile when sidebar is open -->
+    <div x-show="sidebarOpen" x-transition.opacity class="fixed inset-0 bg-slate-900/50 z-[-1] md:hidden" @click="sidebarOpen = false"></div>
+
     {{-- Header del logo --}}
     <div class="h-20 flex-shrink-0 bg-white shadow-sm border-b border-gray-100 relative transition-all duration-300">
         {{-- Contenedor interior fijo. El aside (overflow-hidden) recorta esto a 64px o lo muestra a 256px --}}
@@ -104,6 +114,15 @@
                     </svg>
                     <span class="ml-4 whitespace-nowrap opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-300">Planificaciones</span>
                 </a>
+
+                <a href="{{ route('admin.reports.index') }}"
+                   class="flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-colors {{ request()->routeIs('admin.reports.index') ? 'bg-white/10 text-white' : 'text-blue-100 hover:bg-white/10 hover:text-white' }}">
+                    <svg class="flex-shrink-0 h-5 w-5 {{ request()->routeIs('admin.reports.index') ? 'text-white' : 'text-blue-200' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <title>Reportes</title>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <span class="ml-4 whitespace-nowrap opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-300">Reportes</span>
+                </a>
             </div>
 
             @if(auth()->user()->hasRole('SuperAdmin'))
@@ -127,7 +146,7 @@
     <div class="flex-shrink-0 flex bg-black/20 p-3 pr-2 overflow-hidden transition-all duration-300 h-[72px]">
         <div class="flex items-center w-full">
             <img class="flex-shrink-0 h-10 w-10 rounded-full border-2 border-white/20 object-cover"
-                 src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name ?? 'User') }}&color=0b2d69&background=EBF4FF" alt="">
+                 src="{{ auth()->user()->avatar_url }}" alt="Avatar">
             <div class="ml-3 min-w-0 opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-300 flex-1">
                 <p class="text-xs font-bold text-white truncate">{{ auth()->user()->name ?? 'Usuario' }}</p>
                 <form method="POST" action="{{ route('logout') }}" class="mt-0.5">

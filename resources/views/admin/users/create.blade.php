@@ -5,7 +5,7 @@
 @section('content')
 <div class="max-w-4xl mx-auto">
     <div class="bg-white shadow-sm border border-slate-100 rounded-2xl overflow-hidden p-8">
-        <form action="{{ route('users.store') }}" method="POST" class="space-y-8">
+        <form action="{{ route('users.store') }}" method="POST" class="space-y-8" enctype="multipart/form-data">
             @csrf
             @include('admin.users.form')
 
