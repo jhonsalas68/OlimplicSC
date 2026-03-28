@@ -359,7 +359,11 @@
                 $cobradorIniciales = strtoupper(substr($cobradorNombre, 0, 1));
             @endphp
             <div class="cobrador-row">
-                <div class="cobrador-avatar">{{ $cobradorIniciales }}</div>
+                @if($payment->cobrador && $payment->cobrador->avatar)
+                    <img src="{{ $payment->cobrador->avatar_url }}" class="cobrador-avatar object-cover" alt="Avatar">
+                @else
+                    <div class="cobrador-avatar">{{ $cobradorIniciales }}</div>
+                @endif
                 <div class="cobrador-info">
                     <label>Cobrado por</label>
                     <span>{{ $cobradorNombre }}</span>

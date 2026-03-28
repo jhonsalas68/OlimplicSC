@@ -194,8 +194,9 @@ buscador.addEventListener('input',function(){
                 data.forEach(atleta=>{
                     const div=document.createElement('div');
                     div.className='atleta-item flex items-center gap-3 p-3 border border-slate-100 rounded-xl cursor-pointer';
-                    const fotoHtml=atleta.foto
-                        ?`<img src="/storage/${atleta.foto}" class="w-10 h-10 rounded-full object-cover flex-shrink-0">`
+                    const avatarSrc = atleta.foto ? (atleta.foto.startsWith('http') ? atleta.foto : '/storage/' + atleta.foto) : null;
+                    const fotoHtml=avatarSrc
+                        ?`<img src="${avatarSrc}" class="w-10 h-10 rounded-full object-cover flex-shrink-0">`
                         :`<div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-red-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">${atleta.iniciales}</div>`;
                     div.innerHTML=`${fotoHtml}<div class="flex-1 min-w-0"><p class="text-sm font-semibold text-slate-800 truncate">${atleta.nombre_completo}</p><p class="text-xs text-slate-500">CI: ${atleta.ci} &middot; ${atleta.categoria}</p></div><span class="text-xs font-mono text-blue-600 bg-blue-50 px-2 py-0.5 rounded flex-shrink-0">${atleta.codigo??''}</span>`;
                     div.addEventListener('click',()=>seleccionarAtleta(atleta,div));
@@ -211,7 +212,8 @@ function seleccionarAtleta(atleta,el){
     el.classList.add('selected');
     document.getElementById('athlete_id').value=atleta.id;
     const avatarEl=document.getElementById('atleta-avatar');
-    avatarEl.innerHTML=atleta.foto?`<img src="/storage/${atleta.foto}" class="w-full h-full object-cover">`:atleta.iniciales;
+    const avatarSrc = atleta.foto ? (atleta.foto.startsWith('http') ? atleta.foto : '/storage/' + atleta.foto) : null;
+    avatarEl.innerHTML=avatarSrc?`<img src="${avatarSrc}" class="w-full h-full object-cover">`:atleta.iniciales;
     document.getElementById('atleta-nombre').textContent=atleta.nombre_completo;
     document.getElementById('atleta-meta').textContent=`CI: ${atleta.ci} · ${atleta.categoria}`;
     document.getElementById('atleta-codigo').textContent=atleta.codigo??'';

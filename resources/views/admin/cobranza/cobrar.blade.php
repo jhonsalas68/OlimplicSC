@@ -16,10 +16,8 @@
     {{-- ── TARJETA DEL ATLETA ── --}}
     <div class="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden">
         <div class="bg-gradient-to-r from-blue-900 via-blue-800 to-red-700 px-6 py-5 flex items-center gap-4">
-            @if($athlete->foto)
-                <img src="{{ asset('storage/' . $athlete->foto) }}"
-                     class="h-16 w-16 rounded-full object-cover border-2 border-white/30 shadow-md flex-shrink-0" alt="">
-            @else
+                <img src="{{ str_starts_with($athlete->foto, 'http') ? $athlete->foto : asset('storage/' . $athlete->foto) }}"
+                     class="h-16 w-16 rounded-full object-cover border-2 border-white/30 shadow-md flex-shrink-0" alt="Foto">
                 <div class="h-16 w-16 rounded-full bg-white/20 border-2 border-white/30 flex items-center justify-center text-white font-black text-2xl flex-shrink-0">
                     {{ strtoupper(substr($athlete->nombre, 0, 1)) }}
                 </div>

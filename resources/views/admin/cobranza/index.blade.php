@@ -127,7 +127,7 @@ function renderResultados(atletas) {
             <div class="h-10 w-10 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-white text-sm
                         ${a.foto ? '' : 'bg-gradient-to-br from-blue-700 to-red-600'}">
                 ${a.foto
-                    ? `<img src="/storage/${a.foto}" class="h-10 w-10 rounded-full object-cover">`
+                    ? `<img src="${a.foto.startsWith('http') ? a.foto : '/storage/' + a.foto}" class="h-10 w-10 rounded-full object-cover">`
                     : a.iniciales}
             </div>
             <div class="flex-1 min-w-0">
