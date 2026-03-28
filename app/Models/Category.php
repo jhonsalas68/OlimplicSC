@@ -23,10 +23,20 @@ class Category extends Model
      */
     public static function resolverPorEdad(int $edad): self
     {
-        return static::where('edad_min', '<=', $edad)
+        // Limitar la edad para evitar errores con fechas futuras o muy antiguas
+        if ($edad < 0) $edad = 0;
+        
+        $categoria = static::where('edad_min', '<=', $edad)
             ->where('edad_max', '>=', $edad)
             ->orderBy('edad_min')
-            ->firstOrFail();
+            ->first();
+
+        if (!$categoria) {
+            // Si por alguna razón extrema no la encuentra, asignar la de mayor rango (Libre)
+            $categoria = static::orderBy('edad_max', 'desc')->firstOrFail();
+        }
+
+        return $categoria;
     }
 
     public function athletes(): HasMany
