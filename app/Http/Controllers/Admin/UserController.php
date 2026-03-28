@@ -56,6 +56,14 @@ class UserController extends Controller
             $username = $initials . $counter++;
         }
 
+        $avatarUrl = null;
+        if ($request->hasFile('avatar')) {
+            $response = \CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary::uploadApi()->upload($request->file('avatar')->getRealPath(), [
+                'folder' => 'avatars'
+            ]);
+            $avatarUrl = $response['secure_url'];
+        }
+
         $user = User::create([
             'name'             => $validated['name'],
             'apellido_paterno' => $validated['apellido_paterno'],
@@ -66,9 +74,7 @@ class UserController extends Controller
             'password'         => Hash::make($validated['ci']),
             'is_active'        => $request->boolean('is_active', true),
             'category_id'      => $validated['category_id'] ?? null,
-            'avatar'           => $request->hasFile('avatar') 
-                ? $request->file('avatar')->storeOnCloudinary('avatars')->getSecurePath()
-                : null,
+            'avatar'           => $avatarUrl,
         ]);
 
         $user->syncRoles([$validated['role']]);
@@ -116,7 +122,10 @@ class UserController extends Controller
         ];
         
         if ($request->hasFile('avatar')) {
-            $userData['avatar'] = $request->file('avatar')->storeOnCloudinary('avatars')->getSecurePath();
+            $response = \CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary::uploadApi()->upload($request->file('avatar')->getRealPath(), [
+                'folder' => 'avatars'
+            ]);
+            $userData['avatar'] = $response['secure_url'];
         }
 
         if ($request->filled('password')) {
