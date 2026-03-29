@@ -48,10 +48,10 @@ class TrainingController extends Controller
         ];
 
         if ($request->hasFile('pdf')) {
-            // [NUEVO GATILLO GIT] Forzamos auto para que Cloudinary no bloquee los PDF
+            // [NUEVO GATILLO GIT] Forzamos raw para que Cloudinary NO lo convierta en PNG
             $response = \CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary::uploadApi()->upload($request->file('pdf')->getRealPath(), [
                 'folder' => 'trainings',
-                'resource_type' => 'auto' // Esto detecta que es PDF y no una foto
+                'resource_type' => 'raw'
             ]);
             $data['file_path_pdf'] = $response['secure_url'];
         }
@@ -85,9 +85,10 @@ class TrainingController extends Controller
             if ($training->file_path_pdf) {
                 $this->deleteFromCloudinary($training->file_path_pdf);
             }
+            // [NUEVO GATILLO GIT] Forzamos raw para que Cloudinary NO lo convierta en PNG
             $response = \CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary::uploadApi()->upload($request->file('pdf')->getRealPath(), [
                 'folder' => 'trainings',
-                'resource_type' => 'auto'
+                'resource_type' => 'raw'
             ]);
             $data['file_path_pdf'] = $response['secure_url'];
         }
