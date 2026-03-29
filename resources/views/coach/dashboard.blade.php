@@ -61,7 +61,7 @@
                     <p class="text-xs text-slate-400">{{ $plan->fecha ? $plan->fecha->format('d/m/Y') : '—' }}</p>
                 </div>
                 @if($plan->file_path_pdf)
-                    <a href="{{ Storage::url($plan->file_path_pdf) }}" target="_blank"
+                    <a href="{{ str_starts_with($plan->file_path_pdf, 'http') ? $plan->file_path_pdf : asset('storage/' . $plan->file_path_pdf) }}" target="_blank" rel="noopener noreferrer"
                        class="text-xs text-blue-600 hover:text-blue-800 flex-shrink-0">Ver PDF</a>
                 @endif
             </div>
