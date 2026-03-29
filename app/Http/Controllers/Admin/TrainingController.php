@@ -48,10 +48,10 @@ class TrainingController extends Controller
         ];
 
         if ($request->hasFile('pdf')) {
-            // Generamos un ID con extension .pdf explicita para que Cloudinary no se confunda
-            $publicId = 'plan_' . uniqid() . '.pdf';
+            // Dejamos que Cloudinary auto inyecte el .pdf final para evitar el .pdf.pdf
+            $publicId = 'plan_' . uniqid();
             
-            // [NUEVO GATILLO GIT] Usamos auto + extension explicita para evadir el bloqueo de Frames de Chrome
+            // [NUEVO GATILLO GIT] Usamos auto + extension automatica para evadir el bloqueo de Frames de Chrome
             $response = \CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary::uploadApi()->upload($request->file('pdf')->getRealPath(), [
                 'folder' => 'trainings',
                 'resource_type' => 'auto',
@@ -90,9 +90,9 @@ class TrainingController extends Controller
                 $this->deleteFromCloudinary($training->file_path_pdf);
             }
             
-            $publicId = 'plan_' . uniqid() . '.pdf';
+            $publicId = 'plan_' . uniqid();
             
-            // [NUEVO GATILLO GIT] Usamos auto + extension explicita para evadir el bloqueo de Frames de Chrome
+            // [NUEVO GATILLO GIT] Usamos auto + extension automatica para evadir el bloqueo de Frames de Chrome
             $response = \CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary::uploadApi()->upload($request->file('pdf')->getRealPath(), [
                 'folder' => 'trainings',
                 'resource_type' => 'auto',
