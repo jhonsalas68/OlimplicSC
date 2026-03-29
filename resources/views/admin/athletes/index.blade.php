@@ -1,11 +1,27 @@
 @extends('layouts.admin')
 
-@section('title', 'Atletas Olímpicos')
+@section('title', isset($selectedCategory) ? 'Atletas: ' . $selectedCategory->nombre : 'Atletas Olímpicos')
 
 @section('content')
+@if(isset($selectedCategory))
+<div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+    <div>
+        <h1 class="text-2xl font-black text-slate-800 tracking-tight">{{ $selectedCategory->nombre }}</h1>
+        <p class="text-sm font-medium text-slate-500 mt-1">Edades permitidas: {{ $selectedCategory->edad_min }} a {{ $selectedCategory->edad_max }} años</p>
+    </div>
+    <a href="{{ route('athletes.index') }}" class="inline-flex items-center justify-center px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded-xl transition-colors shadow-sm whitespace-nowrap">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        Volver a Categorías
+    </a>
+</div>
+@endif
+
 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-8">
     <div class="flex items-center space-x-4 w-full lg:w-auto">
         <form action="{{ route('athletes.index') }}" method="GET" class="relative group w-full">
+            @if(request('category_id'))
+                <input type="hidden" name="category_id" value="{{ request('category_id') }}">
+            @endif
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <svg class="h-5 w-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -123,21 +139,9 @@
                 <input type="checkbox" name="selected_athletes[]" value="{{ $athlete->id }}" class="athlete-checkbox h-4 w-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500">
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
-                <div class="flex items-center">
-                    <div class="h-10 w-10 flex-shrink-0">
-                        @if($athlete->foto)
-                            <img class="h-10 w-10 rounded-full object-cover shadow-sm border border-slate-100" 
-                                 src="{{ str_starts_with($athlete->foto, 'http') ? $athlete->foto : asset('storage/' . $athlete->foto) }}" alt="">
-                        @else
-                            <div class="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold border border-blue-100">
-                                {{ substr($athlete->nombre, 0, 1) }}
-                            </div>
-                        @endif
-                    </div>
-                    <div class="ml-4">
-                        <div class="text-sm font-semibold text-slate-900">{{ $athlete->nombre }} {{ $athlete->apellido_paterno }} {{ $athlete->apellido_materno }}</div>
-                        <div class="text-xs text-slate-500">{{ $athlete->fecha_nacimiento?->format('d/m/Y') ?? 'Sin fecha' }}</div>
-                    </div>
+                <div class="flex flex-col">
+                    <div class="text-sm font-semibold text-slate-900">{{ $athlete->nombre }} {{ $athlete->apellido_paterno }} {{ $athlete->apellido_materno }}</div>
+                    <div class="text-xs text-slate-500 mt-0.5">Nacimiento: {{ $athlete->fecha_nacimiento?->format('d/m/Y') ?? 'Sin fecha' }}</div>
                 </div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 font-medium">
@@ -172,11 +176,8 @@
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <div class="flex items-center justify-end space-x-3">
-                    <a href="{{ route('athletes.show', $athlete) }}" class="text-slate-500 hover:text-slate-800 transition-colors" title="Ver perfil">
-                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                        </svg>
+                    <a href="{{ route('athletes.show', $athlete) }}" class="inline-flex items-center px-4 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-600 hover:text-white rounded-lg text-xs font-bold transition-colors shadow-sm">
+                        Ver Perfil
                     </a>
                     <a href="{{ route('athletes.edit', $athlete) }}" class="text-blue-600 hover:text-blue-900 transition-colors">
                         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

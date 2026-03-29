@@ -12,9 +12,11 @@ use App\Imports\AthleteImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+use App\Traits\CloudinaryHelper;
 
 class AthleteController extends Controller
 {
+    use CloudinaryHelper;
     public function export()
     {
         return Excel::download(new AthleteExport, 'atletas_olimpicsc_' . date('Y-m-d') . '.xlsx', \Maatwebsite\Excel\Excel::XLSX);
@@ -46,7 +48,19 @@ class AthleteController extends Controller
     }
     public function index(Request $request)
     {
+        if (!$request->has('category_id') && !$request->has('search')) {
+            $categories = Category::withCount('athletes')->orderBy('edad_min')->get();
+            return view('admin.athletes.categories', compact('categories'));
+        }
+
         $query = Athlete::query();
+
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+            $selectedCategory = Category::find($request->category_id);
+        } else {
+            $selectedCategory = null;
+        }
 
         if ($request->filled('search')) {
             $s = $request->search;
@@ -61,7 +75,7 @@ class AthleteController extends Controller
         }
 
         $athletes = $query->with('category')->latest()->paginate(10);
-        return view('admin.athletes.index', compact('athletes'));
+        return view('admin.athletes.index', compact('athletes', 'selectedCategory'));
     }
 
     public function create()
@@ -164,8 +178,9 @@ class AthleteController extends Controller
 
         try {
             if ($request->hasFile('foto')) {
-                // No eliminamos aquí explícitamente de Cloudinary por ahora para evitar errores, 
-                // pero guardamos el nuevo link seguro.
+                if ($athlete->foto) {
+                    $this->deleteFromCloudinary($athlete->foto);
+                }
                 $response = Cloudinary::uploadApi()->upload($request->file('foto')->getRealPath(), [
                     'folder' => 'athletes'
                 ]);
@@ -187,7 +202,7 @@ class AthleteController extends Controller
     public function destroy(Athlete $athlete)
     {
         if ($athlete->foto) {
-            Storage::disk('public')->delete($athlete->foto);
+            $this->deleteFromCloudinary($athlete->foto);
         }
         $athlete->delete();
         return redirect()->route('athletes.index')->with('success', 'Atleta eliminado.');

@@ -8,9 +8,11 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
+use App\Traits\CloudinaryHelper;
 
 class UserController extends Controller
 {
+    use CloudinaryHelper;
     public function index(Request $request)
     {
         $query = User::query();
@@ -122,6 +124,9 @@ class UserController extends Controller
         ];
         
         if ($request->hasFile('avatar')) {
+            if ($user->avatar) {
+                $this->deleteFromCloudinary($user->avatar);
+            }
             $response = \CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary::uploadApi()->upload($request->file('avatar')->getRealPath(), [
                 'folder' => 'avatars'
             ]);
@@ -145,6 +150,9 @@ class UserController extends Controller
         }
         if ($user->id === auth()->id()) {
             return back()->with('error', 'No puedes eliminarte a ti mismo.');
+        }
+        if ($user->avatar) {
+            $this->deleteFromCloudinary($user->avatar);
         }
         $user->delete();
         return redirect()->route('users.index')->with('success', 'Usuario eliminado.');

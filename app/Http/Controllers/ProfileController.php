@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+use App\Traits\CloudinaryHelper;
 
 class ProfileController extends Controller
 {
+    use CloudinaryHelper;
     /**
      * Show the profile edit form.
      */
@@ -31,6 +33,9 @@ class ProfileController extends Controller
         $user->name = $request->name;
 
         if ($request->hasFile('avatar')) {
+            if ($user->avatar) {
+                $this->deleteFromCloudinary($user->avatar);
+            }
             // 1. Sube el archivo directo a tu cuenta de Cloudinary
             $response = Cloudinary::uploadApi()->upload($request->file('avatar')->getRealPath(), [
                 'folder' => 'avatars'

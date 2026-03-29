@@ -7,9 +7,11 @@ use App\Models\Category;
 use App\Models\Training;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Traits\CloudinaryHelper;
 
 class TrainingController extends Controller
 {
+    use CloudinaryHelper;
     public function index(Request $request)
     {
 
@@ -79,8 +81,8 @@ class TrainingController extends Controller
         ];
 
         if ($request->hasFile('pdf')) {
-            if ($training->file_path_pdf && !str_starts_with($training->file_path_pdf, 'http')) {
-                Storage::disk('public')->delete($training->file_path_pdf);
+            if ($training->file_path_pdf) {
+                $this->deleteFromCloudinary($training->file_path_pdf);
             }
             $response = \CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary::uploadApi()->upload($request->file('pdf')->getRealPath(), [
                 'folder' => 'trainings',
@@ -97,8 +99,8 @@ class TrainingController extends Controller
 
     public function destroy(Training $training)
     {
-        if ($training->file_path_pdf && !str_starts_with($training->file_path_pdf, 'http')) {
-            Storage::disk('public')->delete($training->file_path_pdf);
+        if ($training->file_path_pdf) {
+            $this->deleteFromCloudinary($training->file_path_pdf);
         }
         $training->delete();
 
