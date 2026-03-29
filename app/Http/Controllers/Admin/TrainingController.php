@@ -48,10 +48,14 @@ class TrainingController extends Controller
         ];
 
         if ($request->hasFile('pdf')) {
+            // Generamos un ID con extension .pdf explicita para que Cloudinary no se confunda
+            $publicId = 'plan_' . uniqid() . '.pdf';
+            
             // [NUEVO GATILLO GIT] Forzamos raw para que Cloudinary NO lo convierta en PNG
             $response = \CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary::uploadApi()->upload($request->file('pdf')->getRealPath(), [
                 'folder' => 'trainings',
-                'resource_type' => 'raw'
+                'resource_type' => 'raw',
+                'public_id' => $publicId
             ]);
             $data['file_path_pdf'] = $response['secure_url'];
         }
@@ -85,10 +89,14 @@ class TrainingController extends Controller
             if ($training->file_path_pdf) {
                 $this->deleteFromCloudinary($training->file_path_pdf);
             }
+            
+            $publicId = 'plan_' . uniqid() . '.pdf';
+            
             // [NUEVO GATILLO GIT] Forzamos raw para que Cloudinary NO lo convierta en PNG
             $response = \CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary::uploadApi()->upload($request->file('pdf')->getRealPath(), [
                 'folder' => 'trainings',
-                'resource_type' => 'raw'
+                'resource_type' => 'raw',
+                'public_id' => $publicId
             ]);
             $data['file_path_pdf'] = $response['secure_url'];
         }
