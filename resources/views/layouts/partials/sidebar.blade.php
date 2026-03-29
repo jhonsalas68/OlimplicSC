@@ -7,7 +7,7 @@
     @click.away="sidebarOpen = false"
 >
     <!-- Overlay for mobile when sidebar is open -->
-    <div x-show="sidebarOpen" x-transition.opacity class="fixed inset-0 bg-slate-900/50 z-[-1] md:hidden" @click="sidebarOpen = false"></div>
+    <div x-show="sidebarOpen" x-transition.opacity class="fixed inset-0 bg-slate-900/50 z-40 md:hidden" @click="sidebarOpen = false"></div>
 
     {{-- Header del logo --}}
     <div class="h-20 flex-shrink-0 bg-white shadow-sm border-b border-gray-100 relative transition-all duration-300">

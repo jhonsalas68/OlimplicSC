@@ -60,7 +60,7 @@
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
                 @if($training->file_path_pdf)
-                    <a href="{{ asset('storage/' . $training->file_path_pdf) }}" target="_blank" class="inline-flex items-center text-red-600 hover:text-red-700 font-bold text-xs group">
+                    <a href="{{ str_starts_with($training->file_path_pdf, 'http') ? $training->file_path_pdf : asset('storage/' . $training->file_path_pdf) }}" target="_blank" class="inline-flex items-center text-red-600 hover:text-red-700 font-bold text-xs group">
                         <svg class="h-4 w-4 mr-1 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm1 2.414L17.586 8H15V4.414zM18 20H6V4h7v5h5v11z"/>
                         </svg>

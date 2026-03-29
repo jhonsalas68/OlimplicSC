@@ -46,7 +46,11 @@ class TrainingController extends Controller
         ];
 
         if ($request->hasFile('pdf')) {
-            $data['file_path_pdf'] = $request->file('pdf')->store('trainings', 'public');
+            $response = \CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary::uploadApi()->upload($request->file('pdf')->getRealPath(), [
+                'folder' => 'trainings',
+                'resource_type' => 'auto'
+            ]);
+            $data['file_path_pdf'] = $response['secure_url'];
         }
 
         Training::create($data);
@@ -75,10 +79,14 @@ class TrainingController extends Controller
         ];
 
         if ($request->hasFile('pdf')) {
-            if ($training->file_path_pdf) {
+            if ($training->file_path_pdf && !str_starts_with($training->file_path_pdf, 'http')) {
                 Storage::disk('public')->delete($training->file_path_pdf);
             }
-            $data['file_path_pdf'] = $request->file('pdf')->store('trainings', 'public');
+            $response = \CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary::uploadApi()->upload($request->file('pdf')->getRealPath(), [
+                'folder' => 'trainings',
+                'resource_type' => 'auto'
+            ]);
+            $data['file_path_pdf'] = $response['secure_url'];
         }
 
         $training->update($data);
@@ -89,7 +97,7 @@ class TrainingController extends Controller
 
     public function destroy(Training $training)
     {
-        if ($training->file_path_pdf) {
+        if ($training->file_path_pdf && !str_starts_with($training->file_path_pdf, 'http')) {
             Storage::disk('public')->delete($training->file_path_pdf);
         }
         $training->delete();

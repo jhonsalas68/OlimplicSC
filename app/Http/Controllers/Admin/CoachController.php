@@ -17,11 +17,11 @@ class CoachController extends Controller
         $category = $user->category;
 
         $planificaciones = $category
-            ? Training::where('category_id', $category->id)->latest()->get()
+            ? Training::with(['category', 'coach'])->where('category_id', $category->id)->latest()->get()
             : collect();
 
         $atletas = $category
-            ? Athlete::where('category_id', $category->id)->orderBy('apellido_paterno')->get()
+            ? Athlete::with('category')->where('category_id', $category->id)->orderBy('apellido_paterno')->get()
             : collect();
 
         return view('coach.dashboard', compact('user', 'category', 'planificaciones', 'atletas'));
@@ -34,7 +34,7 @@ class CoachController extends Controller
         $category = $user->category;
 
         $atletas = $category
-            ? Athlete::where('category_id', $category->id)->orderBy('apellido_paterno')->get()
+            ? Athlete::with('category')->where('category_id', $category->id)->orderBy('apellido_paterno')->get()
             : collect();
 
         return view('coach.atletas', compact('category', 'atletas'));
@@ -47,7 +47,7 @@ class CoachController extends Controller
         $category = $user->category;
 
         $planificaciones = $category
-            ? Training::where('category_id', $category->id)->latest()->get()
+            ? Training::with(['category', 'coach'])->where('category_id', $category->id)->latest()->get()
             : collect();
 
         return view('coach.planificaciones', compact('category', 'planificaciones'));

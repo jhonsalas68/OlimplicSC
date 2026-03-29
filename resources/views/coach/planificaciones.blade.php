@@ -1,4 +1,4 @@
-﻿@extends('layouts.admin')
+@extends('layouts.admin')
 
 @section('title', 'Mis Planificaciones')
 
@@ -50,7 +50,7 @@
                     </p>
                     <p class="text-xs text-slate-400 mt-0.5">
                         Fecha: {{ $plan->fecha ? $plan->fecha->format('d/m/Y') : '—' }}
-                        &middot; Subido: {{ $plan->created_at->format('d/m/Y') }}
+                        &middot; Subido: {{ $plan->created_at ? $plan->created_at->format('d/m/Y') : '—' }}
                     </p>
                 </div>
                 <div class="flex items-center gap-3 flex-shrink-0">
