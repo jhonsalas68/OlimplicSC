@@ -26,6 +26,10 @@
         .sidebar-gradient {
             background: linear-gradient(180deg, #1e3a8a 0%, #1e1b4b 100%);
         }
+        /* Mobile Sidebar Text Fix */
+        .sidebar-is-open .opacity-0 {
+            opacity: 1 !important;
+        }
     </style>
 </head>
 <body class="h-full overflow-hidden" x-data="{ sidebarOpen: false }">

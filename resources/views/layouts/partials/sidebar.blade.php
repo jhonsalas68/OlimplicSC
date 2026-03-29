@@ -1,13 +1,14 @@
+<!-- Overlay for mobile when sidebar is open -->
+<div x-show="sidebarOpen" x-transition.opacity class="fixed inset-0 bg-slate-900/50 z-40 md:hidden" @click="sidebarOpen = false"></div>
+
 <aside 
     class="sidebar-gradient flex-shrink-0 flex flex-col transition-all duration-300 overflow-hidden group/sidebar absolute md:relative z-50 h-full bg-[#0b2d69] shadow-2xl"
     :class="{ 
-        'w-64 left-0': sidebarOpen, 
+        'w-64 left-0 sidebar-is-open': sidebarOpen, 
         '-left-64 md:left-0 w-16 md:hover:w-64': !sidebarOpen 
     }"
     @click.away="sidebarOpen = false"
 >
-    <!-- Overlay for mobile when sidebar is open -->
-    <div x-show="sidebarOpen" x-transition.opacity class="fixed inset-0 bg-slate-900/50 z-40 md:hidden" @click="sidebarOpen = false"></div>
 
     {{-- Header del logo --}}
     <div class="h-20 flex-shrink-0 bg-white shadow-sm border-b border-gray-100 relative transition-all duration-300">
