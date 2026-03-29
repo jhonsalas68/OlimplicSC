@@ -48,9 +48,10 @@ class TrainingController extends Controller
         ];
 
         if ($request->hasFile('pdf')) {
+            // [NUEVO GATILLO GIT] Forzamos auto para que Cloudinary no bloquee los PDF
             $response = \CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary::uploadApi()->upload($request->file('pdf')->getRealPath(), [
                 'folder' => 'trainings',
-                'resource_type' => 'auto'
+                'resource_type' => 'auto' // Esto detecta que es PDF y no una foto
             ]);
             $data['file_path_pdf'] = $response['secure_url'];
         }
