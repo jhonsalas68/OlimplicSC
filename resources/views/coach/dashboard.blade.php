@@ -80,12 +80,8 @@
         </div>
         @forelse($atletas->take(6) as $atleta)
             <div class="flex items-center gap-3 py-2.5 border-b border-slate-50 last:border-0">
-                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-red-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0 overflow-hidden">
-                    @if($atleta->foto)
-                        <img src="{{ str_starts_with($atleta->foto, 'http') ? $atleta->foto : asset('storage/' . $atleta->foto) }}" class="w-full h-full object-cover">
-                    @else
-                        {{ strtoupper(substr($atleta->nombre,0,1).substr($atleta->apellido_paterno??'',0,1)) }}
-                    @endif
+                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-red-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0 overflow-hidden shadow-sm">
+                    {{ strtoupper(substr($atleta->nombre,0,1).substr($atleta->apellido_paterno??'',0,1)) }}
                 </div>
                 <div class="flex-1 min-w-0">
                     <p class="text-sm font-medium text-slate-700 truncate">

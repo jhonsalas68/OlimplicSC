@@ -46,10 +46,18 @@ class CoachController extends Controller
         $user = Auth::user();
         $category = $user->category;
 
-        $planificaciones = $category
-            ? Training::with(['category', 'coach'])->where('category_id', $category->id)->latest()->get()
-            : collect();
+        $allTrainings = Training::with(['category', 'coach'])->latest()->get();
 
-        return view('coach.planificaciones', compact('category', 'planificaciones'));
+        $planificacionesPropias = collect();
+        $planificacionesOtras = collect();
+
+        if ($category) {
+            $planificacionesPropias = $allTrainings->where('category_id', $category->id)->values();
+            $planificacionesOtras = $allTrainings->where('category_id', '!=', $category->id)->values();
+        } else {
+            $planificacionesOtras = $allTrainings->values();
+        }
+
+        return view('coach.planificaciones', compact('category', 'planificacionesPropias', 'planificacionesOtras'));
     }
 }

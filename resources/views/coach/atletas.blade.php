@@ -31,11 +31,7 @@
 
             {{-- Avatar --}}
             <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-600 to-red-600 flex items-center justify-center text-white font-bold text-lg flex-shrink-0 overflow-hidden">
-                @if($atleta->foto)
-                    <img src="{{ str_starts_with($atleta->foto, 'http') ? $atleta->foto : asset('storage/' . $atleta->foto) }}" class="w-full h-full object-cover">
-                @else
-                    {{ strtoupper(substr($atleta->nombre,0,1).substr($atleta->apellido_paterno??'',0,1)) }}
-                @endif
+                {{ strtoupper(substr($atleta->nombre,0,1).substr($atleta->apellido_paterno??'',0,1)) }}
             </div>
 
             {{-- Info --}}
