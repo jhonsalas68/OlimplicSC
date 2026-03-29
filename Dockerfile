@@ -32,6 +32,7 @@ RUN apk add --no-cache \
     oniguruma-dev \
     libxml2-dev \
     postgresql-dev \
+    postgresql-client \
     linux-headers
 
 # Install PHP extensions
