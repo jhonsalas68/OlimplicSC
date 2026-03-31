@@ -28,13 +28,20 @@ class CoachController extends Controller
     }
 
     /** Lista de atletas agrupados por categoria, la del coach primero */
-    public function atletas()
+    public function atletas(Request $request)
     {
         $user = Auth::user();
         $myCategory = $user->category;
+        $verTodas = $request->has('ver_todas');
         
-        $allAtletas = Athlete::with(['category', 'latestPayment'])
-            ->orderBy('category_id')
+        // Optimización: Si no se pide ver todas, solo cargamos los de nuestra categoría
+        $query = Athlete::with(['category', 'latestPayment']);
+        
+        if (!$verTodas && $myCategory) {
+            $query->where('category_id', $myCategory->id);
+        }
+
+        $allAtletas = $query->orderBy('category_id')
             ->orderBy('apellido_paterno')
             ->get();
 
@@ -43,33 +50,45 @@ class CoachController extends Controller
 
         if ($myCategory) {
             $atletasPropios = $allAtletas->where('category_id', $myCategory->id)->values();
-            $atletasOtros = $allAtletas->where('category_id', '!=', $myCategory->id)->groupBy(fn($a) => $a->category->nombre ?? 'Sin Categoría');
-        } else {
-            $atletasOtros = $allAtletas->groupBy(fn($a) => $a->category->nombre ?? 'Sin Categoría');
+            if ($verTodas) {
+                $atletasOtros = $allAtletas->where('category_id', '!=', $myCategory->id)
+                    ->groupBy(fn($a) => $a->category?->nombre ?? 'Sin Categoría');
+            }
+        } elseif ($verTodas) {
+            $atletasOtros = $allAtletas->groupBy(fn($a) => $a->category?->nombre ?? 'Sin Categoría');
         }
 
-        return view('coach.atletas', compact('myCategory', 'atletasPropios', 'atletasOtros'));
+        return view('coach.atletas', compact('myCategory', 'atletasPropios', 'atletasOtros', 'verTodas'));
     }
 
     /** Planificaciones agrupadas por categoria */
-    public function planificaciones()
+    public function planificaciones(Request $request)
     {
         $user = Auth::user();
         $myCategory = $user->category;
+        $verTodas = $request->has('ver_todas');
 
-        $allTrainings = Training::with(['category', 'coach'])->latest()->get();
+        $query = Training::with(['category', 'coach']);
+        
+        if (!$verTodas && $myCategory) {
+            $query->where('category_id', $myCategory->id);
+        }
+
+        $allTrainings = $query->latest()->get();
 
         $planificacionesPropias = collect();
         $planificacionesOtras = collect();
 
         if ($myCategory) {
             $planificacionesPropias = $allTrainings->where('category_id', $myCategory->id)->values();
-            $planificacionesOtras = $allTrainings->where('category_id', '!=', $myCategory->id)
-                ->groupBy(fn($t) => $t->category->nombre ?? 'Otras Categorías');
-        } else {
-            $planificacionesOtras = $allTrainings->groupBy(fn($t) => $t->category->nombre ?? 'Otras Categorías');
+            if ($verTodas) {
+                $planificacionesOtras = $allTrainings->where('category_id', '!=', $myCategory->id)
+                    ->groupBy(fn($t) => $t->category?->nombre ?? 'Otras Categorías');
+            }
+        } elseif ($verTodas) {
+            $planificacionesOtras = $allTrainings->groupBy(fn($t) => $t->category?->nombre ?? 'Otras Categorías');
         }
 
-        return view('coach.planificaciones', compact('myCategory', 'planificacionesPropias', 'planificacionesOtras'));
+        return view('coach.planificaciones', compact('myCategory', 'planificacionesPropias', 'planificacionesOtras', 'verTodas'));
     }
 }

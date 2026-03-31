@@ -51,6 +51,7 @@ COPY --from=node_build /app/public/build ./public/build
 
 # Copiar configuraciones de la carpeta docker/
 COPY docker/nginx.conf /etc/nginx/http.d/default.conf
+COPY docker/php-upload.ini /usr/local/etc/php/conf.d/php-upload.ini
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 

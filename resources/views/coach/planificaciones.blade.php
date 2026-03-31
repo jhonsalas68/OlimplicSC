@@ -79,11 +79,22 @@
         </div>
     @endif
 
-    @if($planificacionesOtras->isNotEmpty())
+    {{-- OTRAS CATEGORIAS --}}
+    @if(!$verTodas)
+        <div class="flex justify-center my-12">
+            <a href="{{ route('coach.planificaciones', ['ver_todas' => 1]) }}" 
+               class="inline-flex items-center gap-2 px-8 py-4 bg-slate-100 hover:bg-slate-200 text-slate-600 text-sm font-black rounded-2xl transition-all uppercase tracking-widest">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+                Ver Planificaciones de otras categorías
+            </a>
+        </div>
+    @elseif($planificacionesOtras->isNotEmpty())
         <div class="mt-8 mb-10">
             <div class="flex items-center gap-4 mb-8">
                 <div class="h-px bg-slate-200 flex-1"></div>
-                <h2 class="text-xs font-black text-slate-400 uppercase tracking-[0.2em] px-4">Otras Categorías</h2>
+                <h2 class="text-xs font-black text-slate-400 uppercase tracking-[0.2em] px-4">Explorando Todas las Categorías</h2>
                 <div class="h-px bg-slate-200 flex-1"></div>
             </div>
             
