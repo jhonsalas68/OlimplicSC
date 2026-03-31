@@ -73,6 +73,11 @@ Route::middleware(['auth', 'prevent-back-history'])->prefix('admin')->group(func
     // Module Planificaciones (Trainings)
     Route::resource('trainings', \App\Http\Controllers\Admin\TrainingController::class);
 
+    // Module Notificaciones (AJAX)
+    Route::get('/notifications', [\App\Http\Controllers\Admin\NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{id}/read', [\App\Http\Controllers\Admin\NotificationController::class, 'read'])->name('notifications.read');
+    Route::post('/notifications/{id}/dismiss', [\App\Http\Controllers\Admin\NotificationController::class, 'dismiss'])->name('notifications.dismiss');
+
     // Module Coach
     Route::get('/coach/dashboard', [\App\Http\Controllers\Admin\CoachController::class, 'dashboard'])->name('coach.dashboard');
     Route::get('/coach/atletas', [\App\Http\Controllers\Admin\CoachController::class, 'atletas'])->name('coach.atletas');

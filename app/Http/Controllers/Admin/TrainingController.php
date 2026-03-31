@@ -7,7 +7,10 @@ use App\Models\Category;
 use App\Models\Training;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Models\User;
+use App\Notifications\TrainingUploaded;
 use App\Traits\CloudinaryHelper;
+use Illuminate\Support\Facades\Notification;
 
 class TrainingController extends Controller
 {
@@ -60,7 +63,14 @@ class TrainingController extends Controller
             $data['file_path_pdf'] = $response['secure_url'];
         }
 
-        Training::create($data);
+        $training = Training::create($data);
+
+        // Notificar a todos los usuarios (excepto a quien lo subió, opcionalmente)
+        $usersToNotify = User::all();
+        $coachName = auth()->user()->name;
+        $categoryName = Category::find($validated['category_id'])->nombre ?? '—';
+        
+        Notification::send($usersToNotify, new TrainingUploaded($training, $coachName, $categoryName));
 
         $route = auth()->user()->hasRole('Coach') ? 'coach.planificaciones' : 'trainings.index';
         return redirect()->route($route)->with('success', 'Planificación registrada correctamente.');
