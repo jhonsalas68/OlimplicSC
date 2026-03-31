@@ -225,10 +225,6 @@
                 @enderror
             </div>
 
-            <div class="remember-row">
-                <input type="checkbox" id="remember" name="remember">
-                <label for="remember">Mantener sesión iniciada</label>
-            </div>
 
             <button type="submit" class="btn-submit">
                 Ingresar al Sistema

@@ -84,6 +84,14 @@ class CobrosController extends Controller
             'cobrado_por'         => Auth::id(),
         ]);
 
+        $atleta = Athlete::find($validated['athlete_id']);
+        \App\Services\ActivityLogger::log(
+            'venta_realizada', 
+            "Cobro realizado a {$atleta->nombre} {$atleta->apellido_paterno} por un monto de Bs. {$validated['monto']}.",
+            $payment,
+            ['atleta_id' => $atleta->id, 'monto' => $validated['monto']]
+        );
+
         return redirect()->route('cobros.nota', $payment->id);
     }
 

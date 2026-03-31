@@ -136,6 +136,15 @@
                     </svg>
                     <span class="ml-4 whitespace-nowrap opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-300">Exportar / Backup</span>
                 </a>
+
+                <a href="{{ route('admin.activity-logs.index') }}"
+                   class="flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-colors {{ request()->routeIs('admin.activity-logs.*') ? 'bg-white/10 text-white' : 'text-blue-100 hover:bg-white/10 hover:text-white' }}">
+                    <svg class="flex-shrink-0 h-5 w-5 {{ request()->routeIs('admin.activity-logs.*') ? 'text-white' : 'text-blue-200' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <title>Bitácora de Actividades</title>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span class="ml-4 whitespace-nowrap opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-300">Bitácora</span>
+                </a>
             </div>
             @endif
             @endif

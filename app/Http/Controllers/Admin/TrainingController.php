@@ -72,6 +72,12 @@ class TrainingController extends Controller
         
         Notification::send($usersToNotify, new TrainingUploaded($training, $coachName, $categoryName));
 
+        \App\Services\ActivityLogger::log(
+            'subida_planificacion', 
+            "Nueva planificación subida para la categoría {$categoryName}.",
+            $training
+        );
+
         $route = auth()->user()->hasRole('Coach') ? 'coach.planificaciones' : 'trainings.index';
         return redirect()->route($route)->with('success', 'Planificación registrada correctamente.');
     }
@@ -113,6 +119,13 @@ class TrainingController extends Controller
 
         $training->update($data);
 
+        $categoryName = $training->category->nombre ?? '—';
+        \App\Services\ActivityLogger::log(
+            'edicion_planificacion', 
+            "Planificación actualizada para la categoría {$categoryName} (Fecha: {$training->fecha}).",
+            $training
+        );
+
         $route = auth()->user()->hasRole('Coach') ? 'coach.planificaciones' : 'trainings.index';
         return redirect()->route($route)->with('success', 'Planificación actualizada correctamente.');
     }
@@ -122,6 +135,15 @@ class TrainingController extends Controller
         if ($training->file_path_pdf) {
             $this->deleteFromCloudinary($training->file_path_pdf);
         }
+        
+        $categoryName = $training->category->nombre ?? '—';
+        \App\Services\ActivityLogger::log(
+            'eliminacion_planificacion', 
+            "Planificación eliminada de la categoría {$categoryName} (Fecha: {$training->fecha}).",
+            null,
+            ['categoria' => $categoryName, 'fecha' => $training->fecha]
+        );
+
         $training->delete();
 
         $route = auth()->user()->hasRole('Coach') ? 'coach.planificaciones' : 'trainings.index';

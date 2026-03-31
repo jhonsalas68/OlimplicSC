@@ -97,6 +97,13 @@ class UserController extends Controller
 
         $user->syncRoles([$validated['role']]);
 
+        \App\Services\ActivityLogger::log(
+            'creacion_usuario', 
+            "Nuevo usuario creado: {$user->name} con el rol {$validated['role']}.",
+            $user,
+            ['rol' => $validated['role'], 'username' => $username]
+        );
+
         return redirect()->route('users.index')->with('success', "Usuario creado. Username: $username | Clave inicial: " . $validated['ci']);
     }
 
@@ -156,6 +163,13 @@ class UserController extends Controller
         $user->update($userData);
         $user->syncRoles([$validated['role']]);
 
+        \App\Services\ActivityLogger::log(
+            'edicion_usuario', 
+            "Usuario actualizado: {$user->name}. Rol asignado: {$validated['role']}.",
+            $user,
+            ['rol' => $validated['role']]
+        );
+
         return redirect()->route('users.index')->with('success', 'Usuario actualizado correctamente.');
     }
 
@@ -170,6 +184,14 @@ class UserController extends Controller
         if ($user->avatar) {
             $this->deleteFromCloudinary($user->avatar);
         }
+        
+        \App\Services\ActivityLogger::log(
+            'eliminacion_usuario', 
+            "Usuario eliminado del sistema: {$user->name} ({$user->username}).",
+            null,
+            ['nombre' => $user->name, 'username' => $user->username]
+        );
+
         $user->delete();
         return redirect()->route('users.index')->with('success', 'Usuario eliminado.');
     }

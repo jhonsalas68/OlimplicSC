@@ -145,6 +145,12 @@ class AthleteController extends Controller
             $athlete = Athlete::create($validated);
             \Illuminate\Support\Facades\Log::info('Atleta creado ID: ' . $athlete->id);
 
+            \App\Services\ActivityLogger::log(
+                'inscripcion_atleta', 
+                "Nuevo atleta inscrito: {$athlete->nombre} {$athlete->apellido_paterno}.",
+                $athlete
+            );
+
             return redirect()->route('athletes.index')->with('success', 'Atleta registrado correctamente.');
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Error en AthleteController@store: ' . $e->getMessage());
@@ -211,6 +217,12 @@ class AthleteController extends Controller
 
             $athlete->update($validated);
 
+            \App\Services\ActivityLogger::log(
+                'edicion_atleta', 
+                "Datos del atleta actualizados: {$athlete->nombre} {$athlete->apellido_paterno}.",
+                $athlete
+            );
+
             return redirect()->route('athletes.index')->with('success', 'Atleta actualizado correctamente.');
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Error en AthleteController@update: ' . $e->getMessage());
@@ -223,6 +235,13 @@ class AthleteController extends Controller
         if ($athlete->foto) {
             $this->deleteFromCloudinary($athlete->foto);
         }
+        \App\Services\ActivityLogger::log(
+            'eliminacion_atleta', 
+            "Atleta eliminado del sistema: {$athlete->nombre} {$athlete->apellido_paterno}.",
+            null,
+            ['nombre' => "{$athlete->nombre} {$athlete->apellido_paterno}", 'ci' => $athlete->ci]
+        );
+
         $athlete->delete();
         return redirect()->route('athletes.index')->with('success', 'Atleta eliminado.');
     }
@@ -233,6 +252,15 @@ class AthleteController extends Controller
             return response()->json(['error' => 'No autorizado'], 403);
         }
         $athlete->update(['habilitado_booleano' => !$athlete->habilitado_booleano]);
+        
+        $estado = $athlete->habilitado_booleano ? 'Habilitado' : 'Deshabilitado';
+        \App\Services\ActivityLogger::log(
+            'cambio_estado_atleta', 
+            "Estado del atleta {$athlete->nombre} {$athlete->apellido_paterno} cambiado a: {$estado}.",
+            $athlete,
+            ['nuevo_estado' => $estado]
+        );
+
         return response()->json(['habilitado' => $athlete->habilitado_booleano]);
     }
 }

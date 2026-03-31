@@ -95,5 +95,8 @@ Route::middleware(['auth', 'prevent-back-history'])->prefix('admin')->group(func
         Route::get('/backup/sql',            [\App\Http\Controllers\Admin\SuperAdminController::class, 'backup'])->name('superadmin.backup.sql');
         Route::get('/backup/excel',          [\App\Http\Controllers\Admin\SuperAdminController::class, 'backupExcel'])->name('superadmin.backup.excel');
         Route::post('/restore/sql',          [\App\Http\Controllers\Admin\SuperAdminController::class, 'restore'])->name('superadmin.restore.sql');
+        
+        // Bitácora de Actividades
+        Route::get('/activity-logs', [\App\Http\Controllers\Admin\ActivityLogController::class, 'index'])->name('admin.activity-logs.index');
     });
 });
