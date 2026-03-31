@@ -175,7 +175,7 @@
 
 <script>
 const CATEGORIAS = [
-    { nombre: 'Pre Infantil', min: 0,  max: 13 },
+    { nombre: 'Pre Infantil', min: 12, max: 13 },
     { nombre: 'Infantil',     min: 14, max: 15 },
     { nombre: 'Menores',      min: 16, max: 17 },
     { nombre: 'Juvenil',      min: 18, max: 19 },
