@@ -17,6 +17,21 @@
         </div>
     </div>
 
+    @if(isset($error) || session('error'))
+    <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-8 rounded-xl shadow-sm">
+        <div class="flex items-center">
+            <div class="flex-shrink-0">
+                <i class="fas fa-exclamation-triangle text-red-500"></i>
+            </div>
+            <div class="ml-3">
+                <p class="text-sm text-red-700">
+                    {{ $error ?? session('error') }}
+                </p>
+            </div>
+        </div>
+    </div>
+    @endif
+
     <!-- Filtros -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
         <form action="{{ route('admin.activity-logs.index') }}" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">

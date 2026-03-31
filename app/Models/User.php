@@ -72,4 +72,12 @@ class User extends Authenticatable
         }
         return $this->avatar ?: 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&color=7F9CF5&background=EBF4FF';
     }
+
+    /**
+     * Relación con los registros de actividad del usuario.
+     */
+    public function logs(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ActivityLog::class);
+    }
 }
