@@ -58,7 +58,7 @@ class CoachController extends Controller
             $atletasOtros = $allAtletas->groupBy(fn($a) => $a->category?->nombre ?? 'Sin Categoría');
         }
 
-        return view('coach.atletas', compact('myCategory', 'atletasPropios', 'atletasOtros', 'verTodas'));
+        return view('coach.atletas', compact('user', 'myCategory', 'atletasPropios', 'atletasOtros', 'verTodas'));
     }
 
     /** Planificaciones agrupadas por categoria */
@@ -89,6 +89,6 @@ class CoachController extends Controller
             $planificacionesOtras = $allTrainings->groupBy(fn($t) => $t->category?->nombre ?? 'Otras Categorías');
         }
 
-        return view('coach.planificaciones', compact('myCategory', 'planificacionesPropias', 'planificacionesOtras', 'verTodas'));
+        return view('coach.planificaciones', compact('user', 'myCategory', 'planificacionesPropias', 'planificacionesOtras', 'verTodas'));
     }
 }

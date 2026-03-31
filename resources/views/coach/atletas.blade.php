@@ -10,7 +10,7 @@
     </div>
     
     <div id="selection-panel" class="hidden animate-in fade-in slide-in-from-right-4 duration-300">
-        <form id="convocar-form" action="{{ route('athletes.exportSelected') }}" method="POST">
+        <form id="convocar-form" action="{{ route('athletes.export.selected') }}" method="POST">
             @csrf
             <input type="hidden" name="ids" id="selected-ids">
             <button type="submit" class="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all shadow-lg hover:shadow-blue-200 group">
