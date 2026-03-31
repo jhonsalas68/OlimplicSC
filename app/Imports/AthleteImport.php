@@ -4,39 +4,39 @@ namespace App\Imports;
 
 use App\Models\Athlete;
 use App\Models\Category;
-use Maatwebsite\Excel\Concerns\ToModel;
-use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Carbon\Carbon;
+use Maatwebsite\Excel\Concerns\OnEachRow;
+use Maatwebsite\Excel\Row;
 
-class AthleteImport implements ToModel, WithHeadingRow
+class AthleteImport implements OnEachRow, WithHeadingRow
 {
-    public function model(array $row)
+    public function onRow(Row $row)
     {
-        // El 'id_alfanumerico_unico' se genera en el model booted()
-        // La categoría se busca por nombre
-        $category = Category::where('nombre', $row['categoria'])->first();
+        $data = $row->toArray();
+        
+        $category = Category::where('nombre', $data['categoria'])->first();
 
         try {
-            $fecha = $row['fecha_de_nacimiento'] ? Carbon::createFromFormat('d/m/Y', $row['fecha_de_nacimiento']) : null;
+            $fecha = $data['fecha_de_nacimiento'] ? Carbon::createFromFormat('d/m/Y', $data['fecha_de_nacimiento']) : null;
         } catch (\Exception $e) {
             $fecha = null;
         }
 
-        return new Athlete([
-            'nombre' => $row['nombres'],
-            'apellido_paterno' => $row['apellido_paterno'],
-            'apellido_materno' => $row['apellido_materno'],
-            'ci' => $row['ci'],
-            'category_id' => $category->id ?? null,
-            'fecha_nacimiento' => $fecha,
-            'genero' => $row['genero'],
-            'alergias' => $row['alergias'] ?? null,
-            'seguro_medico' => $row['seguro_medico'] ?? null,
-            'nombre_padre' => $row['padretutor_nombre'] ?? null,
-            'apellido_paterno_padre' => $row['padretutor_ape_paterno'] ?? null,
-            'apellido_materno_padre' => $row['padretutor_ape_materno'] ?? null,
-            'telefono_padre' => $row['padretutor_telefono'] ?? null,
-            'habilitado_booleano' => (strtoupper($row['habilitado'] ?? '') === 'SÍ'),
-        ]);
+        Athlete::updateOrCreate(
+            ['ci' => $data['ci']],
+            [
+                'nombre'                  => $data['nombres'],
+                'apellido_paterno'        => $data['apellido_paterno'],
+                'apellido_materno'        => $data['apellido_materno'],
+                'category_id'             => $category->id ?? null,
+                'fecha_nacimiento'        => $fecha,
+                'genero'                  => $data['genero'],
+                'alergias'                => $data['alergias'] ?? null,
+                'nombre_padre'            => $data['padretutor_nombre'] ?? null,
+                'apellido_paterno_padre'  => $data['padretutor_ape_paterno'] ?? null,
+                'apellido_materno_padre'  => $data['padretutor_ape_materno'] ?? null,
+                'telefono_padre'          => $data['padretutor_telefono'] ?? null,
+                'habilitado_booleano'     => (strtoupper($data['habilitado'] ?? '') === 'SÍ'),
+            ]
+        );
     }
 }

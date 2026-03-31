@@ -18,18 +18,30 @@
 </div>
 
 {{-- FILTROS --}}
-<div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm mb-6">
-    <form method="GET" action="{{ route('admin.reports.index') }}" class="flex flex-col sm:flex-row items-end gap-4">
-        <div class="w-full sm:w-1/3">
+<div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm mb-6" x-data="{ rango: '{{ $stats['rango'] }}' }">
+    <form method="GET" action="{{ route('admin.reports.index') }}" class="flex flex-col sm:flex-row flex-wrap items-end gap-4">
+        <div class="w-full sm:w-1/4">
             <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Periodo</label>
-            <select name="rango" class="w-full bg-slate-50 border border-slate-200 text-slate-700 rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium appearance-none">
+            <select name="rango" x-model="rango" class="w-full bg-slate-50 border border-slate-200 text-slate-700 rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium appearance-none">
                 <option value="hoy" {{ $stats['rango'] === 'hoy' ? 'selected' : '' }}>Hoy</option>
                 <option value="semana" {{ $stats['rango'] === 'semana' ? 'selected' : '' }}>Esta Semana</option>
                 <option value="mes" {{ $stats['rango'] === 'mes' ? 'selected' : '' }}>Este Mes</option>
                 <option value="anio" {{ $stats['rango'] === 'anio' ? 'selected' : '' }}>Este Año</option>
+                <option value="personalizado" {{ $stats['rango'] === 'personalizado' ? 'selected' : '' }}>📅 Personalizado</option>
             </select>
         </div>
-        <div class="w-full sm:w-1/3">
+
+        {{-- Campos de Fecha Personalizada (Alpine.js) --}}
+        <div class="w-full sm:w-1/4" x-show="rango === 'personalizado'" x-cloak x-transition>
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Desde</label>
+            <input type="date" name="desde" value="{{ $stats['desde'] }}" class="w-full bg-slate-50 border border-slate-200 text-slate-700 rounded-xl px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 font-medium">
+        </div>
+        <div class="w-full sm:w-1/4" x-show="rango === 'personalizado'" x-cloak x-transition>
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Hasta</label>
+            <input type="date" name="hasta" value="{{ $stats['hasta'] }}" class="w-full bg-slate-50 border border-slate-200 text-slate-700 rounded-xl px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 font-medium">
+        </div>
+
+        <div class="w-full sm:w-1/4">
             <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Método de Pago</label>
             <select name="metodo" class="w-full bg-slate-50 border border-slate-200 text-slate-700 rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium appearance-none">
                 <option value="todos" {{ $stats['metodo'] === 'todos' ? 'selected' : '' }}>Todos los métodos</option>
@@ -38,7 +50,7 @@
                 <option value="tarjeta" {{ $stats['metodo'] === 'tarjeta' ? 'selected' : '' }}>💳 Tarjeta</option>
             </select>
         </div>
-        <div class="w-full sm:w-1/3">
+        <div class="w-full sm:w-1/4 grow">
             <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl transition-colors shadow-sm">
                 Aplicar Filtros
             </button>
@@ -53,7 +65,14 @@
         <div class="relative z-10">
             <p class="text-sm font-bold text-blue-200 uppercase tracking-wider">Total Ingresos</p>
             <h3 class="text-3xl font-black mt-1">Bs. {{ number_format($stats['total_ingresos'], 2) }}</h3>
-            <p class="text-xs text-blue-100 mt-2 font-medium bg-blue-700/50 inline-block px-2 py-1 rounded-lg">Filtro aplicado: {{ strtoupper($stats['rango']) }}</p>
+            <p class="text-[10px] text-blue-100 mt-2 font-black uppercase tracking-widest bg-blue-700/50 inline-block px-2.5 py-1 rounded-lg border border-blue-500/30">
+                Filtro: 
+                @if($stats['rango'] === 'personalizado')
+                    {{ \Carbon\Carbon::parse($stats['desde'])->format('d/m/Y') }} — {{ \Carbon\Carbon::parse($stats['hasta'])->format('d/m/Y') }}
+                @else
+                    {{ strtoupper($stats['rango']) }}
+                @endif
+            </p>
         </div>
         <svg class="absolute -right-6 -bottom-6 w-32 h-32 text-blue-500 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
     </div>

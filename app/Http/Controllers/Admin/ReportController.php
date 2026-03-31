@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class ReportController extends Controller
 {
@@ -23,6 +24,10 @@ class ReportController extends Controller
             $query->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()]);
         } elseif ($rango === 'anio') {
             $query->whereBetween('created_at', [now()->startOfYear(), now()->endOfYear()]);
+        } elseif ($rango === 'personalizado' && $request->filled('desde') && $request->filled('hasta')) {
+            $desde = Carbon::parse($request->desde)->startOfDay();
+            $hasta = Carbon::parse($request->hasta)->endOfDay();
+            $query->whereBetween('created_at', [$desde, $hasta]);
         }
         
         // Filtro Método de Pago
@@ -43,6 +48,8 @@ class ReportController extends Controller
             
             // Nuevas variables financieras
             'rango' => $rango,
+            'desde' => $request->desde,
+            'hasta' => $request->hasta,
             'metodo' => $metodo,
             'ingresos_mensualidades' => $ingresosMensualidades,
             'ingresos_articulos' => $ingresosArticulos,
@@ -68,6 +75,10 @@ class ReportController extends Controller
             $query->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()]);
         } elseif ($rango === 'anio') {
             $query->whereBetween('created_at', [now()->startOfYear(), now()->endOfYear()]);
+        } elseif ($rango === 'personalizado' && $request->filled('desde') && $request->filled('hasta')) {
+            $desde = Carbon::parse($request->desde)->startOfDay();
+            $hasta = Carbon::parse($request->hasta)->endOfDay();
+            $query->whereBetween('created_at', [$desde, $hasta]);
         }
         
         if ($metodo !== 'todos') {
