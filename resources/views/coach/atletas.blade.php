@@ -1,75 +1,122 @@
 @extends('layouts.admin')
 
-@section('title', 'Atletas de mi Categoria')
+@section('title', 'Gestión de Atletas')
 
 @section('content')
-<div class="flex items-center justify-between mb-6">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
     <div>
-        <h1 class="text-2xl font-bold text-slate-800">
-            {{ $category->nombre ?? 'Mi Categoria' }}
-        </h1>
-        <p class="text-sm text-slate-500 mt-0.5">
-            @if($category)
-                Atletas de {{ $category->edad_min }} a {{ $category->edad_max }} años &middot;
-            @endif
-            {{ $atletas->count() }} atleta(s) registrado(s)
-        </p>
+        <h1 class="text-2xl font-black text-slate-800 tracking-tight">Atletas y Selección</h1>
+        <p class="text-sm text-slate-500 mt-1 uppercase font-bold tracking-widest">Panel de Entrenador</p>
+    </div>
+    
+    <div id="selection-panel" class="hidden animate-in fade-in slide-in-from-right-4 duration-300">
+        <form id="convocar-form" action="{{ route('athletes.exportSelected') }}" method="POST">
+            @csrf
+            <input type="hidden" name="ids" id="selected-ids">
+            <button type="submit" class="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all shadow-lg hover:shadow-blue-200 group">
+                <svg class="h-5 w-5 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                Generar Convocatoria (<span id="count-selected">0</span>)
+            </button>
+        </form>
     </div>
 </div>
 
-@if($atletas->isEmpty())
+@if($atletasPropios->isEmpty() && $atletasOtros->isEmpty())
     <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-12 text-center">
-        <svg class="h-12 w-12 mx-auto text-slate-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-        </svg>
-        <p class="text-slate-400 text-sm">No hay atletas registrados en esta categoria.</p>
+        <p class="text-slate-400 text-sm">No hay atletas registrados en el sistema.</p>
     </div>
 @else
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        @foreach($atletas as $atleta)
-        <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 flex items-start gap-4 hover:shadow-md transition-shadow">
 
-            {{-- Avatar --}}
-            <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-600 to-red-600 flex items-center justify-center text-white font-bold text-lg flex-shrink-0 overflow-hidden">
-                {{ strtoupper(substr($atleta->nombre,0,1).substr($atleta->apellido_paterno??'',0,1)) }}
-            </div>
-
-            {{-- Info --}}
-            <div class="flex-1 min-w-0">
-                <div class="flex items-start justify-between gap-2">
-                    <p class="font-semibold text-slate-800 text-sm leading-tight truncate">
-                        {{ $atleta->nombre }} {{ $atleta->apellido_paterno }} {{ $atleta->apellido_materno }}
-                    </p>
-                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold flex-shrink-0
-                        {{ $atleta->habilitado_booleano ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-600' }}">
-                        <span class="w-1.5 h-1.5 rounded-full {{ $atleta->habilitado_booleano ? 'bg-emerald-500' : 'bg-red-500' }}"></span>
-                        {{ $atleta->habilitado_booleano ? 'Habilitado' : 'Inhabilitado' }}
+    {{-- MI CATEGORIA --}}
+    @if($atletasPropios->isNotEmpty())
+        <div class="mb-10 p-6 bg-white rounded-3xl border border-slate-100 shadow-sm">
+            <div class="flex items-center gap-4 mb-8">
+                <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 shadow-sm border border-blue-100">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                </div>
+                <div>
+                    <h2 class="text-xl font-black text-slate-800 tracking-tight leading-none">Mi Categoría</h2>
+                    <p class="text-xs font-bold text-blue-600 mt-1 uppercase tracking-widest">{{ $myCategory->nombre }}</p>
+                </div>
+                <div class="ml-auto flex flex-col items-end">
+                    <span class="bg-slate-900 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-tighter">
+                        {{ $atletasPropios->count() }} Atletas
                     </span>
                 </div>
-
-                <p class="text-xs text-slate-500 mt-1">CI: {{ $atleta->ci }}</p>
-
-
-                <div class="mt-1.5 flex flex-wrap gap-2">
-                    @if($atleta->fecha_nacimiento)
-                        <span class="text-xs text-slate-400">{{ \Carbon\Carbon::parse($atleta->fecha_nacimiento)->age }} años</span>
-                    @endif
-                    @if($atleta->genero)
-                        <span class="text-xs text-slate-400">{{ $atleta->genero }}</span>
-                    @endif
-                </div>
-
-                <a href="{{ route('athletes.show', $atleta) }}"
-                   class="inline-flex items-center gap-1 mt-2 text-xs text-blue-600 hover:text-blue-800 font-semibold transition-colors">
-                    Ver perfil
-                    <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                    </svg>
-                </a>
             </div>
 
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xxl:grid-cols-5 gap-6">
+                @foreach($atletasPropios as $atleta)
+                    @include('coach.partials.athlete_card', ['atleta' => $atleta])
+                @endforeach
+            </div>
         </div>
-        @endforeach
-    </div>
+    @endif
+
+    {{-- OTRAS CATEGORIAS --}}
+    @if($atletasOtros->isNotEmpty())
+        <div class="mt-16 mb-10">
+            <div class="flex items-center gap-4 mb-10">
+                <div class="h-px bg-slate-200 flex-1"></div>
+                <h2 class="text-xs font-black text-slate-400 uppercase tracking-[0.2em] px-4">Explorar Otras Categorías</h2>
+                <div class="h-px bg-slate-200 flex-1"></div>
+            </div>
+            
+            @foreach($atletasOtros as $catName => $grupo)
+                <div class="mb-12">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-8 h-8 bg-slate-100 rounded-xl flex items-center justify-center text-slate-400">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+                        </div>
+                        <h3 class="text-lg font-black text-slate-700 tracking-tight uppercase tracking-widest">
+                            {{ $catName }}
+                        </h3>
+                        <div class="h-px bg-slate-100 flex-1 ml-2"></div>
+                        <span class="text-[10px] font-bold text-slate-400">{{ $grupo->count() }} ALUMNOS</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xxl:grid-cols-5 gap-5">
+                        @foreach($grupo as $atleta)
+                            @include('coach.partials.athlete_card', ['atleta' => $atleta])
+                        @endforeach
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    @endif
+
 @endif
+
+@push('scripts')
+<script>
+    const selectedIds = new Set();
+    const selectionPanel = document.getElementById('selection-panel');
+    const countDisplay = document.getElementById('count-selected');
+    const hiddenInput = document.getElementById('selected-ids');
+
+    function toggleAthlete(id, cardElement) {
+        if (selectedIds.has(id)) {
+            selectedIds.delete(id);
+            cardElement.classList.remove('ring-4', 'ring-blue-500/30', 'border-blue-600', 'shadow-blue-100');
+            cardElement.classList.add('border-slate-100');
+        } else {
+            selectedIds.add(id);
+            cardElement.classList.remove('border-slate-100');
+            cardElement.classList.add('ring-4', 'ring-blue-500/30', 'border-blue-600', 'shadow-blue-100');
+        }
+
+        const count = selectedIds.size;
+        countDisplay.textContent = count;
+        hiddenInput.value = JSON.stringify(Array.from(selectedIds));
+        
+        if (count > 0) {
+            selectionPanel.classList.remove('hidden');
+        } else {
+            selectionPanel.classList.add('hidden');
+        }
+    }
+</script>
+@endpush
 @endsection

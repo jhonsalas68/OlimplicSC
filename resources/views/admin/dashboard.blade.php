@@ -15,7 +15,7 @@
             <span class="text-sm font-semibold text-green-500 bg-green-50 px-2 py-1 rounded-full">+12%</span>
         </div>
         <h3 class="text-slate-500 text-sm font-medium">Total Atletas</h3>
-        <p class="text-2xl font-bold text-slate-800 mt-1">{{ \App\Models\Athlete::count() }}</p>
+        <p class="text-2xl font-bold text-slate-800 mt-1">{{ $totalAtletas }}</p>
     </div>
 
     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
@@ -27,12 +27,6 @@
             </div>
             <span class="text-sm font-semibold text-slate-400 bg-slate-50 px-2 py-1 rounded-full">Mes Actual</span>
         </div>
-        @php
-            $recaudacionMes = \App\Models\Payment::where(function($q) {
-                $q->where('mes_correspondiente', 'ilike', now()->format('Y-m') . '%')
-                  ->orWhereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()]);
-            })->sum('monto');
-        @endphp
         <h3 class="text-slate-500 text-sm font-medium">Recaudación ({{ now()->translatedFormat('F') }})</h3>
         <p class="text-2xl font-bold text-slate-800 mt-1">Bs. {{ number_format($recaudacionMes, 2) }}</p>
     </div>
@@ -46,7 +40,7 @@
             </div>
         </div>
         <h3 class="text-slate-500 text-sm font-medium">Entrenamientos</h3>
-        <p class="text-2xl font-bold text-slate-800 mt-1">{{ \App\Models\Training::count() }}</p>
+        <p class="text-2xl font-bold text-slate-800 mt-1">{{ $totalEntrenamientos }}</p>
     </div>
 
     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
@@ -58,7 +52,7 @@
             </div>
         </div>
         <h3 class="text-slate-500 text-sm font-medium">Usuarios Inactivos</h3>
-        <p class="text-2xl font-bold text-slate-800 mt-1">{{ \App\Models\User::where('is_active', false)->count() }}</p>
+        <p class="text-2xl font-bold text-slate-800 mt-1">{{ $usuariosInactivos }}</p>
     </div>
 </div>
 

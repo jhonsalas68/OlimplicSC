@@ -27,37 +27,49 @@ class CoachController extends Controller
         return view('coach.dashboard', compact('user', 'category', 'planificaciones', 'atletas'));
     }
 
-    /** Lista de atletas de la categoría del coach */
+    /** Lista de atletas agrupados por categoria, la del coach primero */
     public function atletas()
     {
         $user = Auth::user();
-        $category = $user->category;
+        $myCategory = $user->category;
+        
+        $allAtletas = Athlete::with(['category', 'latestPayment'])
+            ->orderBy('category_id')
+            ->orderBy('apellido_paterno')
+            ->get();
 
-        $atletas = $category
-            ? Athlete::with('category')->where('category_id', $category->id)->orderBy('apellido_paterno')->get()
-            : collect();
+        $atletasPropios = collect();
+        $atletasOtros = collect();
 
-        return view('coach.atletas', compact('category', 'atletas'));
+        if ($myCategory) {
+            $atletasPropios = $allAtletas->where('category_id', $myCategory->id)->values();
+            $atletasOtros = $allAtletas->where('category_id', '!=', $myCategory->id)->groupBy(fn($a) => $a->category->nombre ?? 'Sin Categoría');
+        } else {
+            $atletasOtros = $allAtletas->groupBy(fn($a) => $a->category->nombre ?? 'Sin Categoría');
+        }
+
+        return view('coach.atletas', compact('myCategory', 'atletasPropios', 'atletasOtros'));
     }
 
-    /** Planificaciones del coach */
+    /** Planificaciones agrupadas por categoria */
     public function planificaciones()
     {
         $user = Auth::user();
-        $category = $user->category;
+        $myCategory = $user->category;
 
         $allTrainings = Training::with(['category', 'coach'])->latest()->get();
 
         $planificacionesPropias = collect();
         $planificacionesOtras = collect();
 
-        if ($category) {
-            $planificacionesPropias = $allTrainings->where('category_id', $category->id)->values();
-            $planificacionesOtras = $allTrainings->where('category_id', '!=', $category->id)->values();
+        if ($myCategory) {
+            $planificacionesPropias = $allTrainings->where('category_id', $myCategory->id)->values();
+            $planificacionesOtras = $allTrainings->where('category_id', '!=', $myCategory->id)
+                ->groupBy(fn($t) => $t->category->nombre ?? 'Otras Categorías');
         } else {
-            $planificacionesOtras = $allTrainings->values();
+            $planificacionesOtras = $allTrainings->groupBy(fn($t) => $t->category->nombre ?? 'Otras Categorías');
         }
 
-        return view('coach.planificaciones', compact('category', 'planificacionesPropias', 'planificacionesOtras'));
+        return view('coach.planificaciones', compact('myCategory', 'planificacionesPropias', 'planificacionesOtras'));
     }
 }

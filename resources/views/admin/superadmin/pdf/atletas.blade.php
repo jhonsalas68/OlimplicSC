@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -37,7 +37,6 @@
     <thead>
         <tr>
             <th>#</th>
-            <th>Código</th>
             <th>Nombre Completo</th>
             <th>CI</th>
             <th>Categoría</th>
@@ -51,7 +50,6 @@
         @foreach($atletas as $i => $a)
         <tr>
             <td>{{ $i + 1 }}</td>
-            <td>{{ $a->id_alfanumerico_unico }}</td>
             <td>{{ $a->nombre }} {{ $a->apellido_paterno }} {{ $a->apellido_materno }}</td>
             <td>{{ $a->ci }}</td>
             <td>{{ $a->category->nombre ?? '—' }}</td>

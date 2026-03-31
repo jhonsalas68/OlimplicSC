@@ -1,4 +1,4 @@
-﻿@extends('layouts.admin')
+@extends('layouts.admin')
 
 @section('title', 'Super Admin — Herramientas')
 
@@ -159,6 +159,39 @@
                 </a>
             </div>
         </div>
+
+        {{-- Restaurar (Restorage) --}}
+        <div class="bg-amber-50 rounded-2xl border border-amber-200 shadow-sm p-6 overflow-hidden relative">
+            <div class="absolute -right-4 -top-4 w-24 h-24 bg-amber-200/50 rounded-full blur-xl"></div>
+            
+            <div class="flex items-center gap-3 mb-4 relative z-10">
+                <div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center border border-amber-100 text-amber-600 shadow-sm">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="text-sm font-bold text-slate-800">Restorage / Restaurar</h2>
+                    <p class="text-xs text-slate-500">Recupera una copia de seguridad SQL</p>
+                </div>
+            </div>
+            <form action="{{ route('superadmin.restore.sql') }}" method="POST" enctype="multipart/form-data" 
+                  onsubmit="return confirm('ATENCION PELIGRO: Esto borrará la base de datos actual completa y la reemplazará con el archivo que estás subiendo. Todos los cambios recientes desde tu backup se perderán. ¿Estás ABSOLUTAMENTE seguro de continuar?');" class="relative z-10">
+                @csrf
+                <div class="border-2 border-dashed border-amber-300 bg-white rounded-xl p-4 text-center mb-3 transition-colors">
+                    <input type="file" name="file" accept=".sql" required
+                           class="block w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-amber-100 file:text-amber-800 hover:file:bg-amber-200 cursor-pointer">
+                </div>
+                <p class="text-[11px] text-amber-700 mb-3 font-semibold text-center uppercase tracking-wider">
+                    ⚠️ Acción altamente destructiva
+                </p>
+                <button type="submit"
+                        class="w-full py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-sm font-bold rounded-xl shadow-lg shadow-amber-600/20 transition-all hover:scale-[1.02]">
+                    Restaurar Base de Datos
+                </button>
+            </form>
+        </div>
+
     </div>
 
 </div>

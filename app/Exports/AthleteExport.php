@@ -32,8 +32,7 @@ class AthleteExport implements FromCollection, WithHeadings, WithMapping, WithSt
     public function headings(): array
     {
         return [
-            'ID Alfanumérico',      // A - Auto-generado, no modificar
-            'Nombres',              // B - Obligatorio
+            'Nombres',              // A - Obligatorio
             'Apellido Paterno',     // C - Obligatorio
             'Apellido Materno',     // D - Opcional
             'C.I.',                 // E - Obligatorio, único
@@ -53,7 +52,6 @@ class AthleteExport implements FromCollection, WithHeadings, WithMapping, WithSt
     public function map($athlete): array
     {
         return [
-            $athlete->id_alfanumerico_unico,
             $athlete->nombre,
             $athlete->apellido_paterno,
             $athlete->apellido_materno,
@@ -74,21 +72,20 @@ class AthleteExport implements FromCollection, WithHeadings, WithMapping, WithSt
     public function columnWidths(): array
     {
         return [
-            'A' => 18,  // ID Alfanumérico
-            'B' => 20,  // Nombres
-            'C' => 20,  // Apellido Paterno
-            'D' => 20,  // Apellido Materno
-            'E' => 15,  // C.I.
-            'F' => 14,  // Categoría
-            'G' => 18,  // Fecha Nacimiento
-            'H' => 13,  // Género
-            'I' => 22,  // Alergias
-            'J' => 22,  // Seguro Médico
-            'K' => 20,  // Tutor Nombres
-            'L' => 20,  // Tutor Ape. Paterno
-            'M' => 20,  // Tutor Ape. Materno
-            'N' => 18,  // Tutor Teléfono
-            'O' => 12,  // Habilitado
+            'A' => 20,  // Nombres
+            'B' => 20,  // Apellido Paterno
+            'C' => 20,  // Apellido Materno
+            'D' => 15,  // C.I.
+            'E' => 14,  // Categoría
+            'F' => 18,  // Fecha Nacimiento
+            'G' => 13,  // Género
+            'H' => 22,  // Alergias
+            'I' => 22,  // Seguro Médico
+            'J' => 20,  // Tutor Nombres
+            'K' => 20,  // Tutor Ape. Paterno
+            'L' => 20,  // Tutor Ape. Materno
+            'M' => 18,  // Tutor Teléfono
+            'N' => 12,  // Habilitado
         ];
     }
 
@@ -127,7 +124,7 @@ class AthleteExport implements FromCollection, WithHeadings, WithMapping, WithSt
             AfterSheet::class => function (AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
                 $lastRow = $sheet->getHighestRow();
-                $lastCol = 'O';
+                $lastCol = 'N';
 
                 // Altura de la fila de encabezado
                 $sheet->getRowDimension(1)->setRowHeight(40);
@@ -154,7 +151,7 @@ class AthleteExport implements FromCollection, WithHeadings, WithMapping, WithSt
                 }
 
                 // Centrar columnas específicas
-                $centerCols = ['A', 'E', 'F', 'G', 'H', 'N', 'O'];
+                $centerCols = ['D', 'E', 'F', 'G', 'M', 'N'];
                 foreach ($centerCols as $col) {
                     $sheet->getStyle("{$col}2:{$col}{$lastRow}")->getAlignment()
                         ->setHorizontal(Alignment::HORIZONTAL_CENTER);
@@ -162,7 +159,7 @@ class AthleteExport implements FromCollection, WithHeadings, WithMapping, WithSt
 
                 // Agregar fila de ejemplo al final si no hay datos
                 if ($lastRow === 1) {
-                    $sheet->getStyle("A2:O2")->applyFromArray([
+                    $sheet->getStyle("A2:N2")->applyFromArray([
                         'fill' => [
                             'fillType' => Fill::FILL_SOLID,
                             'startColor' => ['rgb' => 'FFF9C4'],
@@ -170,7 +167,7 @@ class AthleteExport implements FromCollection, WithHeadings, WithMapping, WithSt
                         'font' => ['italic' => true, 'color' => ['rgb' => '666666']],
                     ]);
                     $exampleRow = [
-                        '(auto)', 'Juan', 'Pérez', 'López',
+                        'Juan', 'Pérez', 'López',
                         '12345678', 'Sub-12', '15/06/2012',
                         'Masculino', 'Ninguna', 'Ninguno',
                         'María', 'López', 'García', '77712345', 'SÍ',
@@ -183,7 +180,6 @@ class AthleteExport implements FromCollection, WithHeadings, WithMapping, WithSt
                 $sheet->getComment('A1')->getText()->createTextRun(
                     'INSTRUCCIONES DE IMPORTACIÓN:' . "\n" .
                     '- No modificar los encabezados.' . "\n" .
-                    '- El campo ID es auto-generado.' . "\n" .
                     '- Fecha formato: DD/MM/AAAA.' . "\n" .
                     '- Género: "Masculino" o "Femenino".' . "\n" .
                     '- Habilitado: "SÍ" o "NO".' . "\n" .

@@ -139,9 +139,21 @@
                 <input type="checkbox" name="selected_athletes[]" value="{{ $athlete->id }}" class="athlete-checkbox h-4 w-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500">
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
-                <div class="flex flex-col">
-                    <div class="text-sm font-semibold text-slate-900">{{ $athlete->nombre }} {{ $athlete->apellido_paterno }} {{ $athlete->apellido_materno }}</div>
-                    <div class="text-xs text-slate-500 mt-0.5">Nacimiento: {{ $athlete->fecha_nacimiento?->format('d/m/Y') ?? 'Sin fecha' }}</div>
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 h-10 w-10">
+                        @if($athlete->foto)
+                            <img class="h-10 w-10 rounded-full object-cover shadow-sm bg-slate-100" 
+                                 src="{{ str_starts_with($athlete->foto, 'http') ? str_replace('/upload/', '/upload/c_fill,w_100,h_100,q_auto,f_auto/', $athlete->foto) : asset('storage/' . $athlete->foto) }}" alt="">
+                        @else
+                            <div class="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 font-bold text-xs border border-slate-200">
+                                {{ strtoupper(substr($athlete->nombre,0,1).substr($athlete->apellido_paterno??'',0,1)) }}
+                            </div>
+                        @endif
+                    </div>
+                    <div class="ml-4">
+                        <div class="text-sm font-semibold text-slate-900">{{ $athlete->nombre }} {{ $athlete->apellido_paterno }} {{ $athlete->apellido_materno }}</div>
+                        <div class="text-xs text-slate-500 mt-0.5">Nacimiento: {{ $athlete->fecha_nacimiento?->format('d/m/Y') ?? 'Sin fecha' }}</div>
+                    </div>
                 </div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 font-medium">

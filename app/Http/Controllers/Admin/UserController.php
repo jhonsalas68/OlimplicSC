@@ -16,7 +16,7 @@ class UserController extends Controller
     public function index(Request $request)
     {
         if (!$request->has('role_id') && !$request->has('search')) {
-            $roles = Role::withCount('users')->get();
+            $roles = Role::whereNotIn('name', ['Student'])->withCount('users')->get();
             return view('admin.users.roles', compact('roles'));
         }
 

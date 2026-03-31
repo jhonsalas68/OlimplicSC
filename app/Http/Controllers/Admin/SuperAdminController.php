@@ -162,4 +162,29 @@ class SuperAdminController extends Controller
         $filename = 'backup_excel_olimpicsc_' . now()->format('Y-m-d') . '.xlsx';
         return Excel::download(new \App\Exports\FullBackupExport, $filename);
     }
+
+    // ── RESTORAGE (RESTORE) ────────────────────────────────────────
+
+    public function restore(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimetypes:text/plain,application/sql,application/octet-stream|max:10240', // 10MB .sql extension validation can be tricky, so we use max
+        ]);
+
+        try {
+            $sql = file_get_contents($request->file('file')->getRealPath());
+            
+            // Validate if it is somewhat an SQL string
+            if (empty(trim($sql)) || !str_contains($sql, 'INSERT INTO')) {
+                 return back()->with('error', 'El archivo no parece ser un backup SQL válido.');
+            }
+
+            // Ejecuta el backup masivo
+            DB::unprepared($sql);
+
+            return back()->with('success', '¡Base de datos restaurada y reemplazada correctamente!');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error crítico al restaurar la base de datos: ' . $e->getMessage());
+        }
+    }
 }

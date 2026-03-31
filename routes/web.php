@@ -34,40 +34,44 @@ Route::middleware(['auth', 'prevent-back-history'])->prefix('admin')->group(func
     Route::get('/profile', [\App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
 
-    // Module Atletas
-    Route::get('/athletes/export', [\App\Http\Controllers\Admin\AthleteController::class, 'export'])->name('athletes.export');
+    // Rutas protegidas solo para Admin/SuperAdmin
+    Route::middleware(['role:Admin|SuperAdmin'])->group(function () {
+        // Module Usuarios
+        Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
+
+        // Module Pagos (Gestión)
+        Route::resource('payments', \App\Http\Controllers\Admin\PaymentController::class)->only(['destroy']);
+
+        // Module Reportes
+        Route::get('/reports', [\App\Http\Controllers\Admin\ReportController::class, 'index'])->name('admin.reports.index');
+        Route::get('/reports/export', [\App\Http\Controllers\Admin\ReportController::class, 'exportExcel'])->name('admin.reports.export.excel');
+
+        // Module Cobros (panel de venta independiente)
+        Route::get('/cobros', [\App\Http\Controllers\Admin\CobrosController::class, 'index'])->name('cobros.index');
+        Route::get('/cobros/search', [\App\Http\Controllers\Admin\CobrosController::class, 'search'])->name('cobros.search');
+        Route::get('/cobros/atleta/{athlete}', [\App\Http\Controllers\Admin\CobrosController::class, 'getAtleta'])->name('cobros.atleta');
+        Route::post('/cobros/cobrar', [\App\Http\Controllers\Admin\CobrosController::class, 'cobrar'])->name('cobros.cobrar');
+        Route::get('/cobros/nota/{payment}', [\App\Http\Controllers\Admin\CobrosController::class, 'nota'])->name('cobros.nota');
+
+        // Acciones administrativas de atletas
+        Route::get('/athletes/export', [\App\Http\Controllers\Admin\AthleteController::class, 'export'])->name('athletes.export');
+        Route::post('/athletes/import', [\App\Http\Controllers\Admin\AthleteController::class, 'import'])->name('athletes.import');
+        Route::post('/athletes/{athlete}/toggle-habilitado', [\App\Http\Controllers\Admin\AthleteController::class, 'toggleHabilitado'])->name('athletes.toggle-habilitado');
+        Route::resource('athletes', \App\Http\Controllers\Admin\AthleteController::class)->except(['index', 'show']);
+    });
+
+    // Rutas accesibles por todos (incluyendo Coach para visualización)
+    Route::get('/athletes', [\App\Http\Controllers\Admin\AthleteController::class, 'index'])->name('athletes.index');
+    Route::get('/athletes/{athlete}', [\App\Http\Controllers\Admin\AthleteController::class, 'show'])->name('athletes.show');
     Route::post('/athletes/export/selected', [\App\Http\Controllers\Admin\AthleteController::class, 'exportSelected'])->name('athletes.export.selected');
-    Route::post('/athletes/import', [\App\Http\Controllers\Admin\AthleteController::class, 'import'])->name('athletes.import');
-    Route::post('/athletes/{athlete}/toggle-habilitado', [\App\Http\Controllers\Admin\AthleteController::class, 'toggleHabilitado'])->name('athletes.toggle-habilitado');
-    Route::resource('athletes', \App\Http\Controllers\Admin\AthleteController::class);
 
-    // Module Usuarios
-    Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
-
-    // Module Pagos
+    // Module Historial de Pagos (Solo lectura para Coach)
+    Route::get('/payments', [\App\Http\Controllers\Admin\PaymentController::class, 'index'])->name('payments.index');
     Route::get('/payments/export/pdf',   [\App\Http\Controllers\Admin\PaymentController::class, 'exportPdf'])->name('payments.export.pdf');
     Route::get('/payments/export/excel', [\App\Http\Controllers\Admin\PaymentController::class, 'exportExcel'])->name('payments.export.excel');
-    Route::resource('payments', \App\Http\Controllers\Admin\PaymentController::class)->only(['index','destroy']);
-
-    // Module Cobranza (legacy redirect → cobros)
-    Route::get('/cobranza', fn() => redirect()->route('cobros.index'))->name('cobranza.index');
-    Route::get('/cobranza/search', fn() => redirect()->route('cobros.index'))->name('cobranza.search');
-    Route::post('/cobranza/buscar', fn() => redirect()->route('cobros.index'))->name('cobranza.buscar');
-    Route::post('/cobranza/cobrar', fn() => redirect()->route('cobros.index'))->name('cobranza.cobrar');
-    Route::get('/cobranza/nota/{payment}', fn($payment) => redirect()->route('cobros.nota', $payment))->name('cobranza.nota');
 
     // Module Planificaciones (Trainings)
     Route::resource('trainings', \App\Http\Controllers\Admin\TrainingController::class);
-
-    // Module Reportes
-    Route::get('/reports', [\App\Http\Controllers\Admin\ReportController::class, 'index'])->name('admin.reports.index');
-
-    // Module Cobros (panel de venta independiente)
-    Route::get('/cobros', [\App\Http\Controllers\Admin\CobrosController::class, 'index'])->name('cobros.index');
-    Route::get('/cobros/search', [\App\Http\Controllers\Admin\CobrosController::class, 'search'])->name('cobros.search');
-    Route::get('/cobros/atleta/{athlete}', [\App\Http\Controllers\Admin\CobrosController::class, 'getAtleta'])->name('cobros.atleta');
-    Route::post('/cobros/cobrar', [\App\Http\Controllers\Admin\CobrosController::class, 'cobrar'])->name('cobros.cobrar');
-    Route::get('/cobros/nota/{payment}', [\App\Http\Controllers\Admin\CobrosController::class, 'nota'])->name('cobros.nota');
 
     // Module Coach
     Route::get('/coach/dashboard', [\App\Http\Controllers\Admin\CoachController::class, 'dashboard'])->name('coach.dashboard');
@@ -85,5 +89,6 @@ Route::middleware(['auth', 'prevent-back-history'])->prefix('admin')->group(func
         Route::post('/import/atletas',       [\App\Http\Controllers\Admin\SuperAdminController::class, 'importAtletas'])->name('superadmin.import.atletas');
         Route::get('/backup/sql',            [\App\Http\Controllers\Admin\SuperAdminController::class, 'backup'])->name('superadmin.backup.sql');
         Route::get('/backup/excel',          [\App\Http\Controllers\Admin\SuperAdminController::class, 'backupExcel'])->name('superadmin.backup.excel');
+        Route::post('/restore/sql',          [\App\Http\Controllers\Admin\SuperAdminController::class, 'restore'])->name('superadmin.restore.sql');
     });
 });

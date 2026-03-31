@@ -105,8 +105,8 @@
             <span class="info-value">{{ \Carbon\Carbon::parse($payment->created_at)->format('d/m/Y') }}</span>
         </div>
         <div class="info-row">
-            <span class="info-label">Atleta:</span>
-            <span class="info-value">{{ $payment->athlete->nombre }} (ID: {{ $payment->athlete->id_alfanumerico_unico }})</span>
+            <span class="info-label">Estudiante/Atleta:</span>
+            <span class="info-value">{{ $payment->athlete->nombre }} {{ $payment->athlete->apellido_paterno }} (C.I.: {{ $payment->athlete->ci }})</span>
         </div>
         <div class="info-row">
             <span class="info-label">Concepto / Mes:</span>

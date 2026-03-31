@@ -297,10 +297,7 @@
                         <label>Cedula de Identidad</label>
                         <span>{{ $payment->athlete->ci }}</span>
                     </div>
-                    <div class="info-item">
-                        <label>Codigo</label>
-                        <span>{{ $payment->athlete->id_alfanumerico_unico ?? '—' }}</span>
-                    </div>
+
                     <div class="info-item">
                         <label>Categoria</label>
                         <span>{{ $payment->athlete->category->nombre ?? '—' }}</span>

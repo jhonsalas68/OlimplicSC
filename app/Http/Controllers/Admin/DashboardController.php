@@ -13,6 +13,22 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        return view('admin.dashboard');
+        $totalAtletas = Athlete::count();
+        
+        $recaudacionMes = Payment::where(function($q) {
+            $q->where('mes_correspondiente', 'ilike', now()->format('Y-m') . '%')
+              ->orWhereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()]);
+        })->where('estado_pago', 'pagado')->sum('monto');
+        
+        $totalEntrenamientos = Training::count();
+        
+        $usuariosInactivos = User::where('is_active', false)->count();
+
+        return view('admin.dashboard', compact(
+            'totalAtletas', 
+            'recaudacionMes', 
+            'totalEntrenamientos', 
+            'usuariosInactivos'
+        ));
     }
 }

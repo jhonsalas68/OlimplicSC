@@ -63,6 +63,12 @@ class Athlete extends Model
         return Carbon::parse($this->fecha_nacimiento)->age;
     }
 
+    /** Relacion optima para obtener el ultimo pago y evitar N+1 */
+    public function latestPayment()
+    {
+        return $this->hasOne(Payment::class)->latestOfMany();
+    }
+
     /** Asigna la categoría correcta según la fecha de nacimiento */
     public function asignarCategoriaPorEdad(): void
     {
@@ -72,7 +78,6 @@ class Athlete extends Model
 
     protected static function booted(): void
     {
-        // Auto-asignar categoría antes de crear
         static::creating(function (Athlete $athlete) {
             if ($athlete->fecha_nacimiento) {
                 $athlete->asignarCategoriaPorEdad();

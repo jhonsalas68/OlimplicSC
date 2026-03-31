@@ -47,8 +47,12 @@
             <div class="flex flex-col sm:flex-row sm:items-end gap-5">
                 <div class="-mt-12 w-24 h-24 rounded-2xl border-4 border-white shadow-md overflow-hidden bg-slate-50 flex-shrink-0 relative">
                     @if($athlete->foto)
-                        <img src="{{ str_starts_with($athlete->foto, 'http') ? $athlete->foto : asset('storage/' . $athlete->foto) }}" 
-                             class="w-full h-full object-cover">
+                        @php
+                            $optimizedFoto = str_starts_with($athlete->foto, 'http') 
+                                ? str_replace('/upload/', '/upload/c_fill,w_300,h_300,q_auto,f_auto/', $athlete->foto) 
+                                : asset('storage/' . $athlete->foto);
+                        @endphp
+                        <img src="{{ $optimizedFoto }}" class="w-full h-full object-cover">
                     @else
                         <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#0b2d69] to-[#c61c2c] text-white font-black text-3xl">
                             {{ strtoupper(substr($athlete->nombre,0,1).substr($athlete->apellido_paterno??'',0,1)) }}
@@ -59,10 +63,21 @@
                     <h1 class="text-2xl font-black text-slate-900 tracking-tight mb-1">
                         {{ $athlete->nombre }} {{ $athlete->apellido_paterno }} {{ $athlete->apellido_materno }}
                     </h1>
-                    <div class="flex items-center gap-2 flex-wrap">
+                    <div class="flex items-center gap-2 flex-wrap mt-2">
                         <span class="text-xs font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-md shadow-sm border border-slate-200 cursor-default">
                             {{ $athlete->category->nombre ?? 'Sin categoría' }}
                         </span>
+                        
+                        {{-- Estado de Mensualidad --}}
+                        @if(isset($alDia) && $alDia)
+                            <span class="text-xs font-bold text-emerald-700 bg-emerald-100 px-2.5 py-1 rounded-md shadow-sm border border-emerald-200 cursor-default flex items-center gap-1.5" title="Tiene pagada la mensualidad de este mes">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Mensualidad al día ({{ ucfirst(now()->translatedFormat('F')) }})
+                            </span>
+                        @else
+                            <span class="text-xs font-bold text-red-700 bg-red-100 px-2.5 py-1 rounded-md shadow-sm border border-red-200 cursor-default flex items-center gap-1.5" title="No ha pagado la mensualidad de este mes aún">
+                                <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span> Debe {{ ucfirst(now()->translatedFormat('F')) }}
+                            </span>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -144,10 +159,10 @@
         </div>
     </div>
 
-    {{-- Últimos pagos --}}
-    @if($pagos->count())
+    {{-- Últimos pagos (Solo para Admins) --}}
+    @if($pagos->count() && (auth()->user()->hasRole('Admin') || auth()->user()->hasRole('SuperAdmin')))
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-        <h2 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Últimos Pagos</h2>
+        <h2 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Historial Contable</h2>
         <div class="space-y-1">
             @foreach($pagos as $pago)
             <div class="flex items-center justify-between py-2.5 border-b border-slate-50 last:border-0">

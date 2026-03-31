@@ -139,7 +139,16 @@ class AthleteController extends Controller
     public function show(Athlete $athlete)
     {
         $pagos = $athlete->payments()->latest()->take(5)->get();
-        return view('admin.athletes.show', compact('athlete', 'pagos'));
+        
+        // Determinar si está al día con la mensualidad actual
+        $mesActual = now()->format('Y-m');
+        $alDia = $athlete->payments()
+            ->where('concepto', 'mensualidad')
+            ->where('mes_correspondiente', $mesActual)
+            ->where('estado_pago', 'pagado')
+            ->exists();
+
+        return view('admin.athletes.show', compact('athlete', 'pagos', 'alDia'));
     }
 
     public function edit(Athlete $athlete)
