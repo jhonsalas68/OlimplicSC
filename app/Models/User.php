@@ -67,6 +67,9 @@ class User extends Authenticatable
      */
     public function getAvatarUrlAttribute(): string
     {
-        return $this->avatar ?: 'https://via.placeholder.com/150';
+        if ($this->hasRole('SuperAdmin')) {
+            return $this->avatar ?: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' fill='%231e3a8a'/%3E%3Cpath d='M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z' fill='%23FBBF24'/%3E%3C/svg%3E";
+        }
+        return $this->avatar ?: 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&color=7F9CF5&background=EBF4FF';
     }
 }

@@ -3,9 +3,31 @@
 @section('title', 'Usuarios y Roles')
 
 @section('content')
+<div class="mb-6">
+    <div class="flex items-center space-x-4 mb-2">
+        <a href="{{ route('users.index') }}" class="inline-flex items-center justify-center h-10 w-10 min-w-[40px] rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-blue-600 hover:bg-blue-50 transition-colors shadow-sm">
+            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+        </a>
+        <div>
+            @if(isset($selectedRole))
+                <h1 class="text-2xl font-bold text-slate-800">Usuarios: Rol {{ $selectedRole->name }}</h1>
+            @elseif(request('search'))
+                <h1 class="text-2xl font-bold text-slate-800">Resultados de búsqueda</h1>
+            @else
+                <h1 class="text-2xl font-bold text-slate-800">Todos los Usuarios</h1>
+            @endif
+        </div>
+    </div>
+</div>
+
 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
     <div class="flex items-center space-x-4 w-full sm:w-auto">
         <form action="{{ route('users.index') }}" method="GET" class="relative group w-full">
+            @if(request('role_id'))
+                <input type="hidden" name="role_id" value="{{ request('role_id') }}">
+            @endif
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <svg class="h-5 w-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -47,8 +69,8 @@
         <tr class="hover:bg-slate-50/50 transition-colors">
             <td class="px-6 py-4 whitespace-nowrap">
                 <div class="flex items-center">
-                    <div class="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 text-xs font-bold">
-                        {{ substr($user->name, 0, 1) }}
+                    <div class="shrink-0 h-8 w-8">
+                        <img class="h-8 w-8 rounded-full object-cover border border-slate-200" src="{{ $user->avatar_url }}" alt="{{ $user->name }}">
                     </div>
                     <div class="ml-3">
                         <div class="text-sm font-semibold text-slate-900">{{ $user->name }} {{ $user->apellido_paterno }} {{ $user->apellido_materno }}</div>

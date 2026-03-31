@@ -5,8 +5,8 @@
             <img class="h-16 w-16 object-cover rounded-full border-2 border-slate-100 shadow-sm" src="{{ $user->avatar_url }}" alt="Avatar">
         </div>
         <label class="block">
-            <span class="sr-only">Elegir avatar</span>
-            <input type="file" name="avatar" class="block w-full text-sm text-slate-500
+            <span class="block text-sm font-semibold text-slate-700 mb-1">Foto de Perfil (Opcional)</span>
+            <input type="file" name="avatar" accept="image/*" class="block w-full text-sm text-slate-500
                 file:mr-4 file:py-2 file:px-4
                 file:rounded-full file:border-0
                 file:text-sm file:font-semibold
@@ -83,8 +83,8 @@
             </div>
         </div>
         <label class="block">
-            <span class="sr-only">Elegir avatar</span>
-            <input type="file" name="avatar" class="block w-full text-sm text-slate-500
+            <span class="block text-sm font-semibold text-slate-700 mb-1">Foto de Perfil (Opcional)</span>
+            <input type="file" name="avatar" accept="image/*" class="block w-full text-sm text-slate-500
                 file:mr-4 file:py-2 file:px-4
                 file:rounded-full file:border-0
                 file:text-sm file:font-semibold

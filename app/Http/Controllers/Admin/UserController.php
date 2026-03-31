@@ -15,20 +15,36 @@ class UserController extends Controller
     use CloudinaryHelper;
     public function index(Request $request)
     {
+        if (!$request->has('role_id') && !$request->has('search')) {
+            $roles = Role::withCount('users')->get();
+            return view('admin.users.roles', compact('roles'));
+        }
+
         $query = User::query();
+
+        if ($request->filled('role_id')) {
+            $query->whereHas('roles', function($q) use ($request) {
+                $q->where('id', $request->role_id);
+            });
+            $selectedRole = Role::find($request->role_id);
+        } else {
+            $selectedRole = null;
+        }
 
         if ($request->filled('search')) {
             $query->where('name', 'ilike', '%' . $request->search . '%')
-                  ->orWhere('username', 'ilike', '%' . $request->search . '%');
+                  ->orWhere('username', 'ilike', '%' . $request->search . '%')
+                  ->orWhere('email', 'ilike', '%' . $request->search . '%')
+                  ->orWhere('ci', 'ilike', '%' . $request->search . '%');
         }
 
         $users = $query->with('roles')->latest()->paginate(10);
-        return view('admin.users.index', compact('users'));
+        return view('admin.users.index', compact('users', 'selectedRole'));
     }
 
     public function create()
     {
-        $roles = Role::where('name', '!=', 'SuperAdmin')->get();
+        $roles = Role::whereNotIn('name', ['SuperAdmin', 'Student'])->get();
         $categories = Category::orderBy('edad_min')->get();
         return view('admin.users.create', compact('roles', 'categories'));
     }
@@ -42,7 +58,7 @@ class UserController extends Controller
             'ci'              => 'required|string|max:20|unique:users,ci',
             'email'           => 'required|email|unique:users,email',
             'is_active'       => 'boolean',
-            'role'            => 'required|string|exists:roles,name|not_in:SuperAdmin',
+            'role'            => 'required|string|exists:roles,name|not_in:SuperAdmin,Student',
             'category_id'     => 'nullable|exists:categories,id',
             'avatar'          => 'nullable|image|max:2048',
         ]);
@@ -90,7 +106,7 @@ class UserController extends Controller
             return back()->with('error', 'La cuenta de SuperAdmin es intocable y no puede ser editada.');
         }
 
-        $roles = Role::where('name', '!=', 'SuperAdmin')->get();
+        $roles = Role::whereNotIn('name', ['SuperAdmin', 'Student'])->get();
         $categories = Category::orderBy('edad_min')->get();
         return view('admin.users.edit', compact('user', 'roles', 'categories'));
     }
@@ -108,7 +124,7 @@ class UserController extends Controller
             'email'            => 'required|email|unique:users,email,' . $user->id,
             'ci'               => 'required|string|max:20|unique:users,ci,' . $user->id,
             'password'         => 'nullable|string|min:6|confirmed',
-            'role'             => 'required|string|exists:roles,name|not_in:SuperAdmin',
+            'role'             => 'required|string|exists:roles,name|not_in:SuperAdmin,Student',
             'category_id'      => 'nullable|exists:categories,id',
             'avatar'           => 'nullable|image|max:2048',
         ]);

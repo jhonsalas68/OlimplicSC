@@ -19,26 +19,36 @@ trait CloudinaryHelper
             return;
         }
 
-        // Extractor de public_id de la URL.
-        // Ej: https://res.cloudinary.com/.../upload/v1234/folder/file.ext -> folder/file
-        if (preg_match('/upload\/(?:v\d+\/)?([^\.]+)/', $url, $matches)) {
-            $publicId = $matches[1];
+        // Remove query params if any
+        $urlBase = explode('?', $url)[0];
+
+        // Extractor de resource_type y public_id de la URL.
+        // Ej: https://res.cloudinary.com/demo/image/upload/v1234/folder/file.jpg
+        // Ej: https://res.cloudinary.com/demo/raw/upload/v1234/folder/file.pdf
+        if (preg_match('/\/([a-z]+)\/upload\/(?:v\d+\/)?(.+)$/i', $urlBase, $matches)) {
+            $resourceType = strtolower($matches[1]); // image, raw, video
+            $fullPathWithExt = $matches[2];
+
+            // En Cloudinary, los archivos 'raw' (como PDFs por defecto) requieren la extensión
+            // como parte de su public_id. Para 'image' o 'video', no se requiere ni acepta.
+            if ($resourceType === 'raw') {
+                $publicId = $fullPathWithExt;
+            } else {
+                // Remover extensión para image/video
+                $dir = pathinfo($fullPathWithExt, PATHINFO_DIRNAME);
+                $file = pathinfo($fullPathWithExt, PATHINFO_FILENAME);
+                $publicId = ($dir === '.') ? $file : $dir . '/' . $file;
+            }
+
             try {
-                // Cloudinary soporta destrucción automática para imágenes. 
-                // Para documentos crudos o PDFs que no fueron transformados, 
-                // podría requerir resource_type => raw, por defecto prueba image.
-                $ext = pathinfo($url, PATHINFO_EXTENSION);
-                $resourceType = in_array(strtolower($ext), ['pdf', 'doc', 'docx']) ? 'raw' : 'image';
-                
-                // Intenta eliminarlo asumiendo el tipo de recurso correspondiente con la API
                 Cloudinary::uploadApi()->destroy($publicId, ['resource_type' => $resourceType]);
             } catch (\Exception $e) {
-                // Si falla (ej. era auto pero se guardo distinto), intenta fallback:
+                // Si falla, intenta fallback por si hubo una mutación inusual en la API
                 try {
                     $fallback = $resourceType === 'image' ? 'raw' : 'image';
                     Cloudinary::uploadApi()->destroy($publicId, ['resource_type' => $fallback]);
                 } catch (\Exception $e2) {
-                    Log::error("CloudinaryHelper: Falló al eliminar $url. Error: " . $e2->getMessage());
+                    Log::error("CloudinaryHelper: Falló al eliminar publicId: $publicId de URL $url. Error: " . $e2->getMessage());
                 }
             }
         }
