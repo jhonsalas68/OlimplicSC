@@ -74,7 +74,24 @@ class AthleteController extends Controller
             });
         }
 
-        $athletes = $query->with('category')->latest()->paginate(10);
+        // Filtro por estado de pago (Mensualidad)
+        if ($request->filled('deuda')) {
+            if ($request->deuda === 'al_dia') {
+                $query->alDia();
+            } elseif ($request->deuda === 'deudores') {
+                $query->debe();
+            }
+        }
+
+        $mesActual = now()->format('Y-m');
+        $athletes = $query->with('category')
+            ->withExists(['payments as pagado_mes_actual' => function ($q) use ($mesActual) {
+                $q->where('concepto', 'mensualidad')
+                  ->where('mes_correspondiente', $mesActual)
+                  ->where('estado_pago', 'pagado');
+            }])
+            ->latest()
+            ->paginate(10);
         return view('admin.athletes.index', compact('athletes', 'selectedCategory'));
     }
 
@@ -139,14 +156,7 @@ class AthleteController extends Controller
     public function show(Athlete $athlete)
     {
         $pagos = $athlete->payments()->latest()->take(5)->get();
-        
-        // Determinar si está al día con la mensualidad actual
-        $mesActual = now()->format('Y-m');
-        $alDia = $athlete->payments()
-            ->where('concepto', 'mensualidad')
-            ->where('mes_correspondiente', $mesActual)
-            ->where('estado_pago', 'pagado')
-            ->exists();
+        $alDia = $athlete->isAlDia();
 
         return view('admin.athletes.show', compact('athlete', 'pagos', 'alDia'));
     }

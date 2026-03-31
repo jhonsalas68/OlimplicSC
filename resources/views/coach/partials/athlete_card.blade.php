@@ -39,6 +39,12 @@
             <span class="text-[10px] font-bold bg-slate-100 text-slate-500 px-2 py-0.5 rounded-md">{{ \Carbon\Carbon::parse($atleta->fecha_nacimiento)->age }} años</span>
         @endif
         <span class="text-[10px] font-bold bg-slate-100 text-slate-500 px-2 py-0.5 rounded-md uppercase">{{ $atleta->genero ?? 'N/A' }}</span>
+        
+        @if(isset($atleta->pagado_mes_actual))
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-md uppercase border {{ $atleta->pagado_mes_actual ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-rose-50 text-rose-700 border-rose-100' }}">
+                {{ $atleta->pagado_mes_actual ? 'Al Día' : 'Debe' }}
+            </span>
+        @endif
     </div>
 
     <div class="mt-auto pt-2 w-full border-t border-slate-50">

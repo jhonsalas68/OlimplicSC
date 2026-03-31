@@ -87,7 +87,14 @@
                     <p class="text-sm font-medium text-slate-700 truncate">
                         {{ $atleta->nombre }} {{ $atleta->apellido_paterno }}
                     </p>
-                    <p class="text-xs text-slate-400">CI: {{ $atleta->ci }}</p>
+                    <div class="flex items-center gap-2">
+                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">CI: {{ $atleta->ci }}</p>
+                        @if(isset($atleta->pagado_mes_actual))
+                            <span class="text-[9px] font-black px-1.5 py-0.5 rounded uppercase border {{ $atleta->pagado_mes_actual ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-rose-50 text-rose-600 border-rose-100' }}">
+                                {{ $atleta->pagado_mes_actual ? 'Al Día' : 'Debe' }}
+                            </span>
+                        @endif
+                    </div>
                 </div>
             </div>
         @empty

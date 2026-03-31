@@ -27,8 +27,6 @@
                     {{ $athlete->nombre }} {{ $athlete->apellido_paterno }} {{ $athlete->apellido_materno }}
                 </p>
                 <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1">
-                    <span class="text-blue-200 text-sm font-mono font-semibold">{{ $athlete->id_alfanumerico_unico }}</span>
-                    <span class="text-blue-300 text-xs">·</span>
                     <span class="text-blue-200 text-sm">C.I. {{ $athlete->ci }}</span>
                     <span class="text-blue-300 text-xs">·</span>
                     <span class="inline-flex items-center px-2 py-0.5 bg-white/20 text-white text-xs font-semibold rounded-full">

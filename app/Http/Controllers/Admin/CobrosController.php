@@ -28,14 +28,12 @@ class CobrosController extends Controller
                       ->orWhere('nombre', 'ilike', "%{$q}%")
                       ->orWhere('apellido_paterno', 'ilike', "%{$q}%")
                       ->orWhere('apellido_materno', 'ilike', "%{$q}%")
-                      ->orWhere('id_alfanumerico_unico', 'ilike', "%{$q}%")
                       ->orWhereRaw("CONCAT(nombre, ' ', apellido_paterno, ' ', COALESCE(apellido_materno,'')) ILIKE ?", ["%{$q}%"]);
             })
             ->limit(8)->get()
             ->map(fn(Athlete $a) => [
                 'id'             => $a->id,
                 'ci'             => $a->ci,
-                'codigo'         => $a->id_alfanumerico_unico,
                 'nombre_completo'=> trim("{$a->nombre} {$a->apellido_paterno} {$a->apellido_materno}"),
                 'iniciales'      => strtoupper(substr($a->nombre,0,1).substr($a->apellido_paterno??'',0,1)),
                 'foto'           => $a->foto ? (str_starts_with($a->foto, 'http') ? str_replace('/upload/', '/upload/c_fill,w_100,h_100,q_auto,f_auto/', $a->foto) : $a->foto) : null,
@@ -55,7 +53,6 @@ class CobrosController extends Controller
             'id'             => $athlete->id,
             'nombre_completo'=> trim("{$athlete->nombre} {$athlete->apellido_paterno} {$athlete->apellido_materno}"),
             'ci'             => $athlete->ci,
-            'codigo'         => $athlete->id_alfanumerico_unico,
             'categoria'      => $athlete->category->nombre ?? '—',
             'foto'           => $athlete->foto ? (str_starts_with($athlete->foto, 'http') ? str_replace('/upload/', '/upload/c_fill,w_150,h_150,q_auto,f_auto/', $athlete->foto) : $athlete->foto) : null,
             'ultimo_pago'    => $ultimoPago

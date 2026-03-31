@@ -31,10 +31,10 @@ class FullBackupExport implements WithMultipleSheets
     }
 
     private function atletasHeadings(): array {
-        return ['ID','Código','Nombre','Ape. Paterno','Ape. Materno','CI','Categoría','Fecha Nac.','Género','Habilitado','Seguro','Alergias','Creado'];
+        return ['ID','Nombre','Ape. Paterno','Ape. Materno','CI','Categoría','Fecha Nac.','Género','Habilitado','Seguro','Alergias','Creado'];
     }
     private function atletasMap($a): array {
-        return [$a->id, $a->id_alfanumerico_unico, $a->nombre, $a->apellido_paterno, $a->apellido_materno, $a->ci, $a->category->nombre ?? '—', $a->fecha_nacimiento?->format('d/m/Y'), $a->genero, $a->habilitado_booleano ? 'SÍ' : 'NO', $a->tiene_seguro ? 'SÍ' : 'NO', $a->alergias, $a->created_at->format('d/m/Y')];
+        return [$a->id, $a->nombre, $a->apellido_paterno, $a->apellido_materno, $a->ci, $a->category->nombre ?? '—', $a->fecha_nacimiento?->format('d/m/Y'), $a->genero, $a->habilitado_booleano ? 'SÍ' : 'NO', $a->tiene_seguro ? 'SÍ' : 'NO', $a->alergias, $a->created_at->format('d/m/Y')];
     }
 
     private function pagosHeadings(): array {

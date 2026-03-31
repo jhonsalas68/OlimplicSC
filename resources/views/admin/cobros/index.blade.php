@@ -49,7 +49,6 @@
                     <p id="atleta-meta" class="text-xs text-slate-500 mt-0.5"></p>
                 </div>
                 <div class="text-right flex-shrink-0">
-                    <p id="atleta-codigo" class="text-xs font-mono font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md"></p>
                     <p id="atleta-ultimo-pago" class="text-xs text-slate-400 mt-1"></p>
                 </div>
             </div>
@@ -198,7 +197,7 @@ buscador.addEventListener('input',function(){
                     const fotoHtml=avatarSrc
                         ?`<img src="${avatarSrc}" class="w-10 h-10 rounded-full object-cover flex-shrink-0">`
                         :`<div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-red-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">${atleta.iniciales}</div>`;
-                    div.innerHTML=`${fotoHtml}<div class="flex-1 min-w-0"><p class="text-sm font-semibold text-slate-800 truncate">${atleta.nombre_completo}</p><p class="text-xs text-slate-500">CI: ${atleta.ci} &middot; ${atleta.categoria}</p></div><span class="text-xs font-mono text-blue-600 bg-blue-50 px-2 py-0.5 rounded flex-shrink-0">${atleta.codigo??''}</span>`;
+                    div.innerHTML=`${fotoHtml}<div class="flex-1 min-w-0"><p class="text-sm font-semibold text-slate-800 truncate">${atleta.nombre_completo}</p><p class="text-xs text-slate-500">CI: ${atleta.ci} &middot; ${atleta.categoria}</p></div>`;
                     div.addEventListener('click',()=>seleccionarAtleta(atleta,div));
                     resultados.appendChild(div);
                 });
@@ -216,7 +215,6 @@ function seleccionarAtleta(atleta,el){
     avatarEl.innerHTML=avatarSrc?`<img src="${avatarSrc}" class="w-full h-full object-cover">`:atleta.iniciales;
     document.getElementById('atleta-nombre').textContent=atleta.nombre_completo;
     document.getElementById('atleta-meta').textContent=`CI: ${atleta.ci} · ${atleta.categoria}`;
-    document.getElementById('atleta-codigo').textContent=atleta.codigo??'';
     document.getElementById('atleta-ultimo-pago').textContent=atleta.ultimo_pago?`Ultimo pago: ${atleta.ultimo_pago}`:'Sin pagos registrados';
     panelVacio.classList.add('hidden');
     panelCobro.classList.remove('hidden');

@@ -133,8 +133,7 @@ function renderResultados(atletas) {
             <div class="flex-1 min-w-0">
                 <p class="font-semibold text-slate-800 text-sm truncate">${a.nombre_completo}</p>
                 <p class="text-xs text-slate-400 mt-0.5">
-                    <span class="font-mono text-blue-600">${a.codigo}</span>
-                    &nbsp;·&nbsp; C.I. ${a.ci}
+                    C.I. ${a.ci}
                     &nbsp;·&nbsp; ${a.categoria}
                 </p>
             </div>

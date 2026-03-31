@@ -20,8 +20,17 @@ class CoachController extends Controller
             ? Training::with(['category', 'coach'])->where('category_id', $category->id)->latest()->get()
             : collect();
 
+        $mesActual = now()->format('Y-m');
         $atletas = $category
-            ? Athlete::with('category')->where('category_id', $category->id)->orderBy('apellido_paterno')->get()
+            ? Athlete::with('category')
+                ->withExists(['payments as pagado_mes_actual' => function ($q) use ($mesActual) {
+                    $q->where('concepto', 'mensualidad')
+                      ->where('mes_correspondiente', $mesActual)
+                      ->where('estado_pago', 'pagado');
+                }])
+                ->where('category_id', $category->id)
+                ->orderBy('apellido_paterno')
+                ->get()
             : collect();
 
         return view('coach.dashboard', compact('user', 'category', 'planificaciones', 'atletas'));
@@ -35,10 +44,25 @@ class CoachController extends Controller
         $verTodas = $request->has('ver_todas');
         
         // Optimización: Si no se pide ver todas, solo cargamos los de nuestra categoría
-        $query = Athlete::with(['category', 'latestPayment']);
+        $mesActual = now()->format('Y-m');
+        $query = Athlete::with(['category'])
+            ->withExists(['payments as pagado_mes_actual' => function ($q) use ($mesActual) {
+                $q->where('concepto', 'mensualidad')
+                  ->where('mes_correspondiente', $mesActual)
+                  ->where('estado_pago', 'pagado');
+            }]);
         
         if (!$verTodas && $myCategory) {
             $query->where('category_id', $myCategory->id);
+        }
+
+        // Filtro por estado de pago (Mensualidad)
+        if ($request->filled('deuda')) {
+            if ($request->deuda === 'al_dia') {
+                $query->alDia();
+            } elseif ($request->deuda === 'deudores') {
+                $query->debe();
+            }
         }
 
         $allAtletas = $query->orderBy('category_id')

@@ -9,17 +9,31 @@
         <p class="text-sm text-slate-500 mt-1 uppercase font-bold tracking-widest">Panel de Entrenador</p>
     </div>
     
-    <div id="selection-panel" class="hidden animate-in fade-in slide-in-from-right-4 duration-300">
-        <form id="convocar-form" action="{{ route('athletes.export.selected') }}" method="POST">
-            @csrf
-            <input type="hidden" name="ids" id="selected-ids">
-            <button type="submit" class="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all shadow-lg hover:shadow-blue-200 group">
-                <svg class="h-5 w-5 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                </svg>
-                Generar Convocatoria (<span id="count-selected">0</span>)
-            </button>
+    <div class="flex flex-col sm:flex-row items-center gap-3">
+        <form action="{{ route('coach.atletas') }}" method="GET" class="flex items-center gap-3 w-full sm:w-auto">
+            @if(request('ver_todas'))
+                <input type="hidden" name="ver_todas" value="1">
+            @endif
+            <select name="deuda" onchange="this.form.submit()" 
+                    class="block w-full sm:w-44 px-3 py-2 border border-slate-200 rounded-xl leading-5 bg-white text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs font-bold transition-all shadow-sm cursor-pointer whitespace-nowrap">
+                <option value="">Mensualidades: Todas</option>
+                <option value="al_dia" {{ request('deuda') === 'al_dia' ? 'selected' : '' }}>✅ Al Día</option>
+                <option value="deudores" {{ request('deuda') === 'deudores' ? 'selected' : '' }}>❌ Deudores</option>
+            </select>
         </form>
+
+        <div id="selection-panel" class="hidden animate-in fade-in slide-in-from-right-4 duration-300">
+            <form id="convocar-form" action="{{ route('athletes.export.selected') }}" method="POST">
+                @csrf
+                <input type="hidden" name="ids" id="selected-ids">
+                <button type="submit" class="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition-all shadow-lg hover:shadow-blue-200 group whitespace-nowrap">
+                    <svg class="h-4 w-4 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    Convocatoria (<span id="count-selected">0</span>)
+                </button>
+            </form>
+        </div>
     </div>
 </div>
 

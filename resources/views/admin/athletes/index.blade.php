@@ -18,18 +18,28 @@
 
 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-8">
     <div class="flex items-center space-x-4 w-full lg:w-auto">
-        <form action="{{ route('athletes.index') }}" method="GET" class="relative group w-full">
+        <form action="{{ route('athletes.index') }}" method="GET" id="filter-form" class="flex flex-col sm:flex-row items-center gap-3 w-full">
             @if(request('category_id'))
                 <input type="hidden" name="category_id" value="{{ request('category_id') }}">
             @endif
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg class="h-5 w-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
+            
+            <div class="relative group w-full sm:w-64">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg class="h-5 w-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
+                <input type="text" name="search" value="{{ request('search') }}" 
+                       class="block w-full pl-10 pr-3 py-2.5 border border-slate-200 rounded-xl leading-5 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm transition-all shadow-sm"
+                       placeholder="Buscar por nombre o DNI...">
             </div>
-            <input type="text" name="search" value="{{ request('search') }}" 
-                   class="block w-full pl-10 pr-3 py-2.5 border border-slate-200 rounded-xl leading-5 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm transition-all shadow-sm"
-                   placeholder="Buscar por nombre o DNI...">
+
+            <select name="deuda" onchange="this.form.submit()" 
+                    class="block w-full sm:w-44 px-3 py-2.5 border border-slate-200 rounded-xl leading-5 bg-white text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm transition-all shadow-sm cursor-pointer">
+                <option value="">Todas las mensualidades</option>
+                <option value="al_dia" {{ request('deuda') === 'al_dia' ? 'selected' : '' }}>✅ Al Día</option>
+                <option value="deudores" {{ request('deuda') === 'deudores' ? 'selected' : '' }}>❌ Deudores</option>
+            </select>
         </form>
     </div>
 
@@ -128,8 +138,8 @@
         <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Atleta</th>
         <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">C.I.</th>
         <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Categoría</th>
-        <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Género</th>
         <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Estado</th>
+        <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Mensualidad</th>
         <th class="px-6 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">Acciones</th>
     </x-slot>
 
@@ -164,9 +174,6 @@
                     {{ $athlete->category?->nombre ?? 'N/A' }}
                 </span>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
-                {{ $athlete->genero ?? '-' }}
-            </td>
             <td class="px-6 py-4 whitespace-nowrap">
                 @if(auth()->user()->hasRole('Admin') || auth()->user()->hasRole('SuperAdmin'))
                 <button onclick="toggleHabilitado({{ $athlete->id }}, this)"
@@ -184,6 +191,19 @@
                     <span class="w-1.5 h-1.5 rounded-full {{ $athlete->habilitado_booleano ? 'bg-emerald-500' : 'bg-red-500' }}"></span>
                     {{ $athlete->habilitado_booleano ? 'Habilitado' : 'Inhabilitado' }}
                 </span>
+                @endif
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                @if($athlete->pagado_mes_actual)
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                        Al Día
+                    </span>
+                @else
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-100">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/></svg>
+                        Debe
+                    </span>
                 @endif
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">

@@ -12,6 +12,45 @@ class Athlete extends Model
 {
     use HasFactory;
 
+    /**
+     * Calcula si el atleta está al día con la mensualidad del mes actual.
+     */
+    public function isAlDia(): bool
+    {
+        $mesActual = now()->format('Y-m');
+        return $this->payments()
+            ->where('concepto', 'mensualidad')
+            ->where('mes_correspondiente', $mesActual)
+            ->where('estado_pago', 'pagado')
+            ->exists();
+    }
+
+    /**
+     * Scope para atletas que están al día (pago realizado en el mes actual).
+     */
+    public function scopeAlDia($query)
+    {
+        $mesActual = now()->format('Y-m');
+        return $query->whereHas('payments', function ($q) use ($mesActual) {
+            $q->where('concepto', 'mensualidad')
+              ->where('mes_correspondiente', $mesActual)
+              ->where('estado_pago', 'pagado');
+        });
+    }
+
+    /**
+     * Scope para atletas que deben (sin pago realizado en el mes actual).
+     */
+    public function scopeDebe($query)
+    {
+        $mesActual = now()->format('Y-m');
+        return $query->whereDoesntHave('payments', function ($q) use ($mesActual) {
+            $q->where('concepto', 'mensualidad')
+              ->where('mes_correspondiente', $mesActual)
+              ->where('estado_pago', 'pagado');
+        });
+    }
+
     protected $fillable = [
         'category_id',
         'ci',
@@ -21,7 +60,6 @@ class Athlete extends Model
         'foto',
         'fecha_nacimiento',
         'habilitado_booleano',
-        'id_alfanumerico_unico',
         'contactos_padres',
         'alergias',
         'genero',
@@ -83,23 +121,6 @@ class Athlete extends Model
                 $athlete->asignarCategoriaPorEdad();
             }
 
-            if (empty($athlete->id_alfanumerico_unico)) {
-                // Iniciales: primera letra de nombre, apellido paterno y materno
-                $iniciales = strtoupper(
-                    substr($athlete->nombre ?? '', 0, 1) .
-                    substr($athlete->apellido_paterno ?? '', 0, 1) .
-                    substr($athlete->apellido_materno ?? '', 0, 1)
-                );
-                if (strlen($iniciales) < 2) {
-                    $iniciales = strtoupper(substr($athlete->nombre, 0, 3));
-                }
-
-                // Siguiente número correlativo con 5 dígitos
-                $ultimo = static::max('id') ?? 0;
-                $numero = str_pad($ultimo + 1, 5, '0', STR_PAD_LEFT);
-
-                $athlete->id_alfanumerico_unico = $iniciales . '-' . $numero;
-            }
         });
 
         // Recalcular categoría si cambia la fecha de nacimiento

@@ -47,7 +47,6 @@ class CobranzaController extends Controller
                       ->orWhere('nombre', 'ilike', "%{$q}%")
                       ->orWhere('apellido_paterno', 'ilike', "%{$q}%")
                       ->orWhere('apellido_materno', 'ilike', "%{$q}%")
-                      ->orWhere('id_alfanumerico_unico', 'ilike', "%{$q}%")
                       ->orWhereRaw("CONCAT(nombre, ' ', apellido_paterno, ' ', COALESCE(apellido_materno,'')) ILIKE ?", ["%{$q}%"]);
             })
             ->limit(8)
@@ -56,7 +55,6 @@ class CobranzaController extends Controller
                 $ultimoPago = $a->payments()->latest()->first();
                 return [
                     'ci'            => $a->ci,
-                    'codigo'        => $a->id_alfanumerico_unico,
                     'nombre_completo' => trim("{$a->nombre} {$a->apellido_paterno} {$a->apellido_materno}"),
                     'iniciales'     => strtoupper(substr($a->nombre, 0, 1) . substr($a->apellido_paterno ?? '', 0, 1)),
                     'foto'          => $a->foto,
