@@ -7,7 +7,7 @@
     {{-- Header --}}
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-            <h1 class="text-2xl font-bold text-slate-800">Atletas Olímpicos</h1>
+            <h1 class="text-2xl font-bold text-slate-800">Atletas Olimpic</h1>
             <p class="text-sm text-slate-500 mt-1">Selecciona una categoría para ver a los atletas correspondientes.</p>
         </div>
         <div class="flex items-center gap-3 w-full sm:w-auto">

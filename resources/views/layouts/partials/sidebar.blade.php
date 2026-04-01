@@ -69,10 +69,10 @@
             <a href="{{ route('athletes.index') }}"
                class="flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-colors {{ request()->routeIs('athletes.*') ? 'bg-white/10 text-white' : 'text-blue-100 hover:bg-white/10 hover:text-white' }}">
                 <svg class="flex-shrink-0 h-5 w-5 {{ request()->routeIs('athletes.*') ? 'text-white' : 'text-blue-200' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <title>Atletas Olímpicos</title>
+                    <title>Atletas Olimpic</title>
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                 </svg>
-                <span class="ml-4 whitespace-nowrap opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-300">Atletas Olímpicos</span>
+                <span class="ml-4 whitespace-nowrap opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-300">Atletas Olimpic</span>
             </a>
 
             <a href="{{ route('users.index') }}"

@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', isset($selectedCategory) ? 'Atletas: ' . $selectedCategory->nombre : 'Atletas Olímpicos')
+@section('title', isset($selectedCategory) ? 'Atletas: ' . $selectedCategory->nombre : 'Atletas Olimpic')
 
 @section('content')
 @if(isset($selectedCategory))

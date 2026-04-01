@@ -444,7 +444,7 @@
             @endif
             <a href="{{ url('/admin-panel/athletes') }}" class="nav-item">
                 <span class="nav-icon"><i class="fas fa-running"></i></span>
-                <span class="nav-label">Atletas Olímpicos</span>
+                <span class="nav-label">Atletas Olimpic</span>
             </a>
             
             <div class="nav-divider"></div>
