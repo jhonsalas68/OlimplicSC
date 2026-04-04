@@ -2,11 +2,11 @@
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
     <div class="md:col-span-2 flex items-center space-x-6 mb-4">
         <div class="shrink-0">
-            <img class="h-16 w-16 object-cover rounded-full border-2 border-slate-100 shadow-sm" src="{{ $user->avatar_url }}" alt="Avatar">
+            <img id="preview-avatar-edit" class="h-16 w-16 object-cover rounded-full border-2 border-slate-100 shadow-sm" src="{{ $user->avatar_url }}" alt="Avatar">
         </div>
         <label class="block">
             <span class="block text-sm font-semibold text-slate-700 mb-1">Foto de Perfil (Opcional)</span>
-            <input type="file" name="avatar" accept="image/*" class="block w-full text-sm text-slate-500
+            <input type="file" name="avatar" accept="image/*" onchange="handleAvatarChange(event, 'preview-avatar-edit')" class="block w-full text-sm text-slate-500
                 file:mr-4 file:py-2 file:px-4
                 file:rounded-full file:border-0
                 file:text-sm file:font-semibold
@@ -14,6 +14,9 @@
                 hover:file:bg-blue-100
             "/>
         </label>
+        @error('avatar')
+            <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+        @enderror
     </div>
 
     <x-admin.input label="Nombres" name="name" :value="$user->name ?? ''" required placeholder="Ej: Administrador" />
@@ -78,13 +81,13 @@
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
     <div class="md:col-span-2 flex items-center space-x-6 mb-4">
         <div class="shrink-0">
-            <div class="h-16 w-16 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 border-2 border-dashed border-slate-200">
+            <div id="preview-placeholder" class="h-16 w-16 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 border-2 border-dashed border-slate-200">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
             </div>
         </div>
         <label class="block">
             <span class="block text-sm font-semibold text-slate-700 mb-1">Foto de Perfil (Opcional)</span>
-            <input type="file" name="avatar" accept="image/*" class="block w-full text-sm text-slate-500
+            <input type="file" name="avatar" accept="image/*" onchange="handleAvatarChange(event, 'preview-placeholder')" class="block w-full text-sm text-slate-500
                 file:mr-4 file:py-2 file:px-4
                 file:rounded-full file:border-0
                 file:text-sm file:font-semibold
@@ -92,6 +95,9 @@
                 hover:file:bg-blue-100
             "/>
         </label>
+        @error('avatar')
+            <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+        @enderror
     </div>
 
     <x-admin.input label="Nombres" name="name" :value="old('name')" required placeholder="Ej: Juan" />
@@ -156,4 +162,52 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.role-checkbox').forEach(cb => cb.addEventListener('change', toggleCategoria));
     toggleCategoria();
 });
+
+function handleAvatarChange(event, previewId) {
+    const file = event.target.files[0];
+    if (!file || !file.type.match(/image.*/)) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 500;
+            const MAX_HEIGHT = 500;
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height) {
+                if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+            } else {
+                if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
+            }
+            canvas.width = width;
+            canvas.height = height;
+            canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+            
+            canvas.toBlob((blob) => {
+                if (!blob) return;
+                const newFile = new File([blob], file.name, { type: file.type, lastModified: Date.now() });
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(newFile);
+                event.target.files = dataTransfer.files;
+                
+                const previewElement = document.getElementById(previewId);
+                const objUrl = URL.createObjectURL(blob);
+                if (previewElement.tagName === 'IMG') {
+                    previewElement.src = objUrl;
+                } else {
+                    const newImg = document.createElement('img');
+                    newImg.id = previewId;
+                    newImg.src = objUrl;
+                    newImg.className = "h-16 w-16 object-cover rounded-full border-2 border-slate-100 shadow-sm";
+                    previewElement.parentNode.replaceChild(newImg, previewElement);
+                }
+            }, file.type === 'image/png' ? 'image/png' : 'image/jpeg', 0.85);
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
 </script>

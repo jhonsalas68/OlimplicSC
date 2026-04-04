@@ -60,7 +60,7 @@ class UserController extends Controller
             'is_active'       => 'boolean',
             'role'            => 'required|string|exists:roles,name|not_in:SuperAdmin,Student',
             'category_id'     => 'nullable|exists:categories,id',
-            'avatar'          => 'nullable|image|max:2048',
+            'avatar'          => 'nullable|image|max:5120',
         ]);
 
         $initials = collect([$validated['name'], $validated['apellido_paterno'], $validated['apellido_materno']])
@@ -133,7 +133,7 @@ class UserController extends Controller
             'password'         => 'nullable|string|min:6|confirmed',
             'role'             => 'required|string|exists:roles,name|not_in:SuperAdmin,Student',
             'category_id'      => 'nullable|exists:categories,id',
-            'avatar'           => 'nullable|image|max:2048',
+            'avatar'           => 'nullable|image|max:5120',
         ]);
 
         $userData = [

@@ -20,7 +20,10 @@
             <x-admin.button type="button" variant="secondary" onclick="document.getElementById('foto').click()">
                 {{ isset($athlete) && $athlete->foto ? 'Cambiar Foto' : 'Subir Foto' }}
             </x-admin.button>
-            <p class="mt-2 text-xs text-slate-400">JPG, PNG o WEBP · Máx. 2MB</p>
+            <p class="mt-2 text-xs text-slate-400">JPG, PNG o WEBP · Máx. 5MB</p>
+            @error('foto')
+                <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+            @enderror
         </div>
     </div>
 
@@ -217,22 +220,67 @@ function toggleSeguro(checked) {
     }
 }
 
-function previewImage(event) {
+function compressAndPreviewImage(file, inputElement, previewCallback) {
+    if (!file || !file.type.match(/image.*/)) return;
     const reader = new FileReader();
-    reader.onload = function() {
+    reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 800;
+            const MAX_HEIGHT = 800;
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height) {
+                if (width > MAX_WIDTH) {
+                    height *= MAX_WIDTH / width;
+                    width = MAX_WIDTH;
+                }
+            } else {
+                if (height > MAX_HEIGHT) {
+                    width *= MAX_HEIGHT / height;
+                    height = MAX_HEIGHT;
+                }
+            }
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            
+            canvas.toBlob((blob) => {
+                if (!blob) return;
+                const newFile = new File([blob], file.name, {
+                    type: file.type,
+                    lastModified: Date.now()
+                });
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(newFile);
+                inputElement.files = dataTransfer.files;
+                previewCallback(URL.createObjectURL(blob));
+            }, file.type === 'image/png' ? 'image/png' : 'image/jpeg', 0.85);
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+function previewImage(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    compressAndPreviewImage(file, event.target, function(previewUrl) {
         const ph = document.getElementById('preview-placeholder');
         const prev = document.getElementById('preview');
         if (ph) {
             const img = document.createElement('img');
             img.id = 'preview';
             img.className = 'h-24 w-24 rounded-full object-cover border-2 border-slate-100';
-            img.src = reader.result;
+            img.src = previewUrl;
             ph.parentNode.replaceChild(img, ph);
         } else if (prev) {
-            prev.src = reader.result;
+            prev.src = previewUrl;
         }
-    };
-    if (event.target.files[0]) reader.readAsDataURL(event.target.files[0]);
+    });
 }
 
 document.addEventListener('DOMContentLoaded', () => {

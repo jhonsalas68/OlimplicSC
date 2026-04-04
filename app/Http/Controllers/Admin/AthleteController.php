@@ -109,7 +109,7 @@ class AthleteController extends Controller
             'ci'                      => 'required|string|max:20|unique:athletes,ci',
             'fecha_nacimiento'        => 'required|date',
             'genero'                  => 'nullable|in:Masculino,Femenino,Otro',
-            'foto'                    => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'foto'                    => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
             'alergias'                => 'nullable|string',
             'habilitado_booleano'     => 'nullable|boolean',
             // Seguro
@@ -182,7 +182,7 @@ class AthleteController extends Controller
             'ci'                      => 'required|string|max:20|unique:athletes,ci,' . $athlete->id,
             'fecha_nacimiento'        => 'required|date',
             'genero'                  => 'nullable|in:Masculino,Femenino,Otro',
-            'foto'                    => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'foto'                    => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
             'alergias'                => 'nullable|string',
             'habilitado_booleano'     => 'nullable|boolean',
             // Seguro
