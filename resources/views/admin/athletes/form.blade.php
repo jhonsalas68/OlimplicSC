@@ -222,6 +222,12 @@ function toggleSeguro(checked) {
 
 function compressAndPreviewImage(file, inputElement, previewCallback) {
     if (!file || !file.type.match(/image.*/)) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+        alert("El peso superado. La imagen supera el peso admitido de 5MB.");
+        inputElement.value = "";
+        return;
+    }
     const reader = new FileReader();
     reader.onload = function(e) {
         const img = new Image();

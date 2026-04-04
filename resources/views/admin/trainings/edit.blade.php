@@ -43,7 +43,7 @@
                                 <p class="mb-2 text-sm text-slate-500 font-medium" id="pdf-filename">Haga clic o arrastre el archivo PDF aquí</p>
                                 <p class="text-xs text-slate-400">Sólo PDF (Máx. 5MB)</p>
                             </div>
-                            <input id="pdf" name="pdf" type="file" class="hidden" accept="application/pdf" onchange="document.getElementById('pdf-filename').textContent = this.files.length ? this.files[0].name : 'Haga clic o arrastre el archivo PDF aquí';" />
+                            <input id="pdf" name="pdf" type="file" class="hidden" accept="application/pdf" onchange="handlePdfChange(event)" />
                         </label>
                     </div>
                     @if(isset($training) && $training->file_path_pdf)
@@ -69,4 +69,16 @@
         </form>
     </div>
 </div>
+<script>
+function handlePdfChange(event) {
+    const file = event.target.files[0];
+    if (file && file.size > 5 * 1024 * 1024) {
+        alert("El peso superado. El archivo PDF supera el peso admitido de 5MB.");
+        event.target.value = "";
+        document.getElementById('pdf-filename').textContent = 'Haga clic o arrastre el archivo PDF aquí';
+    } else {
+        document.getElementById('pdf-filename').textContent = file ? file.name : 'Haga clic o arrastre el archivo PDF aquí';
+    }
+}
+</script>
 @endsection
