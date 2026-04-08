@@ -24,11 +24,18 @@ class CobrosController extends Controller
 
         $atletas = Athlete::with(['category', 'latestPayment'])
             ->where(function ($query) use ($q) {
-                $query->where('ci', 'ilike', "%{$q}%")
-                      ->orWhere('nombre', 'ilike', "%{$q}%")
-                      ->orWhere('apellido_paterno', 'ilike', "%{$q}%")
-                      ->orWhere('apellido_materno', 'ilike', "%{$q}%")
-                      ->orWhereRaw("CONCAT(nombre, ' ', apellido_paterno, ' ', COALESCE(apellido_materno,'')) ILIKE ?", ["%{$q}%"]);
+                $keywords = explode(' ', $q);
+                foreach ($keywords as $word) {
+                    $word = trim($word);
+                    if ($word !== '') {
+                        $query->where(function ($query2) use ($word) {
+                            $query2->where('ci', 'ilike', "%{$word}%")
+                                   ->orWhere('nombre', 'ilike', "%{$word}%")
+                                   ->orWhere('apellido_paterno', 'ilike', "%{$word}%")
+                                   ->orWhere('apellido_materno', 'ilike', "%{$word}%");
+                        });
+                    }
+                }
             })
             ->limit(8)->get()
             ->map(fn(Athlete $a) => [

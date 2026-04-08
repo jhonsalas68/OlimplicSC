@@ -65,12 +65,19 @@ class AthleteController extends Controller
         if ($request->filled('search')) {
             $s = $request->search;
             $query->where(function ($q) use ($s) {
-                $q->where('nombre', 'ilike', "%{$s}%")
-                  ->orWhere('apellido_paterno', 'ilike', "%{$s}%")
-                  ->orWhere('apellido_materno', 'ilike', "%{$s}%")
-                  ->orWhere('ci', 'ilike', "%{$s}%")
-                  ->orWhere('id_alfanumerico_unico', 'ilike', "%{$s}%")
-                  ->orWhereRaw("CONCAT(nombre, ' ', apellido_paterno, ' ', COALESCE(apellido_materno,'')) ILIKE ?", ["%{$s}%"]);
+                $keywords = explode(' ', $s);
+                foreach ($keywords as $word) {
+                    $word = trim($word);
+                    if ($word !== '') {
+                        $q->where(function ($query2) use ($word) {
+                            $query2->where('nombre', 'ilike', "%{$word}%")
+                                   ->orWhere('apellido_paterno', 'ilike', "%{$word}%")
+                                   ->orWhere('apellido_materno', 'ilike', "%{$word}%")
+                                   ->orWhere('ci', 'ilike', "%{$word}%")
+                                   ->orWhere('id_alfanumerico_unico', 'ilike', "%{$word}%");
+                        });
+                    }
+                }
             });
         }
 
