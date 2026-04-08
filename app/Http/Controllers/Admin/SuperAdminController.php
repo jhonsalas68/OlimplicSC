@@ -17,6 +17,8 @@ use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\DatabaseBackupMail;
 use ZipArchive;
 
 class SuperAdminController extends Controller
@@ -86,11 +88,40 @@ class SuperAdminController extends Controller
 
     public function backup()
     {
+        $sql = $this->generateBackupSql();
+        $filename = 'backup_olimpicsc_' . now()->format('Y-m-d_H-i-s') . '.sql';
+
+        return response($sql, 200, [
+            'Content-Type'        => 'application/octet-stream',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ]);
+    }
+
+    public function backupToEmail()
+    {
+        try {
+            $sql = $this->generateBackupSql();
+            $filename = 'backup_olimpicsc_' . now()->format('Y-m-d_H-i-s') . '.sql';
+            
+            Mail::to(auth()->user()->email)->send(new DatabaseBackupMail($filename, $sql));
+
+            return back()->with('success', '¡Respaldo enviado correctamente a tu correo (' . auth()->user()->email . ')!');
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error("Error enviando backup: " . $e->getMessage());
+            return back()->with('error', 'Error al enviar el respaldo: ' . $e->getMessage() . '. Asegúrate de haber configurado las variables de Gmail en Railway.');
+        }
+    }
+
+    private function generateBackupSql()
+    {
         $tables = ['users', 'athletes', 'categories', 'payments', 'trainings', 'roles', 'permissions', 'model_has_roles', 'model_has_permissions', 'role_has_permissions'];
         $sql  = "-- ============================================================\n";
         $sql .= "-- Backup OlimpicSC | " . now()->format('Y-m-d H:i:s') . "\n";
         $sql .= "-- ============================================================\n\n";
-        $sql .= "SET FOREIGN_KEY_CHECKS=0;\n\n";
+
+        // Ajuste segun Driver
+        $driver = DB::connection()->getDriverName();
+        if ($driver === 'mysql') $sql .= "SET FOREIGN_KEY_CHECKS=0;\n\n";
 
         foreach ($tables as $table) {
             try {
@@ -98,28 +129,25 @@ class SuperAdminController extends Controller
                 $sql .= "-- Tabla: `{$table}`\n";
                 $sql .= "-- ------------------------------------------------------------\n";
 
-                // DROP + CREATE TABLE
-                $sql .= "DROP TABLE IF EXISTS `{$table}`;\n";
+                // DROP + CREATE TABLE (Basic support)
+                if ($driver !== 'pgsql') {
+                     $sql .= "DROP TABLE IF EXISTS `{$table}`;\n";
+                }
 
-                // Obtener el CREATE TABLE desde SQLite o MySQL
+                // Obtener el CREATE TABLE (Simulado o real segun driver)
                 try {
-                    $createResult = DB::select("SELECT sql FROM sqlite_master WHERE type='table' AND name=?", [$table]);
-                    if (!empty($createResult)) {
-                        $createSql = $createResult[0]->sql;
-                        $sql .= $createSql . ";\n\n";
-                    }
-                } catch (\Exception $e) {
-                    // MySQL fallback
-                    try {
+                    if ($driver === 'sqlite') {
+                        $createResult = DB::select("SELECT sql FROM sqlite_master WHERE type='table' AND name=?", [$table]);
+                        if (!empty($createResult)) $sql .= $createResult[0]->sql . ";\n\n";
+                    } elseif ($driver === 'mysql') {
                         $createResult = DB::select("SHOW CREATE TABLE `{$table}`");
                         if (!empty($createResult)) {
                             $row = (array) $createResult[0];
-                            $createSql = end($row);
-                            $sql .= $createSql . ";\n\n";
+                            $sql .= end($row) . ";\n\n";
                         }
-                    } catch (\Exception $e2) {
-                        $sql .= "-- No se pudo obtener estructura: " . $e2->getMessage() . "\n\n";
                     }
+                } catch (\Exception $e) {
+                    $sql .= "-- No se pudo obtener estructura completa para {$driver}: " . $e->getMessage() . "\n\n";
                 }
 
                 // INSERT datos
@@ -131,13 +159,13 @@ class SuperAdminController extends Controller
 
                 foreach ($rows as $row) {
                     $row  = (array) $row;
-                    $cols = implode(', ', array_map(fn($c) => "`$c`", array_keys($row)));
+                    $cols = implode(', ', array_map(fn($c) => ($driver === 'pgsql' ? "\"$c\"" : "`$c`"), array_keys($row)));
                     $vals = implode(', ', array_map(function ($v) {
                         if (is_null($v))   return 'NULL';
                         if (is_numeric($v)) return $v;
                         return "'" . addslashes((string) $v) . "'";
                     }, array_values($row)));
-                    $sql .= "INSERT INTO `{$table}` ({$cols}) VALUES ({$vals});\n";
+                    $sql .= "INSERT INTO \"{$table}\" ({$cols}) VALUES ({$vals});\n";
                 }
                 $sql .= "\n";
 
@@ -146,14 +174,9 @@ class SuperAdminController extends Controller
             }
         }
 
-        $sql .= "SET FOREIGN_KEY_CHECKS=1;\n";
+        if ($driver === 'mysql') $sql .= "SET FOREIGN_KEY_CHECKS=1;\n";
 
-        $filename = 'backup_olimpicsc_' . now()->format('Y-m-d_H-i-s') . '.sql';
-
-        return response($sql, 200, [
-            'Content-Type'        => 'application/octet-stream',
-            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
-        ]);
+        return $sql;
     }
 
     public function backupExcel()

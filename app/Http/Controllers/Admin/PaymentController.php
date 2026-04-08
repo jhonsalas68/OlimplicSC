@@ -14,7 +14,7 @@ class PaymentController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Payment::query()->with('athlete');
+        $query = Payment::query()->with(['athlete.category', 'cobrador']);
 
         // Filtro por mes (default: mes actual)
         $mes = $request->get('mes', now()->format('Y-m'));

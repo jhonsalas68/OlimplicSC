@@ -146,15 +146,31 @@
                     <p class="text-xs text-slate-400">Respaldo completo del sistema</p>
                 </div>
             </div>
-            <div class="space-y-2">
+            <div class="space-y-2" x-data="{ sending: false }">
                 <a href="{{ route('superadmin.backup.sql') }}"
                    class="flex items-center justify-between w-full px-4 py-3 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-xl text-sm font-semibold transition-colors">
-                    <span>Backup SQL</span>
+                    <span>Backup SQL (Descarga Directa)</span>
                     <span class="text-xs text-slate-400">.sql</span>
                 </a>
+                
+                <a href="{{ route('superadmin.backup.email') }}" 
+                   @click="sending = true"
+                   class="flex items-center justify-between w-full px-4 py-3 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl text-sm font-semibold transition-all group relative overflow-hidden"
+                   :class="{ 'opacity-50 pointer-events-none': sending }">
+                    <span x-show="!sending" class="flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                        Enviar Respaldo a Gmail
+                    </span>
+                    <span x-show="sending" class="flex items-center">
+                        <svg class="animate-spin -ml-1 mr-3 h-4 w-4 text-blue-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        Enviando...
+                    </span>
+                    <span x-show="!sending" class="text-[10px] font-black uppercase tracking-tighter bg-blue-600 text-white px-2 py-0.5 rounded-md">Recomendado</span>
+                </a>
+
                 <a href="{{ route('superadmin.backup.excel') }}"
                    class="flex items-center justify-between w-full px-4 py-3 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-xl text-sm font-semibold transition-colors">
-                    <span>Backup Excel (todas las tablas)</span>
+                    <span>Backup Excel (Todas las tablas)</span>
                     <span class="text-xs text-slate-400">.xlsx</span>
                 </a>
             </div>

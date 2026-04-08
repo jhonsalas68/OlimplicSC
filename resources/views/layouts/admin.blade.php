@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full bg-slate-50">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full bg-slate-50 premium-bg">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,26 +8,43 @@
     <title>{{ config('app.name', 'OlimpicSC') }} - Panel Administrativo</title>
 
     <!-- Fonts -->
+    <!-- Speed & Performance Optimization -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Scripts and Styles -->
+    <!-- Scripts and Core Performance -->
     <script type="module">
         import hotwiredTurbo from 'https://cdn.jsdelivr.net/npm/@hotwired/turbo@8.0.4/+esm';
+        // Activar precarga instantánea al pasar el ratón por los enlaces
+        hotwiredTurbo.start();
     </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    {{-- Turbo View Transitions & Prefetching --}}
+    <meta name="turbo-prefetch" content="true">
     
     <style>
         body { font-family: 'Inter', sans-serif; }
         .glass-header {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px) saturate(180%);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
         }
         .sidebar-gradient {
             background: linear-gradient(180deg, #1e3a8a 0%, #1e1b4b 100%);
+        }
+        .premium-bg {
+            background: radial-gradient(circle at top right, #f8fafc, #eff6ff);
+        }
+        /* Turbo Progress Bar Customization */
+        .turbo-progress-bar {
+            height: 3px;
+            background: linear-gradient(90deg, #1e3a8a, #ef4444);
+            box-shadow: 0 0 10px rgba(30, 58, 138, 0.5);
         }
         /* Mobile Sidebar Text Fix */
         .sidebar-is-open .opacity-0 {

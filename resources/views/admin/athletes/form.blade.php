@@ -1,178 +1,204 @@
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-    {{-- ── FOTO ── --}}
-    <div class="md:col-span-2 flex items-center space-x-6 pb-6 border-b border-slate-100">
-        <div class="flex-shrink-0 h-24 w-24 relative">
-            @if(isset($athlete) && $athlete->foto)
-                <img id="preview" class="h-24 w-24 rounded-full object-cover border-2 border-slate-100"
-                     src="{{ str_starts_with($athlete->foto, 'http') ? $athlete->foto : asset('storage/' . $athlete->foto) }}" alt="">
-            @else
-                <div id="preview-placeholder" class="h-24 w-24 rounded-full bg-slate-100 flex items-center justify-center text-slate-300">
-                    <svg class="h-12 w-12" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z"/>
+    {{-- ── SECCIÓN FOTO Y DATOS ── --}}
+    <div class="md:col-span-2 bg-white p-8 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/40 relative overflow-hidden mb-4">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-blue-50/30 rounded-full -mr-32 -mt-32 blur-3xl"></div>
+        
+        <div class="relative z-10 flex flex-col md:flex-row items-center gap-8">
+            <div class="flex-shrink-0 relative group">
+                <div class="absolute inset-0 bg-blue-600 rounded-full blur-xl opacity-0 group-hover:opacity-20 transition-opacity"></div>
+                @if(isset($athlete) && $athlete->foto)
+                    <img id="preview" class="h-32 w-32 rounded-3xl object-cover border-4 border-white shadow-2xl relative z-10"
+                         src="{{ str_starts_with($athlete->foto, 'http') ? $athlete->foto : asset('storage/' . $athlete->foto) }}" alt="">
+                @else
+                    <div id="preview-placeholder" class="h-32 w-32 rounded-3xl bg-slate-50 border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400 relative z-10 transition-colors group-hover:border-blue-400 group-hover:bg-blue-50">
+                        <svg class="h-10 w-10 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        <span class="text-[10px] font-black uppercase tracking-tighter">Sin Foto</span>
+                    </div>
+                @endif
+                <button type="button" onclick="document.getElementById('foto').click()" 
+                        class="absolute -bottom-2 -right-2 bg-blue-600 text-white p-2.5 rounded-xl shadow-lg hover:bg-blue-700 transition-all z-20 group-hover:scale-110">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                </button>
+            </div>
+
+            <div class="flex-1 w-full space-y-6">
+                <input type="file" name="foto" id="foto" class="hidden" accept="image/*" onchange="previewImage(event)">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <x-admin.input label="Nombres" name="nombre" :value="$athlete->nombre ?? old('nombre')" required placeholder="Ej: Juan" />
+                    <x-admin.input label="Ape. Paterno" name="apellido_paterno" :value="$athlete->apellido_paterno ?? old('apellido_paterno')" required placeholder="Paterno" />
+                    <x-admin.input label="Ape. Materno" name="apellido_materno" :value="$athlete->apellido_materno ?? old('apellido_materno')" placeholder="Materno" />
+                </div>
+            </div>
+        </div>
+        @error('foto')
+            <p class="mt-4 text-xs font-bold text-red-500 bg-red-50 p-2 rounded-lg inline-block border border-red-100">{{ $message }}</p>
+        @enderror
+    </div>
+
+    {{-- ── IDENTIFICACIÓN Y CATEGORÍA ── --}}
+    <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
+        <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-lg shadow-slate-200/30">
+            <x-admin.input label="C.I. (Documento)" name="ci" :value="$athlete->ci ?? old('ci')" required placeholder="Ej: 12345678" />
+        </div>
+
+        <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-lg shadow-slate-200/30">
+            <label class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">Género</label>
+            <div class="flex items-center p-1 bg-slate-50 rounded-2xl border border-slate-100">
+                @foreach(['Masculino', 'Femenino'] as $option)
+                    <label class="flex-1 relative cursor-pointer group">
+                        <input type="radio" name="genero" value="{{ $option }}"
+                            {{ (old('genero', $athlete->genero ?? '') == $option) ? 'checked' : '' }}
+                            class="sr-only peer">
+                        <div class="py-2.5 text-center text-sm font-bold text-slate-500 rounded-xl transition-all peer-checked:bg-white peer-checked:text-blue-600 peer-checked:shadow-sm">
+                            {{ $option }}
+                        </div>
+                    </label>
+                @endforeach
+            </div>
+        </div>
+
+        <div class="bg-blue-600 p-6 rounded-[2rem] shadow-lg shadow-blue-200 overflow-hidden relative group">
+            <div class="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -mr-12 -mt-12 group-hover:scale-150 transition-transform"></div>
+            <label class="block text-[11px] font-black text-blue-100 uppercase tracking-widest mb-2 relative z-10">Categoría Asignada</label>
+            <div class="flex items-center gap-3 relative z-10 mt-1">
+                <div class="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
+                    <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.552 0 1.05.224 1.414.586l7 7a2 2 0 010 2.828l-5 5a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 10V5a2 2 0 012-2z"/>
                     </svg>
                 </div>
-            @endif
-        </div>
-        <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-1">Fotografía del Atleta</label>
-            <input type="file" name="foto" id="foto" class="hidden" accept="image/*" onchange="previewImage(event)">
-            <x-admin.button type="button" variant="secondary" onclick="document.getElementById('foto').click()">
-                {{ isset($athlete) && $athlete->foto ? 'Cambiar Foto' : 'Subir Foto' }}
-            </x-admin.button>
-            <p class="mt-2 text-xs text-slate-400">JPG, PNG o WEBP · Máx. 5MB</p>
-            @error('foto')
-                <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
-            @enderror
-        </div>
-    </div>
-
-    {{-- ── DATOS PERSONALES ── --}}
-    <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4">
-        <x-admin.input label="Nombres" name="nombre" :value="$athlete->nombre ?? old('nombre')" required placeholder="Ej: Juan" />
-        <x-admin.input label="Ape. Paterno" name="apellido_paterno" :value="$athlete->apellido_paterno ?? old('apellido_paterno')" required placeholder="Paterno" />
-        <x-admin.input label="Ape. Materno" name="apellido_materno" :value="$athlete->apellido_materno ?? old('apellido_materno')" placeholder="Materno" />
-    </div>
-
-    <x-admin.input label="Documento de Identidad (C.I.)" name="ci" :value="$athlete->ci ?? old('ci')" required placeholder="Ej: 12345678" />
-
-    {{-- Categoría auto-calculada --}}
-    <div>
-        <label class="block text-sm font-semibold text-slate-700 mb-1">Categoría</label>
-        <div class="flex items-center gap-3 px-4 py-2.5 bg-blue-50 border border-blue-200 rounded-lg">
-            <svg class="h-4 w-4 text-blue-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.552 0 1.05.224 1.414.586l7 7a2 2 0 010 2.828l-5 5a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 10V5a2 2 0 012-2z"/>
-            </svg>
-            <span id="categoria-nombre" class="text-sm font-semibold text-blue-700">
-                @if(isset($athlete) && $athlete->category)
-                    {{ $athlete->category->nombre }}
-                    <span class="font-normal text-blue-500">({{ $athlete->category->edad_min }}–{{ $athlete->category->edad_max }} años)</span>
-                @else
-                    Ingresa la fecha de nacimiento
-                @endif
-            </span>
-        </div>
-        <p class="mt-1 text-xs text-slate-400">Se asigna automáticamente según la edad</p>
-    </div>
-
-    <x-admin.input label="Fecha de Nacimiento" name="fecha_nacimiento" type="date"
-        :value="isset($athlete->fecha_nacimiento) ? $athlete->fecha_nacimiento->format('Y-m-d') : old('fecha_nacimiento')"
-        onchange="onFechaNacChange(this.value)" />
-
-    <div>
-        <label class="block text-sm font-semibold text-slate-700 mb-1">Género</label>
-        <div class="flex items-center space-x-6 h-10">
-            @foreach(['Masculino', 'Femenino'] as $option)
-                <label class="inline-flex items-center">
-                    <input type="radio" name="genero" value="{{ $option }}"
-                        {{ (old('genero', $athlete->genero ?? '') == $option) ? 'checked' : '' }}
-                        class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300">
-                    <span class="ml-2 text-sm text-slate-600">{{ $option }}</span>
-                </label>
-            @endforeach
+                <div class="flex flex-col">
+                    <span id="categoria-nombre" class="text-lg font-black text-white leading-tight uppercase tracking-tight">
+                        @if(isset($athlete) && $athlete->category)
+                            {{ $athlete->category->nombre }}
+                        @else
+                            Pendiente
+                        @endif
+                    </span>
+                    <span class="text-[10px] font-bold text-blue-100/80">Cálculo automático</span>
+                </div>
+            </div>
         </div>
     </div>
 
-    {{-- ── ALERGIAS ── --}}
-    <div class="md:col-span-2 pt-4 border-t border-slate-100">
-        <x-admin.input label="Alergias / Observaciones Médicas" name="alergias"
-            :value="$athlete->alergias ?? old('alergias')" placeholder="Ej: Penicilina, Asma..." />
+    <div class="md:col-span-1 bg-white p-6 rounded-[2rem] border border-slate-100 shadow-lg shadow-slate-200/30">
+        <x-admin.input label="Fecha de Nacimiento" name="fecha_nacimiento" type="date"
+            :value="isset($athlete->fecha_nacimiento) ? $athlete->fecha_nacimiento->format('Y-m-d') : old('fecha_nacimiento')"
+            onchange="onFechaNacChange(this.value)" />
+    </div>
+
+    <div class="md:col-span-2 bg-white p-6 rounded-[2rem] border border-slate-100 shadow-lg shadow-slate-200/30">
+        <x-admin.input label="Alergias u Observaciones Médicas" name="alergias"
+            :value="$athlete->alergias ?? old('alergias')" placeholder="Ej: Penicilina, Asma, Lesión previa..." />
     </div>
 
     {{-- ── SEGURO MÉDICO ── --}}
-    <div class="md:col-span-2 p-5 bg-slate-50 rounded-2xl border border-slate-100 space-y-4">
-        <div class="flex items-center justify-between">
-            <h4 class="text-sm font-bold text-slate-800 uppercase tracking-wider">Seguro Médico</h4>
-            <label class="relative flex items-center cursor-pointer gap-3">
+    <div class="md:col-span-2 bg-white p-8 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/40 relative overflow-hidden">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div>
+                <h4 class="text-sm font-black text-slate-800 uppercase tracking-widest">Seguro Médico</h4>
+                <p class="text-xs text-slate-400 mt-1">Información de cobertura en caso de incidentes</p>
+            </div>
+            <label class="relative flex items-center cursor-pointer group">
                 <input type="checkbox" name="tiene_seguro" id="tiene_seguro" value="1"
                     {{ old('tiene_seguro', $athlete->tiene_seguro ?? false) ? 'checked' : '' }}
                     class="sr-only peer" onchange="toggleSeguro(this.checked)">
-                <div class="w-11 h-6 bg-slate-200 peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer
-                    peer-checked:after:translate-x-full peer-checked:after:border-white
-                    after:content-[''] after:absolute after:top-[2px] after:left-[2px]
-                    after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all
-                    peer-checked:bg-emerald-600"></div>
-                <span class="text-sm font-semibold text-slate-700" id="seguro-label">
-                    {{ old('tiene_seguro', $athlete->tiene_seguro ?? false) ? 'Sí tiene seguro' : 'No tiene seguro' }}
+                <div class="w-14 h-7 bg-slate-100 border border-slate-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-100 peer-checked:bg-blue-600 peer-checked:border-blue-600 transition-all
+                    after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:rounded-full after:h-[20px] after:w-[20px] after:transition-all after:shadow-sm peer-checked:after:translate-x-7"></div>
+                <span class="ml-3 text-sm font-bold text-slate-700" id="seguro-label">
+                    {{ old('tiene_seguro', $athlete->tiene_seguro ?? false) ? 'Sí tiene' : 'No tiene' }}
                 </span>
             </label>
         </div>
 
-        <div id="seguro-detalle" class="{{ old('tiene_seguro', $athlete->tiene_seguro ?? false) ? '' : 'hidden' }} grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div id="seguro-detalle" class="{{ old('tiene_seguro', $athlete->tiene_seguro ?? false) ? '' : 'hidden' }} grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-50">
             <x-admin.input label="Compañía Aseguradora" name="seguro_compania"
                 :value="$athlete->seguro_compania ?? old('seguro_compania')" placeholder="Ej: BUPA, Seguros Illimani..." />
-            <x-admin.input label="Teléfono / Contacto de la Aseguradora" name="seguro_contacto"
+            <x-admin.input label="Teléfono de Emergencia Seguro" name="seguro_contacto"
                 :value="$athlete->seguro_contacto ?? old('seguro_contacto')" placeholder="Ej: 800-12345" />
         </div>
     </div>
 
     {{-- ── CONTACTO DE EMERGENCIA (se muestra según edad) ── --}}
 
-    {{-- MENOR DE EDAD --}}
-    <div id="bloque-menor" class="md:col-span-2 p-5 bg-blue-50 rounded-2xl border border-blue-100 space-y-4
-        {{ $esMenor ?? false ? '' : 'hidden' }}">
-        <h4 class="text-sm font-bold text-blue-800 uppercase tracking-wider">Información del Padre / Madre / Tutor</h4>
-        <p class="text-xs text-blue-500">El atleta es menor de edad. Se requieren datos del responsable legal.</p>
-
-        <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-1">Relación con el atleta</label>
-            <select name="relacion_contacto" class="block w-full px-4 py-2.5 border border-slate-200 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm bg-white">
-                <option value="">Seleccionar...</option>
-                @foreach(['Padre','Madre','Tutor legal','Abuelo','Abuela','Tío','Tía','Hermano mayor','Hermana mayor','Otro'] as $rel)
-                    <option value="{{ $rel }}" {{ old('relacion_contacto', $athlete->relacion_contacto ?? '') == $rel ? 'selected' : '' }}>{{ $rel }}</option>
-                @endforeach
-            </select>
+    {{-- ── CONTACTO DE EMERGENCIA ── --}}
+    <div id="bloque-menor" class="md:col-span-2 bg-blue-50/50 p-8 rounded-[2rem] border border-blue-100 shadow-xl shadow-blue-600/5 space-y-6 {{ $esMenor ?? false ? '' : 'hidden' }}">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <h4 class="text-sm font-black text-blue-800 uppercase tracking-widest">Información del Tutor</h4>
+                <p class="text-[11px] text-blue-500 font-bold mt-1 uppercase">Requerido para menores de edad</p>
+            </div>
+            
+            <div class="w-full sm:w-64">
+                <label class="block text-[10px] font-black text-blue-400 uppercase mb-2">Relación</label>
+                <select name="relacion_contacto" class="block w-full px-4 py-3 border border-blue-200 rounded-xl shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 text-sm font-bold bg-white text-blue-900 cursor-pointer">
+                    <option value="">Seleccionar...</option>
+                    @foreach(['Padre','Madre','Tutor legal','Abuelo','Abuela','Tío','Tía','Hermano mayor','Hermana mayor','Otro'] as $rel)
+                        <option value="{{ $rel }}" {{ old('relacion_contacto', $athlete->relacion_contacto ?? '') == $rel ? 'selected' : '' }}>{{ $rel }}</option>
+                    @endforeach
+                </select>
+            </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <x-admin.input label="Nombres" name="nombre_padre"
-                :value="$athlete->nombre_padre ?? old('nombre_padre')" placeholder="Nombres" />
-            <x-admin.input label="Ape. Paterno" name="apellido_paterno_padre"
-                :value="$athlete->apellido_paterno_padre ?? old('apellido_paterno_padre')" placeholder="Paterno" />
-            <x-admin.input label="Ape. Materno" name="apellido_materno_padre"
-                :value="$athlete->apellido_materno_padre ?? old('apellido_materno_padre')" placeholder="Materno" />
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t border-blue-100/50">
+            <x-admin.input label="Nombres Tutor" name="nombre_padre" :value="$athlete->nombre_padre ?? old('nombre_padre')" placeholder="Nombres" />
+            <x-admin.input label="Ape. Paterno" name="apellido_paterno_padre" :value="$athlete->apellido_paterno_padre ?? old('apellido_paterno_padre')" placeholder="Paterno" />
+            <x-admin.input label="Ape. Materno" name="apellido_materno_padre" :value="$athlete->apellido_materno_padre ?? old('apellido_materno_padre')" placeholder="Materno" />
         </div>
-        <x-admin.input label="Teléfono de Contacto / Emergencia" name="telefono_padre"
-            :value="$athlete->telefono_padre ?? old('telefono_padre')" placeholder="Ej: 77700000" />
-    </div>
-
-    {{-- MAYOR DE EDAD --}}
-    <div id="bloque-mayor" class="md:col-span-2 p-5 bg-slate-50 rounded-2xl border border-slate-100 space-y-4
-        {{ $esMenor ?? true ? 'hidden' : '' }}">
-        <h4 class="text-sm font-bold text-slate-800 uppercase tracking-wider">Contacto de Emergencia</h4>
-        <p class="text-xs text-slate-400">El atleta es mayor de edad. Ingresa un contacto de referencia.</p>
-
-        <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-1">Relación con el atleta</label>
-            <select name="contacto_relacion" class="block w-full px-4 py-2.5 border border-slate-200 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm bg-white">
-                <option value="">Seleccionar...</option>
-                @foreach(['Padre','Madre','Cónyuge','Hermano','Hermana','Amigo/a','Compañero/a de equipo','Otro'] as $rel)
-                    <option value="{{ $rel }}" {{ old('contacto_relacion', $athlete->contacto_relacion ?? '') == $rel ? 'selected' : '' }}>{{ $rel }}</option>
-                @endforeach
-            </select>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <x-admin.input label="Nombre completo" name="contacto_nombre"
-                :value="$athlete->contacto_nombre ?? old('contacto_nombre')" placeholder="Nombre del contacto" />
-            <x-admin.input label="Teléfono de Emergencia" name="contacto_telefono"
-                :value="$athlete->contacto_telefono ?? old('contacto_telefono')" placeholder="Ej: 77700000" />
+        <div class="pt-2">
+            <x-admin.input label="Teléfono de Emergencia Tutor" name="telefono_padre" :value="$athlete->telefono_padre ?? old('telefono_padre')" placeholder="Ej: 77700000" />
         </div>
     </div>
 
-    {{-- ── ESTADO ── --}}
-    <div class="md:col-span-2 pt-6 border-t border-slate-100">
-        <label class="relative flex items-center cursor-pointer">
+    <div id="bloque-mayor" class="md:col-span-2 bg-slate-50/50 p-8 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/40 space-y-6 {{ $esMenor ?? true ? 'hidden' : '' }}">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <h4 class="text-sm font-black text-slate-800 uppercase tracking-widest">Contacto de Emergencia</h4>
+                <p class="text-[11px] text-slate-400 font-bold mt-1 uppercase">Opcional para mayores de edad</p>
+            </div>
+            
+            <div class="w-full sm:w-64">
+                <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">Relación</label>
+                <select name="contacto_relacion" class="block w-full px-4 py-3 border border-slate-200 rounded-xl shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 text-sm font-bold bg-white text-slate-700 cursor-pointer">
+                    <option value="">Seleccionar...</option>
+                    @foreach(['Padre','Madre','Cónyuge','Hermano','Hermana','Amigo/a','Compañero/a de equipo','Otro'] as $rel)
+                        <option value="{{ $rel }}" {{ old('contacto_relacion', $athlete->contacto_relacion ?? '') == $rel ? 'selected' : '' }}>{{ $rel }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-slate-100">
+            <x-admin.input label="Nombre completo del contacto" name="contacto_nombre" :value="$athlete->contacto_nombre ?? old('contacto_nombre')" placeholder="Nombre completo" />
+            <x-admin.input label="Teléfono de Emergencia" name="contacto_telefono" :value="$athlete->contacto_telefono ?? old('contacto_telefono')" placeholder="Ej: 77700000" />
+        </div>
+    </div>
+
+    {{-- ── ESTADO Y HABILITACIÓN ── --}}
+    <div class="md:col-span-2 bg-white p-8 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/40 relative overflow-hidden">
+        <label class="relative flex items-center cursor-pointer group">
             <input type="checkbox" name="habilitado_booleano" value="1"
                 {{ old('habilitado_booleano', $athlete->habilitado_booleano ?? true) ? 'checked' : '' }}
                 class="sr-only peer">
-            <div class="w-11 h-6 bg-slate-200 peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer
-                peer-checked:after:translate-x-full peer-checked:after:border-white
-                after:content-[''] after:absolute after:top-[2px] after:left-[2px]
-                after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all
-                peer-checked:bg-emerald-600"></div>
-            <span class="ml-3 text-sm font-semibold text-slate-700 italic">Estudiante habilitado para jugar</span>
+            <div class="w-14 h-7 bg-slate-100 border border-slate-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-emerald-100 peer-checked:bg-emerald-600 peer-checked:border-emerald-600 transition-all
+                after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:rounded-full after:h-[20px] after:w-[20px] after:transition-all after:shadow-sm peer-checked:after:translate-x-7"></div>
+            <span class="ml-4 text-sm font-bold text-slate-700">Atleta habilitado para actividades y competencia militar/deportiva</span>
         </label>
+    </div>
+</div>
+
+<div class="mt-12 flex items-center justify-end gap-4 p-8 bg-slate-900 rounded-[2rem] shadow-2xl relative overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-r from-blue-900/50 to-transparent"></div>
+    <div class="relative z-10 flex flex-wrap gap-4">
+        <x-admin.button type="button" variant="secondary" onclick="window.history.back()" class="!bg-white/10 !text-white !border-white/20 hover:!bg-white/20 !rounded-2xl !px-8">
+            Cancelar
+        </x-admin.button>
+        <x-admin.button type="submit" variant="danger" class="!px-10 !py-4 !text-base !rounded-2xl !shadow-red-900/40">
+            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+            {{ isset($athlete) ? 'Guardar Cambios' : 'Registrar Atleta' }}
+        </x-admin.button>
     </div>
 </div>
 

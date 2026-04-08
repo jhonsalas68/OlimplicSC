@@ -4,38 +4,43 @@
 
 @section('content')
 @if(isset($selectedCategory))
-<div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-    <div>
-        <h1 class="text-2xl font-black text-slate-800 tracking-tight">{{ $selectedCategory->nombre }}</h1>
-        <p class="text-sm font-medium text-slate-500 mt-1">Edades permitidas: {{ $selectedCategory->edad_min }} a {{ $selectedCategory->edad_max }} años</p>
+<div class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-white p-8 rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/50 relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-32 h-32 bg-blue-50/50 rounded-full -mr-16 -mt-16 blur-3xl"></div>
+    <div class="relative z-10">
+        <h1 class="text-3xl font-black text-slate-800 tracking-tight leading-tight">{{ $selectedCategory->nombre }}</h1>
+        <p class="text-sm font-bold text-blue-600 mt-2 flex items-center">
+            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Edades: {{ $selectedCategory->edad_min }} a {{ $selectedCategory->edad_max }} años
+        </p>
     </div>
-    <a href="{{ route('athletes.index') }}" class="inline-flex items-center justify-center px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded-xl transition-colors shadow-sm whitespace-nowrap">
-        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+    <a href="{{ route('athletes.index') }}" class="inline-flex items-center justify-center px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-bold rounded-2xl transition-all shadow-sm hover:shadow-md whitespace-nowrap group">
+        <svg class="w-4 h-4 mr-2 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
         Volver a Categorías
     </a>
 </div>
 @endif
 
-<div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-8">
-    <div class="flex items-center space-x-4 w-full lg:w-auto">
-        <form action="{{ route('athletes.index') }}" method="GET" id="filter-form" class="flex flex-col sm:flex-row items-center gap-3 w-full">
+<div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-10">
+    <div class="flex items-center w-full lg:w-auto">
+        <form action="{{ route('athletes.index') }}" method="GET" id="filter-form" class="flex flex-col sm:flex-row items-center gap-4 w-full">
             @if(request('category_id'))
                 <input type="hidden" name="category_id" value="{{ request('category_id') }}">
             @endif
             
-            <div class="relative group w-full sm:w-64">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg class="h-5 w-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="relative group w-full sm:w-80">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <svg class="h-5 w-5 text-slate-400 group-hover:text-blue-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                 </div>
                 <input type="text" name="search" value="{{ request('search') }}" 
-                       class="block w-full pl-10 pr-3 py-2.5 border border-slate-200 rounded-xl leading-5 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm transition-all shadow-sm"
+                       class="block w-full pl-12 pr-4 py-3.5 border border-slate-200 rounded-2xl leading-5 bg-white placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 sm:text-sm transition-all shadow-sm"
                        placeholder="Buscar por nombre o DNI...">
             </div>
 
             <select name="deuda" onchange="this.form.submit()" 
-                    class="block w-full sm:w-44 px-3 py-2.5 border border-slate-200 rounded-xl leading-5 bg-white text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm transition-all shadow-sm cursor-pointer">
+                    class="block w-full sm:w-52 px-4 py-3.5 border border-slate-200 rounded-2xl leading-5 bg-white text-slate-700 font-bold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 sm:text-sm transition-all shadow-sm cursor-pointer appearance-none bg-no-repeat bg-[right_1rem_center] bg-[length:1em_1em]"
+                    style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2364748b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');">
                 <option value="">Todas las mensualidades</option>
                 <option value="al_dia" {{ request('deuda') === 'al_dia' ? 'selected' : '' }}>✅ Al Día</option>
                 <option value="deudores" {{ request('deuda') === 'deudores' ? 'selected' : '' }}>❌ Deudores</option>
@@ -44,31 +49,28 @@
     </div>
 
     <div class="flex flex-wrap items-center gap-3">
-        <!-- Export Button -->
-        <a href="{{ route('athletes.export') }}" class="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded-xl transition-colors shadow-sm border border-slate-200">
-            <svg class="w-4 h-4 mr-2 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <a href="{{ route('athletes.export') }}" class="flex-1 sm:flex-none inline-flex items-center justify-center px-5 py-2.5 bg-white hover:bg-slate-50 text-slate-700 text-sm font-bold rounded-2xl transition-all shadow-sm border border-slate-200 group">
+            <svg class="w-5 h-5 mr-2 text-emerald-600 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
             Exportar
         </a>
  
-        <!-- Convocados Button (Selective Export) -->
-        <button id="btn-convocados" onclick="exportSelected()" class="hidden flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl transition-colors shadow-sm border border-blue-700">
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <button id="btn-convocados" onclick="exportSelected()" class="hidden flex-1 sm:flex-none inline-flex items-center justify-center px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-2xl transition-all shadow-lg shadow-blue-200/50 group">
+            <svg class="w-5 h-5 mr-2 transition-transform group-hover:rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
             Convocados (<span id="selected-count">0</span>)
         </button>
 
-        <!-- Import Button (Triggers Modal) -->
-        <button onclick="document.getElementById('importModal').classList.remove('hidden')" class="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded-xl transition-colors shadow-sm border border-slate-200">
-            <svg class="w-4 h-4 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <button onclick="document.getElementById('importModal').classList.remove('hidden')" class="flex-1 sm:flex-none inline-flex items-center justify-center px-5 py-2.5 bg-white hover:bg-slate-50 text-slate-700 text-sm font-bold rounded-2xl transition-all shadow-sm border border-slate-200">
+            <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
             </svg>
             Importar
         </button>
 
-        <x-admin.button onclick="window.location.href='{{ route('athletes.create') }}'" class="w-full sm:w-auto justify-center">
+        <x-admin.button onclick="window.location.href='{{ route('athletes.create') }}'" class="w-full sm:w-auto justify-center !shadow-lg shadow-red-200/50 !rounded-2xl" variant="danger">
             <svg class="mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
             </svg>
@@ -178,16 +180,16 @@
                 @if(auth()->user()->hasRole('Admin') || auth()->user()->hasRole('SuperAdmin'))
                 <button onclick="toggleHabilitado({{ $athlete->id }}, this)"
                         data-habilitado="{{ $athlete->habilitado_booleano ? '1' : '0' }}"
-                        class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all
+                        class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all
                                {{ $athlete->habilitado_booleano
-                                   ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'
-                                   : 'bg-red-100 text-red-600 hover:bg-red-200' }}">
-                    <span class="w-1.5 h-1.5 rounded-full {{ $athlete->habilitado_booleano ? 'bg-emerald-500' : 'bg-red-500' }}"></span>
+                                   ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'
+                                   : 'bg-red-50 text-red-600 hover:bg-red-100' }}">
+                    <span class="w-1.5 h-1.5 rounded-full {{ $athlete->habilitado_booleano ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]' }}"></span>
                     {{ $athlete->habilitado_booleano ? 'Habilitado' : 'Inhabilitado' }}
                 </button>
                 @else
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold
-                             {{ $athlete->habilitado_booleano ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-600' }}">
+                <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider
+                             {{ $athlete->habilitado_booleano ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600' }}">
                     <span class="w-1.5 h-1.5 rounded-full {{ $athlete->habilitado_booleano ? 'bg-emerald-500' : 'bg-red-500' }}"></span>
                     {{ $athlete->habilitado_booleano ? 'Habilitado' : 'Inhabilitado' }}
                 </span>
@@ -195,20 +197,20 @@
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
                 @if($athlete->pagado_mes_actual)
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
+                    <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider bg-blue-50 text-blue-600 border border-blue-100 shadow-sm">
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                         Al Día
                     </span>
                 @else
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-100">
+                    <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider bg-red-50 text-red-600 border border-red-100 shadow-sm">
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/></svg>
                         Debe
                     </span>
                 @endif
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <div class="flex items-center justify-end space-x-3">
-                    <a href="{{ route('athletes.show', $athlete) }}" class="inline-flex items-center px-4 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-600 hover:text-white rounded-lg text-xs font-bold transition-colors shadow-sm">
+                <div class="flex items-center justify-end space-x-2">
+                    <a href="{{ route('athletes.show', $athlete) }}" class="inline-flex items-center px-4 py-2 bg-slate-50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-xl text-[10px] font-black uppercase tracking-wider transition-all shadow-sm hover:shadow-md">
                         Ver Perfil
                     </a>
                     <a href="{{ route('athletes.edit', $athlete) }}" class="text-blue-600 hover:text-blue-900 transition-colors">

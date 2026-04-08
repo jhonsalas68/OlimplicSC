@@ -1,4 +1,4 @@
-<header class="h-16 flex items-center justify-between px-4 sm:px-6 flex-shrink-0 shadow-md transition-all duration-300 z-40" style="background-color: #c61c2c;">
+<header class="h-16 flex items-center justify-between px-4 sm:px-6 flex-shrink-0 glass-header border-b-0 transition-all duration-300 z-40" style="background-color: rgba(198, 28, 44, 0.95); backdrop-filter: blur(8px);">
     <div class="flex items-center">
         {{-- Mobile Menu Button --}}
         <button @click.stop="sidebarOpen = !sidebarOpen" class="mr-4 text-white/80 hover:text-white md:hidden cursor-pointer p-1 rounded-lg hover:bg-white/10 transition-colors">

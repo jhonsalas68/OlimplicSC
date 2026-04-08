@@ -45,6 +45,7 @@ Route::middleware(['auth', 'prevent-back-history'])->prefix('admin')->group(func
         // Module Reportes
         Route::get('/reports', [\App\Http\Controllers\Admin\ReportController::class, 'index'])->name('admin.reports.index');
         Route::get('/reports/export', [\App\Http\Controllers\Admin\ReportController::class, 'exportExcel'])->name('admin.reports.export.excel');
+        Route::get('/reports/export-pdf', [\App\Http\Controllers\Admin\ReportController::class, 'exportPdf'])->name('admin.reports.export.pdf');
 
         // Module Cobros (panel de venta independiente)
         Route::get('/cobros', [\App\Http\Controllers\Admin\CobrosController::class, 'index'])->name('cobros.index');
@@ -93,6 +94,7 @@ Route::middleware(['auth', 'prevent-back-history'])->prefix('admin')->group(func
         Route::get('/export/usuarios/excel', [\App\Http\Controllers\Admin\SuperAdminController::class, 'exportUsuariosExcel'])->name('superadmin.export.usuarios.excel');
         Route::post('/import/atletas',       [\App\Http\Controllers\Admin\SuperAdminController::class, 'importAtletas'])->name('superadmin.import.atletas');
         Route::get('/backup/sql',            [\App\Http\Controllers\Admin\SuperAdminController::class, 'backup'])->name('superadmin.backup.sql');
+        Route::get('/backup/email',          [\App\Http\Controllers\Admin\SuperAdminController::class, 'backupToEmail'])->name('superadmin.backup.email');
         Route::get('/backup/excel',          [\App\Http\Controllers\Admin\SuperAdminController::class, 'backupExcel'])->name('superadmin.backup.excel');
         Route::post('/restore/sql',          [\App\Http\Controllers\Admin\SuperAdminController::class, 'restore'])->name('superadmin.restore.sql');
         
