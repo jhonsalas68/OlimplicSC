@@ -10,5 +10,9 @@ php artisan view:cache
 php artisan migrate --force
 php artisan db:seed --force
 
+# CORRECCIÓN VITAL PARA SQLITE Y LOGS EN RAILWAY/DOCKER
+# Asignar propiedad a www-data (el usuario del servidor web) para que pueda leer/escribir en la base de datos y logs.
+chown -R www-data:www-data /var/www/html/database /var/www/html/storage /var/www/html/bootstrap/cache
+
 # Arrancar el servidor
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
