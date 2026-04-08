@@ -11,6 +11,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Confiar en todos los proxies (necesario para Railway / Heroku y HTTPS)
+        $middleware->trustProxies(at: '*');
+
         // Aplicar middleware personalizado para redirigir después de login
         $middleware->web(append: [
             \App\Http\Middleware\RedirectIfAuthenticated::class,
