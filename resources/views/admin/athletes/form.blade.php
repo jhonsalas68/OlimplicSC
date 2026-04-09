@@ -184,23 +184,12 @@
                 class="sr-only peer">
             <div class="w-14 h-7 bg-slate-100 border border-slate-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-emerald-100 peer-checked:bg-emerald-600 peer-checked:border-emerald-600 transition-all
                 after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:rounded-full after:h-[20px] after:w-[20px] after:transition-all after:shadow-sm peer-checked:after:translate-x-7"></div>
-            <span class="ml-4 text-sm font-bold text-slate-700">Atleta habilitado para actividades y competencia militar/deportiva</span>
+            <span class="ml-4 text-sm font-bold text-slate-700">habilitado para jugar</span>
         </label>
     </div>
 </div>
 
-<div class="mt-12 flex items-center justify-end gap-4 p-8 bg-slate-900 rounded-[2rem] shadow-2xl relative overflow-hidden">
-    <div class="absolute inset-0 bg-gradient-to-r from-blue-900/50 to-transparent"></div>
-    <div class="relative z-10 flex flex-wrap gap-4">
-        <x-admin.button type="button" variant="secondary" onclick="window.history.back()" class="!bg-white/10 !text-white !border-white/20 hover:!bg-white/20 !rounded-2xl !px-8">
-            Cancelar
-        </x-admin.button>
-        <x-admin.button type="submit" variant="danger" class="!px-10 !py-4 !text-base !rounded-2xl !shadow-red-900/40">
-            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
-            {{ isset($athlete) ? 'Guardar Cambios' : 'Registrar Atleta' }}
-        </x-admin.button>
-    </div>
-</div>
+
 
 <script>
 const CATEGORIAS = [
