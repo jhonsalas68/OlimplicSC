@@ -1,0 +1,4 @@
+ci,nombres,apellido_paterno,apellido_materno,categoria,fecha_de_nacimiento,genero,padretutor_nombre,padretutor_ape_paterno,padretutor_ape_materno,padretutor_telefono,habilitado
+9000101,Carlos Alberto,Mendez,Vargas,Sub-15,12/05/2011,Masculino,Roberto,Mendez,Ruiz,70011223,SÍ
+9000102,Lucia Fernanda,Rojas,Flores,Mayores,05/09/1998,Femenino,,,,SÍ
+9000103,Mateo David,Villarroel,Ortiz,Sub-13,19/12/2013,Masculino,David,Villarroel,Soto,71122334,SÍ
