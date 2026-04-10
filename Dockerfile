@@ -17,7 +17,7 @@ RUN npm install
 COPY . .
 RUN npm run build
 
-# Stage 3: Final Runtime
+# Stage 3: Final Runtime (PostgreSQL optimized)
 FROM php:8.2-fpm-alpine
 
 # Install system dependencies
