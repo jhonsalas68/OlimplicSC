@@ -1,0 +1,3 @@
+ci,nombres,apellido_paterno,apellido_materno,categoria,fecha_de_nacimiento,genero,alergias,padretutor_nombre,padretutor_telefono,habilitado
+1234567,Juan Pablo,Perez,Soliz,Sub-15,15/05/2010,Masculino,Ninguna,Roberto Perez,76012345,SÍ
+7654321,Maria Belen,Garcia,Luna,Mayores,20/02/1995,Femenino,Penicilina,Ana Luna,69054321,SÍ
