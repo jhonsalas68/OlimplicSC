@@ -136,13 +136,12 @@ class AthleteController extends Controller
         ]);
 
         try {
-            $fotoPath = null;
             if ($request->hasFile('foto')) {
-                // Guardarlo localmente rápido y procesar en segundo plano para no hacer esperar al servidor
-                $fotoPath = $request->file('foto')->store('tmp_athletes', 'local');
+                $response = Cloudinary::uploadApi()->upload($request->file('foto')->getRealPath(), [
+                    'folder' => 'athletes'
+                ]);
+                $validated['foto'] = $response['secure_url'];
             }
-            // Quitamos foto de validated ya que la subirá el Job
-            unset($validated['foto']);
 
             $validated['habilitado_booleano'] = $request->has('habilitado_booleano');
             $validated['tiene_seguro']        = $request->has('tiene_seguro');
@@ -150,11 +149,6 @@ class AthleteController extends Controller
             \Illuminate\Support\Facades\Log::info('Creando atleta en BD...', $validated);
             $athlete = Athlete::create($validated);
             \Illuminate\Support\Facades\Log::info('Atleta creado ID: ' . $athlete->id);
-
-            // Despachar la subida de foto a Cloudinary
-            if ($fotoPath) {
-                dispatch(new \App\Jobs\UploadAthletePhotoToCloudinary($athlete, $fotoPath));
-            }
 
             \App\Services\ActivityLogger::log(
                 'inscripcion_atleta', 
@@ -165,7 +159,6 @@ class AthleteController extends Controller
             return redirect()->route('athletes.index')->with('success', 'Atleta registrado correctamente.');
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Error en AthleteController@store: ' . $e->getMessage());
-            \Illuminate\Support\Facades\Log::error($e->getTraceAsString());
             return back()->withInput()->with('error', 'Error al registrar: ' . $e->getMessage());
         }
     }

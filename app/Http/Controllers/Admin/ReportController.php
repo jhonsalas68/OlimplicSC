@@ -61,7 +61,7 @@ class ReportController extends Controller
         // Traemos los registros paginados o limitados para la tabla (Optimizado)
         $pagosFiltrados = $query->with(['athlete.category', 'cobrador'])->latest()->get();
 
-        $historialMeses = \App\Models\Payment::selectRaw('EXTRACT(YEAR FROM created_at) as anio, EXTRACT(MONTH FROM created_at) as mes')
+        $historialMeses = \App\Models\Payment::selectRaw('EXTRACT(YEAR FROM created_at) as anio, EXTRACT(MONTH FROM created_at) as mes, COUNT(*) as total_pagos, SUM(monto) as total_monto')
             ->where('estado_pago', 'pagado')
             ->groupBy('anio', 'mes')
             ->orderBy('anio', 'desc')
@@ -97,7 +97,10 @@ class ReportController extends Controller
         
         $query = \App\Models\Payment::query()->where('estado_pago', 'pagado');
         
-        if ($rango === 'hoy') {
+        if ($rango === 'mes_especifico') {
+            $query->whereYear('created_at', $request->get('year', now()->year))
+                  ->whereMonth('created_at', $request->get('month', now()->month));
+        } elseif ($rango === 'hoy') {
             $query->whereDate('created_at', now()->toDateString());
         } elseif ($rango === 'semana') {
             $query->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]);

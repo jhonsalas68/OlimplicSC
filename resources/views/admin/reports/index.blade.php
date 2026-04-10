@@ -30,24 +30,30 @@
 
 {{-- ── NAVEGACIÓN HISTÓRICA POR MESES ── --}}
 <div class="mb-10">
-    <label class="block text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 ml-1">Historial de Operaciones</label>
-    <div class="flex flex-wrap gap-3">
+    <label class="block text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 ml-1">Historial de Ganancias por Mes</label>
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
         @foreach($stats['historial_meses'] as $hm)
             @php
                 $esSeleccionado = ($stats['month'] == $hm->mes && $stats['year'] == $hm->anio);
-                $nombreMes = \Carbon\Carbon::create(null, $hm->mes)->translatedFormat('F');
+                $nombreMes = \Carbon\Carbon::create($hm->anio, $hm->mes, 1)->translatedFormat('F');
             @endphp
             <a href="{{ route('admin.reports.index', ['rango' => 'mes_especifico', 'month' => $hm->mes, 'year' => $hm->anio]) }}"
-               class="px-5 py-3 rounded-2xl text-sm font-bold transition-all border {{ $esSeleccionado ? 'bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-200 scale-105 z-10' : 'bg-white border-slate-100 text-slate-600 hover:border-blue-200 hover:bg-blue-50' }}">
-                <span class="capitalize">{{ $nombreMes }}</span>
-                <span class="opacity-60 text-[10px] block font-black leading-none mt-1">{{ $hm->anio }}</span>
+               class="group p-4 rounded-3xl transition-all border {{ $esSeleccionado ? 'bg-blue-600 border-blue-600 text-white shadow-xl shadow-blue-200 ring-4 ring-blue-600/10' : 'bg-white border-slate-100 text-slate-600 hover:border-blue-400 hover:shadow-lg hover:shadow-slate-200/50' }}">
+                <div class="flex flex-col">
+                    <span class="text-[10px] font-black uppercase tracking-widest leading-none mb-1 {{ $esSeleccionado ? 'text-blue-200' : 'text-slate-400 group-hover:text-blue-500' }}">{{ $hm->anio }}</span>
+                    <span class="text-lg font-black capitalize leading-tight mb-2">{{ $nombreMes }}</span>
+                    
+                    <div class="mt-auto pt-2 border-t {{ $esSeleccionado ? 'border-white/20' : 'border-slate-50 group-hover:border-blue-100' }}">
+                        <p class="text-[9px] font-black uppercase tracking-tighter {{ $esSeleccionado ? 'text-blue-100' : 'text-slate-400' }}">
+                            {{ $hm->total_pagos }} Pagos Realizados
+                        </p>
+                        <p class="text-sm font-black {{ $esSeleccionado ? 'text-white' : 'text-emerald-600' }}">
+                            Bs. {{ number_format($hm->total_monto, 2) }}
+                        </p>
+                    </div>
+                </div>
             </a>
         @endforeach
-        
-        <a href="{{ route('admin.reports.index', ['rango' => 'semana']) }}" 
-           class="px-5 py-3 rounded-2xl text-sm font-bold bg-slate-100 text-slate-600 border border-transparent hover:bg-slate-200 transition-all flex items-center">
-            Ver Esta Semana
-        </a>
     </div>
 </div>
 
