@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Mail\DatabaseBackupMail;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
@@ -50,7 +51,10 @@ class BackupDatabase extends Command
         putenv("PGPASSWORD={$password}");
         
         // El comando pg_dump para PostgreSQL
-        $command = "pg_dump -U {$username} -h {$host} -p {$port} {$database} --clean --if-exists > {$filepath} 2>&1";
+        $pgDumpPath = env('PG_DUMP_PATH', 'pg_dump');
+        $command = "\"{$pgDumpPath}\" -U {$username} -h {$host} -p {$port} {$database} --clean --if-exists > {$filepath} 2>&1";
+        
+        $this->info("Ejecutando: {$pgDumpPath}...");
         exec($command, $output, $resultCode);
         
         putenv("PGPASSWORD="); // Limpiar contraseña por seguridad
@@ -59,11 +63,8 @@ class BackupDatabase extends Command
             $this->info("Backup finalizado con exito. Enviando correo a {$emailDestination}...");
             
             try {
-                Mail::raw("Adjunto encontrarás el resguardo automático de la base de datos de OlimpicSC del día {$date}. ¡Guárdalo en un lugar seguro!", function ($message) use ($emailDestination, $filepath, $filename) {
-                    $message->to($emailDestination)
-                            ->subject("OlimpicSC - Respaldo Diario de Base de Datos ({$filename})")
-                            ->attach($filepath);
-                });
+                Mail::to($emailDestination)->send(new DatabaseBackupMail($filename, $filepath));
+                
                 $this->info('Correo enviado exitosamente.');
                 Log::info("Backup DB completado y enviado por correo a {$emailDestination}");
             } catch (\Exception $e) {
@@ -72,10 +73,13 @@ class BackupDatabase extends Command
             }
 
             // Eliminar el archivo después de enviarlo para no consumir disco
-            unlink($filepath);
+            if (file_exists($filepath)) {
+                unlink($filepath);
+            }
         } else {
-            $this->error('Fallo el comando pg_dump: ' . implode("\n", $output));
-            Log::error('Fallo en la creacion del Backup DB con pg_dump');
+            $this->error('Fallo el comando pg_dump. Código de error: ' . $resultCode);
+            $this->error('Salida: ' . implode("\n", $output));
+            Log::error('Fallo en la creacion del Backup DB con pg_dump: ' . implode("\n", $output));
         }
     }
 }

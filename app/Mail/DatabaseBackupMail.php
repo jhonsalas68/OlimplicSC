@@ -14,15 +14,15 @@ class DatabaseBackupMail extends Mailable
     use Queueable, SerializesModels;
 
     public $filename;
-    public $content;
+    public $filepath;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($filename, $content)
+    public function __construct($filename, $filepath)
     {
         $this->filename = $filename;
-        $this->content = $content;
+        $this->filepath = $filepath;
     }
 
     /**
@@ -53,7 +53,8 @@ class DatabaseBackupMail extends Mailable
     public function attachments(): array
     {
         return [
-            Attachment::fromData(fn() => $this->content, $this->filename)
+            Attachment::fromPath($this->filepath)
+                ->as($this->filename)
                 ->withMime('application/sql'),
         ];
     }
