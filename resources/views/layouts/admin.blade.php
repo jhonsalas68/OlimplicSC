@@ -52,7 +52,9 @@
         }
     </style>
 </head>
-<body class="h-full overflow-hidden" x-data="{ sidebarOpen: false }">
+<body class="h-full overflow-hidden" 
+      x-data="{ sidebarOpen: localStorage.getItem('sidebar-open') === 'true' }" 
+      x-init="$watch('sidebarOpen', val => localStorage.setItem('sidebar-open', val))">
     <div class="flex h-full">
         <!-- Sidebar -->
         @include('layouts.partials.sidebar')
