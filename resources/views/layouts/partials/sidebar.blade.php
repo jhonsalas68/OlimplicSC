@@ -2,14 +2,12 @@
 <div x-show="sidebarOpen" x-transition.opacity class="fixed inset-0 bg-slate-900/50 z-40 md:hidden" @click="sidebarOpen = false"></div>
 
 <aside 
-    id="admin-sidebar"
-    data-turbo-permanent
-    class="sidebar-gradient flex-shrink-0 flex flex-col transition-all duration-300 overflow-hidden group/sidebar absolute md:relative z-50 h-full bg-[#0b2d69] shadow-2xl"
+    id="main-sidebar"
+    class="sidebar-gradient flex-shrink-0 flex flex-col transition-all duration-300 overflow-hidden group/sidebar fixed z-50 h-full bg-[#0b2d69] shadow-2xl"
     :class="{ 
         'w-64 left-0 sidebar-is-open': sidebarOpen, 
-        '-left-64 md:left-0 w-16 md:hover:w-64': !sidebarOpen 
+        'w-16 -left-64 md:left-0 md:hover:w-64': !sidebarOpen 
     }"
-    @click.away="sidebarOpen = false"
 >
 
     {{-- Header del logo --}}
@@ -63,6 +61,9 @@
 
             @if(auth()->user()->hasRole('SuperAdmin'))
             <div class="pt-6">
+                <h3 class="px-4 text-[10px] font-black text-blue-300 uppercase tracking-[0.2em] mb-3 opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+                    Sistema & Soporte
+                </h3>
                 <x-sidebar-link href="{{ route('superadmin.index') }}" icon="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" label="Mantenimiento" :active="request()->routeIs('superadmin.*')" />
 
                 <x-sidebar-link href="{{ route('admin.activity-logs.index') }}" icon="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" label="Bitácora" :active="request()->routeIs('admin.activity-logs.*')" />

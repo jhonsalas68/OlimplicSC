@@ -17,17 +17,45 @@
     <!-- Scripts and Core Performance -->
     <script type="module">
         import hotwiredTurbo from 'https://cdn.jsdelivr.net/npm/@hotwired/turbo@8.0.4/+esm';
-        // Activar precarga instantánea al pasar el ratón por los enlaces
+        // Activar Turbo y habilitar la precarga inteligente
         hotwiredTurbo.start();
+        
+        // Optimización extra: Precarga agresiva al mover el ratón sobre el sidebar
+        document.addEventListener("mouseover", (event) => {
+            const link = event.target.closest("a");
+            if (link && link.href && !link.dataset.turboPrefetched) {
+                const url = new URL(link.href);
+                if (url.origin === window.location.origin) {
+                    hotwiredTurbo.visit(link.href, { action: "prefetch" });
+                    link.dataset.turboPrefetched = "true";
+                }
+            }
+        });
+    </script>
+
+    <script shadow>
+        // Pre-inicialización crítica para evitar parpadeos al volver atrás (Restoration Visits)
+        if (localStorage.getItem('sidebar-open') === 'true') {
+            document.documentElement.classList.add('sidebar-is-open');
+        } else {
+            document.documentElement.classList.remove('sidebar-is-open');
+        }
     </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
-    {{-- Turbo View Transitions & Prefetching --}}
+    {{-- Turbo View Transitions, Morphing & Prefetching --}}
     <meta name="turbo-prefetch" content="true">
+    <meta name="turbo-refresh-method" content="morph">
+    <meta name="turbo-refresh-scroll" content="preserve">
+    <meta name="view-transition" content="same-origin">
     
     <style>
         body { font-family: 'Inter', sans-serif; }
+        [x-cloak] { display: none !important; }
+        .no-transition, .no-transition * {
+            transition: none !important;
+        }
         .glass-header {
             background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(12px) saturate(180%);
@@ -52,15 +80,19 @@
         }
     </style>
 </head>
-<body class="h-full overflow-hidden" 
-      x-data="{ sidebarOpen: localStorage.getItem('sidebar-open') === 'true' }" 
-      x-init="$watch('sidebarOpen', val => localStorage.setItem('sidebar-open', val))">
+<body class="h-full overflow-hidden no-transition" 
+      x-data="{ sidebarOpen: localStorage.getItem('sidebar-open') === 'true' || false }" 
+      x-init="
+        $watch('sidebarOpen', val => localStorage.setItem('sidebar-open', val));
+        setTimeout(() => $el.classList.remove('no-transition'), 100);
+      ">
     <div class="flex h-full">
         <!-- Sidebar -->
         @include('layouts.partials.sidebar')
 
         <!-- Main Content -->
-        <div class="flex flex-col flex-1 min-w-0 overflow-hidden">
+        <div class="flex flex-col flex-1 min-w-0 overflow-hidden transition-all duration-300"
+             :class="sidebarOpen ? 'md:pl-64' : 'md:pl-16'">
             <!-- Navbar -->
             @include('layouts.partials.navbar')
 

@@ -252,7 +252,7 @@
         Nota de Venta <span>#{{ str_pad($payment->id, 5, "0", STR_PAD_LEFT) }}</span>
     </div>
     <div class="action-btns">
-        <a href="{{ route('cobros.index') }}" class="btn-back">
+        <a href="{{ route('payments.index') }}" class="btn-back" data-turbo="false">
             ← Volver
         </a>
         <button onclick="window.print()" class="btn-print">
