@@ -109,11 +109,16 @@ class AthleteController extends Controller
 
     public function store(Request $request)
     {
+        // 1. Validación manual del C.I. para evitar colapsos (502) en Railway
+        if (Athlete::where('ci', $request->ci)->exists()) {
+            return back()->withInput()->withErrors(['ci' => 'Este número de C.I. ya está registrado en otro atleta.']);
+        }
+
         $validated = $request->validate([
             'nombre'                  => 'required|string|max:255',
             'apellido_paterno'        => 'required|string|max:255',
             'apellido_materno'        => 'nullable|string|max:255',
-            'ci'                      => 'required|string|max:20|unique:athletes,ci',
+            'ci'                      => 'required|string|max:20',
             'fecha_nacimiento'        => 'required|date',
             'genero'                  => 'nullable|in:Masculino,Femenino,Otro',
             'foto'                    => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
@@ -134,7 +139,6 @@ class AthleteController extends Controller
             'contacto_telefono'       => 'nullable|string|max:20',
             'contacto_relacion'       => 'nullable|string|max:50',
         ], [
-            'ci.unique' => 'Este número de C.I. ya está registrado en otro atleta.',
             'ci.required' => 'El número de C.I. es obligatorio.',
             'nombre.required' => 'El nombre es obligatorio.',
             'apellido_paterno.required' => 'El apellido paterno es obligatorio.',
@@ -189,11 +193,16 @@ class AthleteController extends Controller
 
     public function update(Request $request, Athlete $athlete)
     {
+        // 1. Validación manual del C.I. para evitar colapsos (502) en Railway
+        if (Athlete::where('ci', $request->ci)->where('id', '!=', $athlete->id)->exists()) {
+            return back()->withInput()->withErrors(['ci' => 'Este número de C.I. ya está registrado en otro atleta.']);
+        }
+
         $validated = $request->validate([
             'nombre'                  => 'required|string|max:255',
             'apellido_paterno'        => 'required|string|max:255',
             'apellido_materno'        => 'nullable|string|max:255',
-            'ci'                      => 'required|string|max:20|unique:athletes,ci,' . $athlete->id,
+            'ci'                      => 'required|string|max:20',
             'fecha_nacimiento'        => 'required|date',
             'genero'                  => 'nullable|in:Masculino,Femenino,Otro',
             'foto'                    => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
@@ -214,7 +223,6 @@ class AthleteController extends Controller
             'contacto_telefono'       => 'nullable|string|max:20',
             'contacto_relacion'       => 'nullable|string|max:50',
         ], [
-            'ci.unique' => 'Este número de C.I. ya está registrado en otro atleta.',
             'ci.required' => 'El número de C.I. es obligatorio.',
             'nombre.required' => 'El nombre es obligatorio.',
             'apellido_paterno.required' => 'El apellido paterno es obligatorio.',
