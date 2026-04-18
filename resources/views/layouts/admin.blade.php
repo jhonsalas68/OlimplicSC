@@ -86,13 +86,13 @@
         $watch('sidebarOpen', val => localStorage.setItem('sidebar-open', val));
         setTimeout(() => $el.classList.remove('no-transition'), 100);
       ">
-    <div class="flex h-full">
+    <div class="flex h-full w-full bg-slate-50">
         <!-- Sidebar -->
         @include('layouts.partials.sidebar')
 
         <!-- Main Content -->
-        <div class="flex flex-col flex-1 min-w-0 overflow-hidden transition-all duration-300"
-             :class="sidebarOpen ? 'md:pl-64' : 'md:pl-16'">
+        <div class="flex flex-col flex-1 min-w-0 h-full overflow-hidden transition-all duration-300 bg-slate-50 premium-bg"
+             :class="sidebarOpen ? 'md:pl-64 w-full' : 'md:pl-16 w-full'">
             <!-- Navbar -->
             @include('layouts.partials.navbar')
 
