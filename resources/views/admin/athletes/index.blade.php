@@ -213,14 +213,20 @@
                     <a href="{{ route('athletes.show', $athlete) }}" class="inline-flex items-center px-4 py-2 bg-slate-50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-xl text-[10px] font-black uppercase tracking-wider transition-all shadow-sm hover:shadow-md">
                         Ver Perfil
                     </a>
-                    <a href="{{ route('athletes.edit', $athlete) }}" class="text-blue-600 hover:text-blue-900 transition-colors">
+                    <a href="{{ route('athletes.edit', $athlete) }}" 
+                       class="p-2 text-blue-600 hover:text-blue-900 transition-colors"
+                       title="Editar atleta" aria-label="Editar">
                         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
                     </a>
-                    <form action="{{ route('athletes.destroy', $athlete) }}" method="POST" onsubmit="return confirm('¿Eliminar atleta?')">
+                    <form action="{{ route('athletes.destroy', $athlete) }}" method="POST" 
+                          onsubmit="return confirm('¿Estás seguro de que deseas eliminar a este atleta? Esta acción no se puede deshacer.')"
+                          class="inline">
                         @csrf @method('DELETE')
-                        <button class="text-red-600 hover:text-red-900 transition-colors cursor-pointer">
+                        <button type="submit" 
+                                class="p-2 text-red-600 hover:text-red-900 transition-colors cursor-pointer"
+                                title="Eliminar atleta" aria-label="Eliminar">
                             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                             </svg>
