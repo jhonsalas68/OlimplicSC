@@ -133,6 +133,12 @@ class AthleteController extends Controller
             'contacto_nombre'         => 'nullable|string|max:255',
             'contacto_telefono'       => 'nullable|string|max:20',
             'contacto_relacion'       => 'nullable|string|max:50',
+        ], [
+            'ci.unique' => 'Este número de C.I. ya está registrado en otro atleta.',
+            'ci.required' => 'El número de C.I. es obligatorio.',
+            'nombre.required' => 'El nombre es obligatorio.',
+            'apellido_paterno.required' => 'El apellido paterno es obligatorio.',
+            'fecha_nacimiento.required' => 'La fecha de nacimiento es obligatoria.',
         ]);
 
         try {
@@ -203,6 +209,12 @@ class AthleteController extends Controller
             'contacto_nombre'         => 'nullable|string|max:255',
             'contacto_telefono'       => 'nullable|string|max:20',
             'contacto_relacion'       => 'nullable|string|max:50',
+        ], [
+            'ci.unique' => 'Este número de C.I. ya está registrado en otro atleta.',
+            'ci.required' => 'El número de C.I. es obligatorio.',
+            'nombre.required' => 'El nombre es obligatorio.',
+            'apellido_paterno.required' => 'El apellido paterno es obligatorio.',
+            'fecha_nacimiento.required' => 'La fecha de nacimiento es obligatoria.',
         ]);
 
         try {

@@ -58,7 +58,7 @@ class TrainingController extends Controller
             $response = \CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary::uploadApi()->upload($request->file('pdf')->getRealPath(), [
                 'folder' => 'trainings',
                 'resource_type' => 'raw',
-                'public_id' => $publicId
+                'public_id' => $publicId . '.pdf'
             ]);
             $data['file_path_pdf'] = $response['secure_url'];
         }
@@ -112,7 +112,7 @@ class TrainingController extends Controller
             $response = \CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary::uploadApi()->upload($request->file('pdf')->getRealPath(), [
                 'folder' => 'trainings',
                 'resource_type' => 'raw',
-                'public_id' => $publicId
+                'public_id' => $publicId . '.pdf'
             ]);
             $data['file_path_pdf'] = $response['secure_url'];
         }

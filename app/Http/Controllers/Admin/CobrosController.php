@@ -43,7 +43,7 @@ class CobrosController extends Controller
                 'ci'             => $a->ci,
                 'nombre_completo'=> trim("{$a->nombre} {$a->apellido_paterno} {$a->apellido_materno}"),
                 'iniciales'      => strtoupper(substr($a->nombre,0,1).substr($a->apellido_paterno??'',0,1)),
-                'foto'           => $a->foto ? (str_starts_with($a->foto, 'http') ? str_replace('/upload/', '/upload/c_fill,w_100,h_100,q_auto,f_auto/', $a->foto) : $a->foto) : null,
+                'foto'           => $a->foto,
                 'categoria'      => $a->category->nombre ?? '—',
                 'ultimo_pago'    => $a->latestPayment?->created_at?->format('M Y'),
             ]);
@@ -61,7 +61,7 @@ class CobrosController extends Controller
             'nombre_completo'=> trim("{$athlete->nombre} {$athlete->apellido_paterno} {$athlete->apellido_materno}"),
             'ci'             => $athlete->ci,
             'categoria'      => $athlete->category->nombre ?? '—',
-            'foto'           => $athlete->foto ? (str_starts_with($athlete->foto, 'http') ? str_replace('/upload/', '/upload/c_fill,w_150,h_150,q_auto,f_auto/', $athlete->foto) : $athlete->foto) : null,
+            'foto'           => $athlete->foto,
             'ultimo_pago'    => $ultimoPago
                 ? ['mes' => $ultimoPago->mes_correspondiente, 'monto' => $ultimoPago->monto, 'fecha' => $ultimoPago->created_at->format('d/m/Y')]
                 : null,
