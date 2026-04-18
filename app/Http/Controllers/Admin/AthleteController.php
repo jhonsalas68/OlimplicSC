@@ -109,9 +109,9 @@ class AthleteController extends Controller
 
     public function store(Request $request)
     {
-        // 1. Validación manual del C.I. para evitar colapsos (502) en Railway
+        // 1. Validación manual del C.I. con redirección directa (evita bucles de Nginx)
         if (Athlete::where('ci', $request->ci)->exists()) {
-            return back()->withInput()->withErrors(['ci' => 'Este número de C.I. ya está registrado en otro atleta.']);
+            return redirect()->route('athletes.create')->with('error', 'Este número de C.I. ya está registrado en otro atleta.');
         }
 
         $validated = $request->validate([
@@ -169,11 +169,7 @@ class AthleteController extends Controller
             return redirect()->route('athletes.index')->with('success', 'Atleta registrado correctamente.');
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Error en AthleteController@store: ' . $e->getMessage());
-            $errorMsg = str_contains($e->getMessage(), 'unique constraint') || str_contains($e->getMessage(), 'Duplicate entry')
-                ? 'El número de C.I. ya está registrado.'
-                : 'Ocurrió un error al procesar el registro. Por favor, verifica los datos.';
-                
-            return back()->withInput()->with('error', $errorMsg);
+            return redirect()->route('athletes.create')->with('error', 'Ocurrió un error. El carnet podría estar duplicado.');
         }
     }
 
@@ -193,9 +189,9 @@ class AthleteController extends Controller
 
     public function update(Request $request, Athlete $athlete)
     {
-        // 1. Validación manual del C.I. para evitar colapsos (502) en Railway
+        // 1. Validación manual del C.I. con redirección directa (evita bucles de Nginx)
         if (Athlete::where('ci', $request->ci)->where('id', '!=', $athlete->id)->exists()) {
-            return back()->withInput()->withErrors(['ci' => 'Este número de C.I. ya está registrado en otro atleta.']);
+            return redirect()->route('athletes.edit', $athlete)->with('error', 'Este número de C.I. ya está registrado en otro perfil.');
         }
 
         $validated = $request->validate([
