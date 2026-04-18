@@ -165,7 +165,11 @@ class AthleteController extends Controller
             return redirect()->route('athletes.index')->with('success', 'Atleta registrado correctamente.');
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Error en AthleteController@store: ' . $e->getMessage());
-            return back()->withInput()->with('error', 'Error al registrar: ' . $e->getMessage());
+            $errorMsg = str_contains($e->getMessage(), 'unique constraint') || str_contains($e->getMessage(), 'Duplicate entry')
+                ? 'El número de C.I. ya está registrado.'
+                : 'Ocurrió un error al procesar el registro. Por favor, verifica los datos.';
+                
+            return back()->withInput()->with('error', $errorMsg);
         }
     }
 
@@ -242,7 +246,11 @@ class AthleteController extends Controller
             return redirect()->route('athletes.index')->with('success', 'Atleta actualizado correctamente.');
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Error en AthleteController@update: ' . $e->getMessage());
-            return back()->withInput()->with('error', 'Error al actualizar: ' . $e->getMessage());
+            $errorMsg = str_contains($e->getMessage(), 'unique constraint') || str_contains($e->getMessage(), 'Duplicate entry')
+                ? 'El número de C.I. ya está registrado en otro perfil.'
+                : 'Error al actualizar el perfil.';
+
+            return back()->withInput()->with('error', $errorMsg);
         }
     }
 
