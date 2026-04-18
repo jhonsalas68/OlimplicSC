@@ -17,15 +17,30 @@
     <!-- Scripts and Core Performance -->
     <script type="module">
         import hotwiredTurbo from 'https://cdn.jsdelivr.net/npm/@hotwired/turbo@8.0.4/+esm';
-        // Activar Turbo y habilitar la precarga inteligente
+        window.Turbo = hotwiredTurbo; // Hacerlo global para depuración
         hotwiredTurbo.start();
         
-        // Optimización extra: Precarga agresiva al mover el ratón sobre el sidebar
+        // CORRECCIÓN CRÍTICA: Limpiar caché al detectar cambios de sesión o antes de envíos
+        document.addEventListener("turbo:load", () => {
+            // Asegurar que el scroll se resetee y los tokens se refresquen
+            if (window.performance && window.performance.navigation.type === 2) {
+                location.reload(); // Recargar si es un 'Atrás' de navegador que pueda tener tokens viejos
+            }
+        });
+
+        // Prevenir conflictos de CSRF en accesos simultáneos
+        document.addEventListener("turbo:before-fetch-request", (event) => {
+            const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            if (token) {
+                event.detail.fetchOptions.headers['X-CSRF-Token'] = token;
+            }
+        });
+        
         document.addEventListener("mouseover", (event) => {
             const link = event.target.closest("a");
             if (link && link.href && !link.dataset.turboPrefetched) {
                 const url = new URL(link.href);
-                if (url.origin === window.location.origin) {
+                if (url.origin === window.location.origin && !link.href.includes('logout')) {
                     hotwiredTurbo.visit(link.href, { action: "prefetch" });
                     link.dataset.turboPrefetched = "true";
                 }
