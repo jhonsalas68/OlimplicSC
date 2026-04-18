@@ -429,7 +429,10 @@
 
         <nav class="sidebar-nav">
             <span class="nav-section-label">Principal</span>
-            <a href="{{ url('/dashboard') }}" class="nav-item active">
+            <a href="{{ url('/            <a href="{{ url('/            <a href="{{ url('/            <a href="{{ url('/            <a href="{{ url('/            <a href="{{ url('/            <a href="{{ url('/            <a href="{{ url('/            <a href="{{ url('/            <a href="{{ url('/            <a href="{{ url('/dashboard') }}" class="nav-item active">
+                <span class="nav-icon"><i class="fas fa-home"></i></span>
+                <span class="nav-label">Panel de Control</span>
+            </a>') }}" class="nav-item active">
                 <span class="nav-icon"><i class="fas fa-home"></i></span>
                 <span class="nav-label">Panel de Control</span>
             </a>

@@ -12,7 +12,7 @@
     <div class="relative w-20 h-20 mb-3">
         <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#0b2d69] to-[#c61c2c] flex items-center justify-center text-white font-black text-2xl flex-shrink-0 overflow-hidden shadow-md">
             @if($atleta->foto)
-                <img src="{{ str_starts_with($atleta->foto, 'http') ? str_replace('/upload/', '/upload/c_fill,w_200,h_200,q_auto,f_auto/', $atleta->foto) : asset('storage/' . $atleta->foto) }}" 
+                <img src="{{ str_starts_with($atleta->foto, 'http') ? $atleta->foto : asset('storage/' . $atleta->foto) }}" 
                      class="w-full h-full object-cover" loading="lazy">
             @else
                 {{ strtoupper(substr($atleta->nombre,0,1).substr($atleta->apellido_paterno??'',0,1)) }}

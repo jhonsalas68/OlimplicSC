@@ -155,7 +155,7 @@
                     <div class="flex-shrink-0 h-10 w-10">
                         @if($athlete->foto)
                             <img class="h-10 w-10 rounded-full object-cover shadow-sm bg-slate-100" 
-                                 src="{{ str_starts_with($athlete->foto, 'http') ? str_replace('/upload/', '/upload/c_fill,w_100,h_100,q_auto,f_auto/', $athlete->foto) : asset('storage/' . $athlete->foto) }}" alt="">
+                                 src="{{ str_starts_with($athlete->foto, 'http') ? $athlete->foto : asset('storage/' . $athlete->foto) }}" alt="">
                         @else
                             <div class="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 font-bold text-xs border border-slate-200">
                                 {{ strtoupper(substr($athlete->nombre,0,1).substr($athlete->apellido_paterno??'',0,1)) }}

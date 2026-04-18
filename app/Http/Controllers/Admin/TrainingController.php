@@ -57,7 +57,7 @@ class TrainingController extends Controller
             // [NUEVO GATILLO GIT] Usamos auto + extension automatica para evadir el bloqueo de Frames de Chrome
             $response = \CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary::uploadApi()->upload($request->file('pdf')->getRealPath(), [
                 'folder' => 'trainings',
-                'resource_type' => 'auto',
+                'resource_type' => 'raw',
                 'public_id' => $publicId
             ]);
             $data['file_path_pdf'] = $response['secure_url'];
@@ -111,7 +111,7 @@ class TrainingController extends Controller
             // [NUEVO GATILLO GIT] Usamos auto + extension automatica para evadir el bloqueo de Frames de Chrome
             $response = \CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary::uploadApi()->upload($request->file('pdf')->getRealPath(), [
                 'folder' => 'trainings',
-                'resource_type' => 'auto',
+                'resource_type' => 'raw',
                 'public_id' => $publicId
             ]);
             $data['file_path_pdf'] = $response['secure_url'];

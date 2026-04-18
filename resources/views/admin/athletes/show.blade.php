@@ -49,8 +49,8 @@
                     @if($athlete->foto)
                         @php
                             $optimizedFoto = str_starts_with($athlete->foto, 'http') 
-                                ? str_replace('/upload/', '/upload/c_fill,w_300,h_300,q_auto,f_auto/', $athlete->foto) 
-                                : asset('storage/' . $athlete->foto);
+                                 ? $athlete->foto 
+                                 : asset('storage/' . $athlete->foto);
                         @endphp
                         <img src="{{ $optimizedFoto }}" class="w-full h-full object-cover">
                     @else
