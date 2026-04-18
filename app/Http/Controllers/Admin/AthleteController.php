@@ -17,89 +17,40 @@ use App\Traits\CloudinaryHelper;
 class AthleteController extends Controller
 {
     use CloudinaryHelper;
-    public function export()
-    {
-        return Excel::download(new AthleteExport, 'atletas_olimpicsc_' . date('Y-m-d') . '.xlsx', \Maatwebsite\Excel\Excel::XLSX);
-    }
 
-    public function exportSelected(Request $request)
-    {
-        $ids = json_decode($request->ids, true);
-        if (!$ids) return back()->with('error', 'No se seleccionaron atletas.');
-
-        $athletes = Athlete::whereIn('id', $ids)->with('category')->get();
-        
-        $pdf = Pdf::loadView('admin.athletes.export_pdf', compact('athletes'));
-        return $pdf->download('convocados_' . date('Ymd_His') . '.pdf');
-    }
-
-    public function import(Request $request)
-    {
-        $request->validate([
-            'file' => 'required|mimes:xlsx,xls|max:5120',
-        ]);
-
-        try {
-            Excel::import(new AthleteImport, $request->file('file'));
-            return redirect()->route('athletes.index')->with('success', 'Atletas importados correctamente.');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Error al importar: ' . $e->getMessage());
-        }
-    }
     public function index(Request $request)
     {
-        if (!$request->has('category_id') && !$request->has('search')) {
-            $categories = Category::withCount('athletes')->orderBy('edad_min')->get();
-            return view('admin.athletes.categories', compact('categories'));
-        }
-
-        $query = Athlete::query();
-
-        if ($request->filled('category_id')) {
-            $query->where('category_id', $request->category_id);
-            $selectedCategory = Category::find($request->category_id);
-        } else {
-            $selectedCategory = null;
-        }
+        $query = Athlete::with(['category', 'latestPayment']);
 
         if ($request->filled('search')) {
-            $s = $request->search;
-            $query->where(function ($q) use ($s) {
-                $keywords = explode(' ', $s);
-                foreach ($keywords as $word) {
-                    $word = trim($word);
-                    if ($word !== '') {
-                        $q->where(function ($query2) use ($word) {
-                            $query2->where('nombre', 'ilike', "%{$word}%")
-                                   ->orWhere('apellido_paterno', 'ilike', "%{$word}%")
-                                   ->orWhere('apellido_materno', 'ilike', "%{$word}%")
-                                   ->orWhere('ci', 'ilike', "%{$word}%")
-                                   ->orWhere('id_alfanumerico_unico', 'ilike', "%{$word}%");
-                        });
-                    }
-                }
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('nombre', 'LIKE', "%$search%")
+                  ->orWhere('apellido_paterno', 'LIKE', "%$search%")
+                  ->orWhere('ci', 'LIKE', "%$search%");
             });
         }
 
-        // Filtro por estado de pago (Mensualidad)
-        if ($request->filled('deuda')) {
-            if ($request->deuda === 'al_dia') {
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        if ($request->filled('genero')) {
+            $query->where('genero', $request->genero);
+        }
+
+        if ($request->filled('estado_pago')) {
+            if ($request->estado_pago == 'al_dia') {
                 $query->alDia();
-            } elseif ($request->deuda === 'deudores') {
+            } else {
                 $query->debe();
             }
         }
 
-        $mesActual = now()->format('Y-m');
-        $athletes = $query->with('category')
-            ->withExists(['payments as pagado_mes_actual' => function ($q) use ($mesActual) {
-                $q->where('concepto', 'mensualidad')
-                  ->where('mes_correspondiente', $mesActual)
-                  ->where('estado_pago', 'pagado');
-            }])
-            ->latest()
-            ->paginate(10);
-        return view('admin.athletes.index', compact('athletes', 'selectedCategory'));
+        $athletes = $query->latest()->paginate(15)->withQueryString();
+        $categories = Category::all();
+
+        return view('admin.athletes.index', compact('athletes', 'categories'));
     }
 
     public function create()
@@ -109,7 +60,7 @@ class AthleteController extends Controller
 
     public function store(Request $request)
     {
-        // 1. Validación manual del C.I. con redirección directa (evita bucles de Nginx)
+        // 1. Validación manual del C.I. con redirección directa (especial para Railway)
         if (Athlete::where('ci', $request->ci)->exists()) {
             return redirect()->route('athletes.create')->with('error', 'Este número de C.I. ya está registrado en otro atleta.');
         }
@@ -124,17 +75,14 @@ class AthleteController extends Controller
             'foto'                    => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
             'alergias'                => 'nullable|string',
             'habilitado_booleano'     => 'nullable|boolean',
-            // Seguro
             'tiene_seguro'            => 'nullable|boolean',
             'seguro_compania'         => 'nullable|string|max:255',
             'seguro_contacto'         => 'nullable|string|max:255',
-            // Contacto menor
             'nombre_padre'            => 'nullable|string|max:255',
             'apellido_paterno_padre'  => 'nullable|string|max:255',
             'apellido_materno_padre'  => 'nullable|string|max:255',
             'telefono_padre'          => 'nullable|string|max:20',
             'relacion_contacto'       => 'nullable|string|max:50',
-            // Contacto mayor
             'contacto_nombre'         => 'nullable|string|max:255',
             'contacto_telefono'       => 'nullable|string|max:20',
             'contacto_relacion'       => 'nullable|string|max:50',
@@ -156,9 +104,7 @@ class AthleteController extends Controller
             $validated['habilitado_booleano'] = $request->has('habilitado_booleano');
             $validated['tiene_seguro']        = $request->has('tiene_seguro');
 
-            \Illuminate\Support\Facades\Log::info('Creando atleta en BD...', $validated);
             $athlete = Athlete::create($validated);
-            \Illuminate\Support\Facades\Log::info('Atleta creado ID: ' . $athlete->id);
 
             \App\Services\ActivityLogger::log(
                 'inscripcion_atleta', 
@@ -169,7 +115,7 @@ class AthleteController extends Controller
             return redirect()->route('athletes.index')->with('success', 'Atleta registrado correctamente.');
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Error en AthleteController@store: ' . $e->getMessage());
-            return redirect()->route('athletes.create')->with('error', 'Ocurrió un error. El carnet podría estar duplicado.');
+            return redirect()->route('athletes.create')->with('error', 'Ocurrió un error inesperado al registrar al atleta.');
         }
     }
 
@@ -177,7 +123,6 @@ class AthleteController extends Controller
     {
         $pagos = $athlete->payments()->latest()->take(5)->get();
         $alDia = $athlete->isAlDia();
-
         return view('admin.athletes.show', compact('athlete', 'pagos', 'alDia'));
     }
 
@@ -189,7 +134,7 @@ class AthleteController extends Controller
 
     public function update(Request $request, Athlete $athlete)
     {
-        // 1. Validación manual del C.I. con redirección directa (evita bucles de Nginx)
+        // 1. Validación manual del C.I. para evitar colapsos
         if (Athlete::where('ci', $request->ci)->where('id', '!=', $athlete->id)->exists()) {
             return redirect()->route('athletes.edit', $athlete)->with('error', 'Este número de C.I. ya está registrado en otro perfil.');
         }
@@ -204,17 +149,14 @@ class AthleteController extends Controller
             'foto'                    => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
             'alergias'                => 'nullable|string',
             'habilitado_booleano'     => 'nullable|boolean',
-            // Seguro
             'tiene_seguro'            => 'nullable|boolean',
             'seguro_compania'         => 'nullable|string|max:255',
             'seguro_contacto'         => 'nullable|string|max:255',
-            // Contacto menor
             'nombre_padre'            => 'nullable|string|max:255',
             'apellido_paterno_padre'  => 'nullable|string|max:255',
             'apellido_materno_padre'  => 'nullable|string|max:255',
             'telefono_padre'          => 'nullable|string|max:20',
             'relacion_contacto'       => 'nullable|string|max:50',
-            // Contacto mayor
             'contacto_nombre'         => 'nullable|string|max:255',
             'contacto_telefono'       => 'nullable|string|max:20',
             'contacto_relacion'       => 'nullable|string|max:50',
@@ -250,11 +192,7 @@ class AthleteController extends Controller
             return redirect()->route('athletes.index')->with('success', 'Atleta actualizado correctamente.');
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Error en AthleteController@update: ' . $e->getMessage());
-            $errorMsg = str_contains($e->getMessage(), 'unique constraint') || str_contains($e->getMessage(), 'Duplicate entry')
-                ? 'El número de C.I. ya está registrado en otro perfil.'
-                : 'Error al actualizar el perfil.';
-
-            return back()->withInput()->with('error', $errorMsg);
+            return redirect()->route('athletes.edit', $athlete)->with('error', 'Ocurrió un error al actualizar el perfil.');
         }
     }
 
@@ -290,5 +228,27 @@ class AthleteController extends Controller
         );
 
         return response()->json(['habilitado' => $athlete->habilitado_booleano]);
+    }
+
+    public function export()
+    {
+        return Excel::download(new AthleteExport, 'atletas_olimpic.xlsx');
+    }
+
+    public function import(Request $request) 
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv|max:5120'
+        ]);
+
+        Excel::import(new AthleteImport, $request->file('file'));
+        
+        return back()->with('success', 'Atletas importados correctamente.');
+    }
+
+    public function downloadPdf(Athlete $athlete)
+    {
+        $pdf = Pdf::loadView('admin.athletes.pdf', compact('athlete'));
+        return $pdf->download("atleta_{$athlete->ci}.pdf");
     }
 }
