@@ -11,12 +11,12 @@ use App\Exports\AthleteExport;
 use App\Imports\AthleteImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
-use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
-use App\Traits\CloudinaryHelper;
+use Illuminate\Support\Facades\Storage;
+use App\Traits\FileStorageHelper;
 
 class AthleteController extends Controller
 {
-    use CloudinaryHelper;
+    use FileStorageHelper;
 
     public function index(Request $request)
     {
@@ -95,10 +95,8 @@ class AthleteController extends Controller
 
         try {
             if ($request->hasFile('foto')) {
-                $response = Cloudinary::uploadApi()->upload($request->file('foto')->getRealPath(), [
-                    'folder' => 'athletes'
-                ]);
-                $validated['foto'] = $response['secure_url'];
+                $path = Storage::disk('r2')->putFile('athletes', $request->file('foto'));
+                $validated['foto'] = Storage::disk('r2')->url($path);
             }
 
             $validated['habilitado_booleano'] = $request->has('habilitado_booleano');
@@ -170,12 +168,10 @@ class AthleteController extends Controller
         try {
             if ($request->hasFile('foto')) {
                 if ($athlete->foto) {
-                    $this->deleteFromCloudinary($athlete->foto);
+                    $this->deleteFile($athlete->foto);
                 }
-                $response = Cloudinary::uploadApi()->upload($request->file('foto')->getRealPath(), [
-                    'folder' => 'athletes'
-                ]);
-                $validated['foto'] = $response['secure_url'];
+                $path = Storage::disk('r2')->putFile('athletes', $request->file('foto'));
+                $validated['foto'] = Storage::disk('r2')->url($path);
             }
 
             $validated['habilitado_booleano'] = $request->has('habilitado_booleano');
@@ -199,7 +195,7 @@ class AthleteController extends Controller
     public function destroy(Athlete $athlete)
     {
         if ($athlete->foto) {
-            $this->deleteFromCloudinary($athlete->foto);
+            $this->deleteFile($athlete->foto);
         }
         \App\Services\ActivityLogger::log(
             'eliminacion_atleta', 

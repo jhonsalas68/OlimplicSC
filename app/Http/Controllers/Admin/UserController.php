@@ -8,11 +8,12 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
-use App\Traits\CloudinaryHelper;
+use Illuminate\Support\Facades\Storage;
+use App\Traits\FileStorageHelper;
 
 class UserController extends Controller
 {
-    use CloudinaryHelper;
+    use FileStorageHelper;
     public function index(Request $request)
     {
         if (!$request->has('role_id') && !$request->has('search')) {
@@ -76,10 +77,8 @@ class UserController extends Controller
 
         $avatarUrl = null;
         if ($request->hasFile('avatar')) {
-            $response = \CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary::uploadApi()->upload($request->file('avatar')->getRealPath(), [
-                'folder' => 'avatars'
-            ]);
-            $avatarUrl = $response['secure_url'];
+            $path = Storage::disk('r2')->putFile('avatars', $request->file('avatar'));
+            $avatarUrl = Storage::disk('r2')->url($path);
         }
 
         $user = User::create([
@@ -148,12 +147,10 @@ class UserController extends Controller
         
         if ($request->hasFile('avatar')) {
             if ($user->avatar) {
-                $this->deleteFromCloudinary($user->avatar);
+                $this->deleteFile($user->avatar);
             }
-            $response = \CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary::uploadApi()->upload($request->file('avatar')->getRealPath(), [
-                'folder' => 'avatars'
-            ]);
-            $userData['avatar'] = $response['secure_url'];
+            $path = Storage::disk('r2')->putFile('avatars', $request->file('avatar'));
+            $userData['avatar'] = Storage::disk('r2')->url($path);
         }
 
         if ($request->filled('password')) {
@@ -182,7 +179,7 @@ class UserController extends Controller
             return back()->with('error', 'No puedes eliminarte a ti mismo.');
         }
         if ($user->avatar) {
-            $this->deleteFromCloudinary($user->avatar);
+            $this->deleteFile($user->avatar);
         }
         
         \App\Services\ActivityLogger::log(

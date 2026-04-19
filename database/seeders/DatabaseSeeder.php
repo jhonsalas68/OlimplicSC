@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             RolesSeeder::class,
+            CategorySeeder::class,
         ]);
 
         // Crear usuario administrativo de prueba

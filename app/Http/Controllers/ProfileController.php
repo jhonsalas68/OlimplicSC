@@ -4,12 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
-use App\Traits\CloudinaryHelper;
+use Illuminate\Support\Facades\Storage;
+use App\Traits\FileStorageHelper;
 
 class ProfileController extends Controller
 {
-    use CloudinaryHelper;
+    use FileStorageHelper;
     /**
      * Show the profile edit form.
      */
@@ -34,15 +34,13 @@ class ProfileController extends Controller
 
         if ($request->hasFile('avatar')) {
             if ($user->avatar) {
-                $this->deleteFromCloudinary($user->avatar);
+                $this->deleteFile($user->avatar);
             }
-            // 1. Sube el archivo directo a tu cuenta de Cloudinary
-            $response = Cloudinary::uploadApi()->upload($request->file('avatar')->getRealPath(), [
-                'folder' => 'avatars'
-            ]);
+            // 1. Sube el archivo a Cloudflare R2
+            $path = Storage::disk('r2')->putFile('avatars', $request->file('avatar'));
             
-            // 2. Obtiene el link eterno (el que empieza con https)
-            $url = $response['secure_url'];
+            // 2. Obtiene el link público
+            $url = Storage::disk('r2')->url($path);
 
             // 3. Lo guarda en tu base de datos
             $user->avatar = $url;
