@@ -11,7 +11,6 @@ use App\Exports\AthleteExport;
 use App\Imports\AthleteImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Illuminate\Support\Facades\Storage;
 use App\Traits\FileStorageHelper;
 
 class AthleteController extends Controller

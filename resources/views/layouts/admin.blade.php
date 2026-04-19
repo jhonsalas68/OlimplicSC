@@ -11,43 +11,9 @@
     <!-- Speed & Performance Optimization -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Scripts and Core Performance -->
-    <script type="module">
-        import hotwiredTurbo from 'https://cdn.jsdelivr.net/npm/@hotwired/turbo@8.0.4/+esm';
-        window.Turbo = hotwiredTurbo; // Hacerlo global para depuración
-        hotwiredTurbo.start();
-        
-        // CORRECCIÓN CRÍTICA: Limpiar caché al detectar cambios de sesión o antes de envíos
-        document.addEventListener("turbo:load", () => {
-            // Asegurar que el scroll se resetee y los tokens se refresquen
-            if (window.performance && window.performance.navigation.type === 2) {
-                location.reload(); // Recargar si es un 'Atrás' de navegador que pueda tener tokens viejos
-            }
-        });
-
-        // Prevenir conflictos de CSRF en accesos simultáneos
-        document.addEventListener("turbo:before-fetch-request", (event) => {
-            const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-            if (token) {
-                event.detail.fetchOptions.headers['X-CSRF-Token'] = token;
-            }
-        });
-        
-        document.addEventListener("mouseover", (event) => {
-            const link = event.target.closest("a");
-            if (link && link.href && !link.dataset.turboPrefetched) {
-                const url = new URL(link.href);
-                if (url.origin === window.location.origin && !link.href.includes('logout')) {
-                    hotwiredTurbo.visit(link.href, { action: "prefetch" });
-                    link.dataset.turboPrefetched = "true";
-                }
-            }
-        });
-    </script>
-
     <script shadow>
         // Pre-inicialización crítica para evitar parpadeos al volver atrás (Restoration Visits)
         if (localStorage.getItem('sidebar-open') === 'true') {
@@ -57,7 +23,6 @@
         }
     </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     {{-- Turbo View Transitions, Morphing & Prefetching --}}
     <meta name="turbo-prefetch" content="true">
