@@ -7,12 +7,12 @@ return [
     | Default Filesystem Disk
     |--------------------------------------------------------------------------
     |
-    | Aquí cambiamos 'local' por 'cloudinary'. Si la variable de entorno
-    | FILESYSTEM_DISK no existe, usará cloudinary por defecto.
+    | Aquí cambiamos el disco por defecto a R2. Si la variable de entorno
+    | FILESYSTEM_DISK no existe, usará R2 por defecto.
     |
     */
 
-    'default' => env('FILESYSTEM_DISK', 'cloudinary'),
+    'default' => env('FILESYSTEM_DISK', 'r2'),
 
     /*
     |--------------------------------------------------------------------------

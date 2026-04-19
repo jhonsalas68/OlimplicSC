@@ -9,12 +9,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Models\User;
 use App\Notifications\TrainingUploaded;
-use App\Traits\CloudinaryHelper;
+use App\Traits\FileStorageHelper;
 use Illuminate\Support\Facades\Notification;
 
 class TrainingController extends Controller
 {
-    use CloudinaryHelper;
+    use FileStorageHelper;
     public function index(Request $request)
     {
 
@@ -51,16 +51,8 @@ class TrainingController extends Controller
         ];
 
         if ($request->hasFile('pdf')) {
-            // Dejamos que Cloudinary auto inyecte el .pdf final para evitar el .pdf.pdf
-            $publicId = 'plan_' . uniqid();
-            
-            // [NUEVO GATILLO GIT] Usamos auto + extension automatica para evadir el bloqueo de Frames de Chrome
-            $response = \CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary::uploadApi()->upload($request->file('pdf')->getRealPath(), [
-                'folder' => 'trainings',
-                'resource_type' => 'raw',
-                'public_id' => $publicId . '.pdf'
-            ]);
-            $data['file_path_pdf'] = $response['secure_url'];
+            $path = Storage::disk('r2')->putFile('trainings', $request->file('pdf'));
+            $data['file_path_pdf'] = Storage::disk('r2')->url($path);
         }
 
         $training = Training::create($data);
@@ -103,18 +95,11 @@ class TrainingController extends Controller
 
         if ($request->hasFile('pdf')) {
             if ($training->file_path_pdf) {
-                $this->deleteFromCloudinary($training->file_path_pdf);
+                $this->deleteFile($training->file_path_pdf);
             }
             
-            $publicId = 'plan_' . uniqid();
-            
-            // [NUEVO GATILLO GIT] Usamos auto + extension automatica para evadir el bloqueo de Frames de Chrome
-            $response = \CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary::uploadApi()->upload($request->file('pdf')->getRealPath(), [
-                'folder' => 'trainings',
-                'resource_type' => 'raw',
-                'public_id' => $publicId . '.pdf'
-            ]);
-            $data['file_path_pdf'] = $response['secure_url'];
+            $path = Storage::disk('r2')->putFile('trainings', $request->file('pdf'));
+            $data['file_path_pdf'] = Storage::disk('r2')->url($path);
         }
 
         $training->update($data);
@@ -133,7 +118,7 @@ class TrainingController extends Controller
     public function destroy(Training $training)
     {
         if ($training->file_path_pdf) {
-            $this->deleteFromCloudinary($training->file_path_pdf);
+            $this->deleteFile($training->file_path_pdf);
         }
         
         $categoryName = $training->category->nombre ?? '—';

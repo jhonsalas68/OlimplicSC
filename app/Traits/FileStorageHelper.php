@@ -32,12 +32,4 @@ trait FileStorageHelper
             }
         }
     }
-
-    /**
-     * Alias para compatibilidad parcial (opcional)
-     */
-    public function deleteFromCloudinary(?string $url): void
-    {
-        $this->deleteFile($url);
-    }
 }

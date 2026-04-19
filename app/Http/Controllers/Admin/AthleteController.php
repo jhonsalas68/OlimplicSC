@@ -39,8 +39,8 @@ class AthleteController extends Controller
             $query->where('genero', $request->genero);
         }
 
-        if ($request->filled('estado_pago')) {
-            if ($request->estado_pago == 'al_dia') {
+        if ($request->filled('deuda')) {
+            if ($request->deuda === 'al_dia') {
                 $query->alDia();
             } else {
                 $query->debe();

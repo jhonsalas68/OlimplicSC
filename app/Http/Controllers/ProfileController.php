@@ -20,7 +20,7 @@ class ProfileController extends Controller
     }
 
     /**
-     * Update the user's profile using Cloudinary facade.
+     * Update the user's profile using Cloudflare R2 storage.
      */
     public function update(Request $request)
     {

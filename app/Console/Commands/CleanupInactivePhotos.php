@@ -25,13 +25,8 @@ class CleanupInactivePhotos extends Command
                 \Illuminate\Support\Facades\Storage::disk('public')->delete($athlete->foto);
             }
 
-            // Si es URL de Cloudinary (ej: empieza con http), idealmente borraríamos vía API 
-            // pero si usamos el driver de Cloudinary como disco 'public', el comando anterior funcionaría.
-            // Para ser seguros con el paquete cloudinary-laravel:
-            if (str_contains($athlete->foto, 'cloudinary')) {
-                // Aquí se podría implementar el borrado vía public_id si se guarda
-                // Por ahora simplemente quitamos la referencia si es muy antiguo
-            }
+            // Si es una URL externa antigua (ej: empieza con http), no podemos eliminarla automáticamente desde el disco R2.
+            // Por ahora simplemente quitamos la referencia si es muy antiguo.
 
             $athlete->update(['foto' => null]);
             $count++;
