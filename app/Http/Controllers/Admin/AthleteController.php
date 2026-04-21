@@ -32,8 +32,10 @@ class AthleteController extends Controller
                 });
             }
 
+            $selectedCategory = null;
             if ($request->filled('category_id')) {
                 $query->where('category_id', $request->category_id);
+                $selectedCategory = Category::find($request->category_id);
             }
 
             if ($request->filled('genero')) {
@@ -51,12 +53,29 @@ class AthleteController extends Controller
             $athletes = $query->latest()->paginate(15)->withQueryString();
             $categories = Category::all();
 
-            return view('admin.athletes.index', compact('athletes', 'categories'));
+            // Agrupación por categorías para el dashboard inicial
+            $athletesByCategory = [];
+            if (!$request->filled('category_id') && !$request->filled('search')) {
+                foreach ($categories as $cat) {
+                    $catAtletas = Athlete::where('category_id', $cat->id)->take(3)->get();
+                    if ($catAtletas->isNotEmpty()) {
+                        $athletesByCategory[] = [
+                            'category' => $cat,
+                            'athletes' => $catAtletas,
+                            'total' => Athlete::where('category_id', $cat->id)->count()
+                        ];
+                    }
+                }
+            }
+
+            return view('admin.athletes.index', compact('athletes', 'categories', 'athletesByCategory', 'selectedCategory'));
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Error en AthleteController@index: ' . $e->getMessage() . ' - ' . $e->getTraceAsString());
             return view('admin.athletes.index', [
                 'athletes' => collect([]),
-                'categories' => Category::all()
+                'categories' => Category::all(),
+                'athletesByCategory' => [],
+                'selectedCategory' => null
             ])->with('error', 'Error al cargar los atletas. Por favor, intenta nuevamente.');
         }
     }

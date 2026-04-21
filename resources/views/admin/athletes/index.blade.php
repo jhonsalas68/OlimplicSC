@@ -43,6 +43,11 @@
     </div>
 
     <div class="flex items-center gap-4 w-full lg:w-auto justify-end">
+        <button id="btn-convocados" onclick="exportSelected()" class="hidden flex-1 sm:flex-none inline-flex items-center justify-center px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-2xl transition-all shadow-lg shadow-blue-200/50">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            Convocatoria (<span id="selected-count">0</span>)
+        </button>
+
         <button onclick="exportToExcel()" class="flex-1 sm:flex-none inline-flex items-center justify-center px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white text-sm font-bold rounded-2xl transition-all shadow-sm hover:shadow-md">
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -66,193 +71,46 @@
     </div>
 </div>
 
-<!-- Lista de Atletas -->
-<div class="bg-white rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/50 overflow-hidden">
-    <div class="overflow-x-auto">
-        <table class="w-full">
-            <thead class="bg-slate-50 border-b border-slate-100">
-                <tr>
-                    <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Atleta</th>
-                    <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Categoría</th>
-                    <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Edad</th>
-                    <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Estado</th>
-                    <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Último Pago</th>
-                    <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Acciones</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100">
-                @forelse($athletes as $athlete)
-                <tr class="hover:bg-slate-50 transition-colors">
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="flex items-center">
-                            @if($athlete->foto)
-                                <img class="h-10 w-10 rounded-full object-cover border-2 border-slate-200" src="{{ Storage::url($athlete->foto) }}" alt="Foto">
-                            @else
-                                <div class="h-10 w-10 rounded-full bg-slate-200 flex items-center justify-center">
-                                    <svg class="h-6 w-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                    </svg>
-                                </div>
-                            @endif
-                            <div class="ml-4">
-                                <div class="text-sm font-bold text-slate-900">{{ $athlete->nombre }} {{ $athlete->apellido_paterno }}</div>
-                                <div class="text-sm text-slate-500">{{ $athlete->ci }}</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                            {{ $athlete->category->nombre ?? 'Sin categoría' }}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-900 font-bold">
-                        {{ $athlete->edadActual() }} años
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        @if($athlete->pagado_mes_actual ?? false)
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                </svg>
-                                Al día
-                            </span>
-                        @else
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                                Debe
-                            </span>
-                        @endif
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
-                        {{ $athlete->latestPayment ? $athlete->latestPayment->created_at->format('M Y') : 'Nunca' }}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div class="flex items-center space-x-2">
-                            <a href="{{ route('athletes.show', $athlete) }}" class="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50 transition-colors">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg>
-                            </a>
-                            <a href="{{ route('athletes.edit', $athlete) }}" class="text-indigo-600 hover:text-indigo-900 p-1 rounded hover:bg-indigo-50 transition-colors">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                </svg>
-                            </a>
-                            <form action="{{ route('athletes.destroy', $athlete) }}" method="POST" class="inline" onsubmit="return confirm('¿Estás seguro de eliminar este atleta?')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50 transition-colors">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                    </svg>
-                                </button>
-                            </form>
-                        </div>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="6" class="px-6 py-12 text-center text-slate-500">
-                        <svg class="mx-auto h-12 w-12 text-slate-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                        </svg>
-                        <p class="text-lg font-medium text-slate-900 mb-2">No hay atletas registrados</p>
-                        <p class="text-sm">Comienza creando tu primer atleta.</p>
-                    </td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-
-    @if($athletes->hasPages())
-    <div class="bg-slate-50 px-6 py-4 border-t border-slate-100">
-        {{ $athletes->appends(request()->query())->links() }}
-    </div>
-    @endif
-</div>
-
-<!-- Import Modal -->
+{{-- MODAL DE IMPORTACIÓN --}}
 <div id="importModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
         <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-            <h3 class="text-lg font-bold text-slate-900 flex items-center">
-                <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-                Importar Atletas
-            </h3>
+            <h3 class="text-lg font-black text-slate-800 uppercase tracking-tighter">Importar Atletas</h3>
             <button onclick="document.getElementById('importModal').classList.add('hidden')" class="text-slate-400 hover:text-slate-600 p-2 hover:bg-slate-100 rounded-full transition-colors">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
         <form action="{{ route('athletes.import') }}" method="POST" enctype="multipart/form-data" class="p-8 space-y-6">
             @csrf
             <div>
-                <label class="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-tight">Archivo Excel (.xlsx únicamente)</label>
-                <div class="relative">
-                    <input type="file" name="file" required class="block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-6 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer border border-slate-200 rounded-xl p-2 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
+                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Archivo Excel (.xlsx / .xls)</label>
+                <input type="file" name="file" required class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-[10px] file:font-black file:bg-blue-600 file:text-white file:uppercase hover:file:bg-blue-700 cursor-pointer border border-slate-100 rounded-2xl p-2 bg-slate-50">
             </div>
-
-            <div class="bg-amber-50 border border-amber-100 p-4 rounded-xl">
-                <div class="flex">
-                    <svg class="h-5 w-5 text-amber-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
-                    <p class="text-xs text-amber-800 leading-relaxed font-medium">
-                        Asegúrese de que las columnas coincidan con la plantilla oficial para evitar errores en el registro.
-                    </p>
-                </div>
-            </div>
-
-            <div class="flex justify-end space-x-3 pt-4">
-                <button type="button" onclick="document.getElementById('importModal').classList.add('hidden')" class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
-                    Cancelar
-                </button>
-                <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
-                    Importar
-                </button>
+            <div class="flex justify-end gap-3 mt-8">
+                <button type="button" onclick="document.getElementById('importModal').classList.add('hidden')" class="px-6 py-2 text-xs font-bold text-slate-500 uppercase tracking-widest hover:text-slate-800 transition-colors">Cancelar</button>
+                <button type="submit" class="px-8 py-3 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all">Importar Ahora</button>
             </div>
         </form>
     </div>
 </div>
 
-<script>
-function exportToExcel() {
-    window.location.href = '{{ route("athletes.export") }}';
-}
+
 
 @if(session('success'))
-    // Mostrar notificación de éxito
-    console.log('{{ session('success') }}');
-@endif
-
-@if(session('error'))
-    // Mostrar notificación de error
-    console.log('{{ session('error') }}');
-@endif
-</script>
-
-@endsection
-                <x-admin.button type="button" variant="secondary" onclick="document.getElementById('importModal').classList.add('hidden')">
-                    Cancelar
-                </x-admin.button>
-                <x-admin.button type="submit">
-                    Importar Datos
-                </x-admin.button>
-            </div>
-        </form>
-    </div>
-</div>
-
-@if(session('success'))
-    <div class="mb-6 p-4 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-700 text-sm font-medium flex items-center">
+    <div class="mb-6 p-4 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-700 text-sm font-medium flex items-center shadow-sm animate-in fade-in slide-in-from-top-4">
         <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
         {{ session('success') }}
+    </div>
+@endif
+
+@if(session('error'))
+    <div class="mb-6 p-4 bg-rose-50 border border-rose-100 rounded-xl text-rose-700 text-sm font-medium flex items-center shadow-sm">
+        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        {{ session('error') }}
     </div>
 @endif
 
@@ -429,6 +287,8 @@ function updateSelectedCount() {
     document.getElementById('selected-count').textContent = selected;
     document.getElementById('btn-convocados').classList.toggle('hidden', selected === 0);
 }
+
+function exportToExcel() { window.location.href = "{{ route('athletes.export') }}"; }
 
 function exportSelected() {
     const ids = Array.from(document.querySelectorAll('.athlete-checkbox:checked')).map(cb => cb.value);
