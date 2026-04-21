@@ -19,7 +19,13 @@ class AthleteController extends Controller
 
     public function index(Request $request)
     {
-        $query = Athlete::with(['category', 'latestPayment']);
+        $mesActual = now()->format('Y-m');
+        $query = Athlete::with(['category', 'latestPayment'])
+            ->withExists(['payments as pagado_mes_actual' => function ($q) use ($mesActual) {
+                $q->where('concepto', 'mensualidad')
+                  ->where('mes_correspondiente', $mesActual)
+                  ->where('estado_pago', 'pagado');
+            }]);
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -49,7 +55,26 @@ class AthleteController extends Controller
         $athletes = $query->latest()->paginate(15)->withQueryString();
         $categories = Category::all();
 
-        return view('admin.athletes.index', compact('athletes', 'categories'));
+        if ($request->filled('category_id')) {
+            $selectedCategory = Category::find($request->category_id);
+            return view('admin.athletes.index', compact('athletes', 'categories', 'selectedCategory'));
+        }
+
+        // Agrupar atletas por categoría para vista general
+        $athletesByCategory = [];
+        foreach ($categories as $category) {
+            $categoryQuery = clone $query;
+            $categoryAthletes = $categoryQuery->where('category_id', $category->id)->latest()->take(10)->get();
+            if ($categoryAthletes->isNotEmpty()) {
+                $athletesByCategory[] = [
+                    'category' => $category,
+                    'athletes' => $categoryAthletes,
+                    'total' => $categoryQuery->where('category_id', $category->id)->count(),
+                ];
+            }
+        }
+
+        return view('admin.athletes.index', compact('athletesByCategory', 'categories'));
     }
 
     public function create()

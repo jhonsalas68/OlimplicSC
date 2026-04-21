@@ -21,8 +21,28 @@
         <h1 class="text-2xl font-black text-slate-800 tracking-tight">Atletas y Selección</h1>
         <p class="text-sm text-slate-500 mt-1 uppercase font-bold tracking-widest">Panel de Entrenador</p>
     </div>
-    
-    <div class="flex flex-col sm:flex-row items-center gap-3">
+</div>
+
+{{-- Widgets de Categorías --}}
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    @foreach($categories as $catData)
+    <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-4 {{ $catData['is_mine'] ? 'ring-2 ring-blue-500' : '' }}">
+        <div class="flex items-center justify-between">
+            <div>
+                <h3 class="text-sm font-bold text-slate-800">{{ $catData['category']->nombre }}</h3>
+                <p class="text-xs text-slate-500">{{ $catData['count'] }} atletas</p>
+            </div>
+            @if($catData['is_mine'])
+                <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">Tu Categoría</span>
+            @else
+                <span class="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded-full">Otra</span>
+            @endif
+        </div>
+    </div>
+    @endforeach
+</div>
+
+<div class="flex flex-col sm:flex-row items-center gap-3">
         <form action="{{ route('coach.atletas') }}" method="GET" class="flex items-center gap-3 w-full sm:w-auto">
             @if(request('ver_todas'))
                 <input type="hidden" name="ver_todas" value="1">

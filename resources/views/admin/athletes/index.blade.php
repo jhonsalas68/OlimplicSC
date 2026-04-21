@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', isset($selectedCategory) ? 'Atletas: ' . $selectedCategory->nombre : 'Atletas Olimpic')
+@section('title', isset($selectedCategory) ? 'Atletas: ' . $selectedCategory->nombre : 'Atletas por Categoría')
 
 @section('content')
 @if(isset($selectedCategory))
@@ -18,8 +18,14 @@
         Volver a Categorías
     </a>
 </div>
+@else
+<div class="mb-8">
+    <h1 class="text-3xl font-black text-slate-800 tracking-tight leading-tight">Atletas por Categoría</h1>
+    <p class="text-slate-500 mt-2">Organización de atletas agrupados por sus respectivas categorías</p>
+</div>
 @endif
 
+@if(isset($selectedCategory))
 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-10">
     <div class="flex items-center w-full lg:w-auto">
         <form action="{{ route('athletes.index') }}" method="GET" id="filter-form" class="flex flex-col sm:flex-row items-center gap-4 w-full">
@@ -78,6 +84,7 @@
         </x-admin.button>
     </div>
 </div>
+@endif
 
 <!-- Import Modal -->
 <div id="importModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -130,6 +137,40 @@
         </svg>
         {{ session('success') }}
     </div>
+@endif
+
+@if(!isset($selectedCategory))
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+    @foreach($athletesByCategory as $group)
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+        <div class="flex items-center justify-between mb-4">
+            <div>
+                <h3 class="text-lg font-bold text-slate-800">{{ $group['category']->nombre }}</h3>
+                <p class="text-sm text-slate-500">{{ $group['total'] }} atletas</p>
+            </div>
+            <a href="{{ route('athletes.index', ['category_id' => $group['category']->id]) }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Ver todos</a>
+        </div>
+        <div class="space-y-3">
+            @foreach($group['athletes'] as $athlete)
+            <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
+                <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold text-slate-600">
+                    {{ strtoupper(substr($athlete->nombre,0,1).substr($athlete->apellido_paterno??'',0,1)) }}
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-slate-800 truncate">{{ $athlete->nombre }} {{ $athlete->apellido_paterno }}</p>
+                    <p class="text-xs text-slate-500">{{ $athlete->ci }}</p>
+                </div>
+                @if($athlete->pagado_mes_actual)
+                    <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">Al Día</span>
+                @else
+                    <span class="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full">Debe</span>
+                @endif
+            </div>
+            @endforeach
+        </div>
+    </div>
+    @endforeach
+</div>
 @endif
 
 <x-admin.table>

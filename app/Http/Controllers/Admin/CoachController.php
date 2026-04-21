@@ -82,7 +82,16 @@ class CoachController extends Controller
             $atletasOtros = $allAtletas->groupBy(fn($a) => $a->category?->nombre ?? 'Sin Categoría');
         }
 
-        return view('coach.atletas', compact('user', 'myCategory', 'atletasPropios', 'atletasOtros', 'verTodas'));
+        // Obtener todas las categorías con conteos
+        $categories = \App\Models\Category::withCount('athletes')->get()->map(function($cat) use ($myCategory) {
+            return [
+                'category' => $cat,
+                'is_mine' => $myCategory && $cat->id === $myCategory->id,
+                'count' => $cat->athletes_count,
+            ];
+        });
+
+        return view('coach.atletas', compact('user', 'myCategory', 'atletasPropios', 'atletasOtros', 'categories', 'verTodas'));
     }
 
     /** Planificaciones agrupadas por categoria */
