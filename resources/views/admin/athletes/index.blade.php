@@ -114,41 +114,85 @@
     </div>
 @endif
 
-@if(!isset($selectedCategory))
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-    @foreach($athletesByCategory as $group)
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-        <div class="flex items-center justify-between mb-4">
-            <div>
-                <h3 class="text-lg font-bold text-slate-800">{{ $group['category']->nombre }}</h3>
-                <p class="text-sm text-slate-500">{{ $group['total'] }} atletas</p>
-            </div>
-            <a href="{{ route('athletes.index', ['category_id' => $group['category']->id]) }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Ver todos</a>
-        </div>
-        <div class="space-y-3">
-            @foreach($group['athletes'] as $athlete)
-            <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
-                <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold text-slate-600">
-                    {{ strtoupper(substr($athlete->nombre,0,1).substr($athlete->apellido_paterno??'',0,1)) }}
+@if(!request('category_id') && !request('search'))
+    {{-- MODO DASHBOARD / WIDGETS --}}
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 mb-12">
+        @foreach($athletesByCategory as $group)
+            <div onclick="window.location.href='{{ route('athletes.index', ['category_id' => $group['category']->id]) }}'"
+                 class="group bg-white rounded-[2.5rem] border border-slate-100 p-8 shadow-2xl shadow-slate-200/40 hover:shadow-blue-200/50 transition-all cursor-pointer overflow-hidden relative border-b-4 border-b-blue-600">
+                
+                <div class="absolute -right-8 -top-8 w-40 h-40 bg-blue-50 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-500 scale-75 group-hover:scale-100"></div>
+
+                <div class="relative z-10">
+                    <div class="flex items-start justify-between mb-8">
+                        <div class="w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-blue-200 group-hover:rotate-6 transition-transform">
+                            <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-4xl font-black text-slate-900 tracking-tighter">{{ $group['total'] }}</span>
+                            <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest">Atletas</span>
+                        </div>
+                    </div>
+                    
+                    <h3 class="text-2xl font-black text-slate-800 tracking-tight leading-none group-hover:text-blue-600 transition-colors">{{ $group['category']->nombre }}</h3>
+                    <div class="flex items-center gap-2 mt-2">
+                        <span class="w-10 h-1 bg-red-600 rounded-full"></span>
+                        <p class="text-slate-400 font-bold text-[10px] uppercase tracking-[0.2em]">{{ $group['category']->edad_min }}-{{ $group['category']->edad_max }} AÑOS</p>
+                    </div>
+
+                    <div class="mt-10 flex items-center justify-between">
+                        <div class="flex -space-x-3 overflow-hidden">
+                            @foreach($group['athletes'] as $athlete)
+                                <div class="inline-block h-10 w-10 rounded-full ring-4 ring-white bg-slate-100 overflow-hidden">
+                                    @if($athlete->foto)
+                                        <img src="{{ str_starts_with($athlete->foto, 'http') ? $athlete->foto : asset('storage/'.$athlete->foto) }}" class="h-full w-full object-cover">
+                                    @else
+                                        <div class="h-full w-full flex items-center justify-center text-[10px] font-black text-slate-400 uppercase">
+                                            {{ substr($athlete->nombre,0,1) }}
+                                        </div>
+                                    @endif
+                                </div>
+                            @endforeach
+                        </div>
+                        
+                        <div class="flex items-center text-blue-600 font-black text-[10px] uppercase tracking-widest gap-1 group-hover:translate-x-1 transition-transform">
+                            Gestionar
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                        </div>
+                    </div>
                 </div>
-                <div class="flex-1 min-w-0">
-                    <p class="text-sm font-medium text-slate-800 truncate">{{ $athlete->nombre }} {{ $athlete->apellido_paterno }}</p>
-                    <p class="text-xs text-slate-500">{{ $athlete->ci }}</p>
-                </div>
-                @if($athlete->pagado_mes_actual)
-                    <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">Al Día</span>
-                @else
-                    <span class="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full">Debe</span>
-                @endif
             </div>
-            @endforeach
+        @endforeach
+
+        <div onclick="window.location.href='{{ route('athletes.create') }}'"
+             class="group border-4 border-dashed border-slate-100 rounded-[2.5rem] p-8 flex flex-col items-center justify-center text-center hover:border-blue-200 hover:bg-blue-50/30 transition-all cursor-pointer">
+            <div class="w-16 h-16 bg-slate-50 text-slate-300 rounded-2xl flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all duration-500 mb-4 shadow-sm group-hover:shadow-blue-200">
+                <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+            </div>
+            <h4 class="text-sm font-black text-slate-400 uppercase tracking-widest group-hover:text-blue-900 transition-colors">Nuevo Atleta</h4>
         </div>
     </div>
-    @endforeach
-</div>
-@endif
+@else
+    {{-- MODO TABLA / GESTIÓN --}}
+    <div class="mb-6 flex items-center gap-3 animate-in slide-in-from-left-4 duration-500">
+        <a href="{{ route('athletes.index') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-black text-slate-500 hover:text-blue-600 hover:border-blue-600 transition-all shadow-sm">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+            Volver a Categorías
+        </a>
+        @if(isset($selectedCategory))
+            <h2 class="text-lg font-black text-slate-800 uppercase tracking-tighter">
+                Categoría: <span class="text-blue-600">{{ $selectedCategory->nombre }}</span>
+            </h2>
+        @else
+            <h2 class="text-lg font-black text-slate-800 uppercase tracking-tighter">
+                Resultados de <span class="text-blue-600">Búsqueda</span>
+            </h2>
+        @endif
+    </div>
 
-<x-admin.table>
+    <x-admin.table>
     <x-slot name="header">
         <th class="px-6 py-3 text-left">
             <input type="checkbox" id="select-all" class="h-4 w-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500">
@@ -268,6 +312,7 @@
         {{ $athletes->links() }}
     </x-slot>
 </x-admin.table>
+@endif
 
 <script>
 document.getElementById('select-all').addEventListener('change', function() {
