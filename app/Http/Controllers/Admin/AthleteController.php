@@ -20,43 +20,45 @@ class AthleteController extends Controller
 
     public function index(Request $request)
     {
-        $mesActual = now()->format('Y-m');
-        $query = Athlete::with(['category', 'latestPayment'])
-            ->withExists(['payments as pagado_mes_actual' => function ($q) use ($mesActual) {
-                $q->where('concepto', 'mensualidad')
-                  ->where('mes_correspondiente', $mesActual)
-                  ->where('estado_pago', 'pagado');
-            }]);
+        try {
+            $query = Athlete::with('category');
 
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('nombre', 'LIKE', "%$search%")
-                  ->orWhere('apellido_paterno', 'LIKE', "%$search%")
-                  ->orWhere('ci', 'LIKE', "%$search%");
-            });
-        }
-
-        if ($request->filled('category_id')) {
-            $query->where('category_id', $request->category_id);
-        }
-
-        if ($request->filled('genero')) {
-            $query->where('genero', $request->genero);
-        }
-
-        if ($request->filled('deuda')) {
-            if ($request->deuda === 'al_dia') {
-                $query->alDia();
-            } else {
-                $query->debe();
+            if ($request->filled('search')) {
+                $search = $request->search;
+                $query->where(function($q) use ($search) {
+                    $q->where('nombre', 'LIKE', "%$search%")
+                      ->orWhere('apellido_paterno', 'LIKE', "%$search%")
+                      ->orWhere('ci', 'LIKE', "%$search%");
+                });
             }
+
+            if ($request->filled('category_id')) {
+                $query->where('category_id', $request->category_id);
+            }
+
+            if ($request->filled('genero')) {
+                $query->where('genero', $request->genero);
+            }
+
+            if ($request->filled('deuda')) {
+                if ($request->deuda === 'al_dia') {
+                    $query->alDia();
+                } else {
+                    $query->debe();
+                }
+            }
+
+            $athletes = $query->latest()->paginate(15)->withQueryString();
+            $categories = Category::all();
+
+            return view('admin.athletes.index', compact('athletes', 'categories'));
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error en AthleteController@index: ' . $e->getMessage() . ' - ' . $e->getTraceAsString());
+            return view('admin.athletes.index', [
+                'athletes' => collect([]),
+                'categories' => Category::all()
+            ])->with('error', 'Error al cargar los atletas. Por favor, intenta nuevamente.');
         }
-
-        $athletes = $query->latest()->paginate(15)->withQueryString();
-        $categories = Category::all();
-
-        return view('admin.athletes.index', compact('athletes', 'categories'));
     }
 
     public function create()
@@ -101,8 +103,10 @@ class AthleteController extends Controller
 
         try {
             if ($request->hasFile('foto')) {
-                $path = Storage::disk('public')->putFile('athletes', $request->file('foto'));
-                $validated['foto'] = Storage::disk('public')->url($path);
+                $file = $request->file('foto');
+                $filename = uniqid() . '.' . $file->getClientOriginalExtension();
+                $path = Storage::disk('r2')->putFileAs('athletes', $file, $filename);
+                $validated['foto'] = Storage::disk('r2')->url($path);
             }
 
             $validated['habilitado_booleano'] = $request->has('habilitado_booleano');
@@ -176,8 +180,10 @@ class AthleteController extends Controller
                 if ($athlete->foto) {
                     $this->deleteFile($athlete->foto);
                 }
-                $path = Storage::disk('public')->putFile('athletes', $request->file('foto'));
-                $validated['foto'] = Storage::disk('public')->url($path);
+                $file = $request->file('foto');
+                $filename = uniqid() . '.' . $file->getClientOriginalExtension();
+                $path = Storage::disk('r2')->putFileAs('athletes', $file, $filename);
+                $validated['foto'] = Storage::disk('r2')->url($path);
             }
 
             $validated['habilitado_booleano'] = $request->has('habilitado_booleano');
