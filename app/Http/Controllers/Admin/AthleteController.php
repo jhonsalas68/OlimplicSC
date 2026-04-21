@@ -56,26 +56,7 @@ class AthleteController extends Controller
         $athletes = $query->latest()->paginate(15)->withQueryString();
         $categories = Category::all();
 
-        if ($request->filled('category_id')) {
-            $selectedCategory = Category::find($request->category_id);
-            return view('admin.athletes.index', compact('athletes', 'categories', 'selectedCategory'));
-        }
-
-        // Agrupar atletas por categoría para vista general
-        $athletesByCategory = [];
-        foreach ($categories as $category) {
-            $categoryQuery = clone $query;
-            $categoryAthletes = $categoryQuery->where('category_id', $category->id)->latest()->take(10)->get();
-            if ($categoryAthletes->isNotEmpty()) {
-                $athletesByCategory[] = [
-                    'category' => $category,
-                    'athletes' => $categoryAthletes,
-                    'total' => $categoryQuery->where('category_id', $category->id)->count(),
-                ];
-            }
-        }
-
-        return view('admin.athletes.index', compact('athletesByCategory', 'categories'));
+        return view('admin.athletes.index', compact('athletes', 'categories'));
     }
 
     public function create()

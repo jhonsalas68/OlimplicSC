@@ -1,37 +1,16 @@
 @extends('layouts.admin')
 
-@section('title', isset($selectedCategory) ? 'Atletas: ' . $selectedCategory->nombre : 'Atletas por Categoría')
+@section('title', 'Atletas')
 
 @section('content')
-@if(isset($selectedCategory))
-<div class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-white p-8 rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/50 relative overflow-hidden">
-    <div class="absolute top-0 right-0 w-32 h-32 bg-blue-50/50 rounded-full -mr-16 -mt-16 blur-3xl"></div>
-    <div class="relative z-10">
-        <h1 class="text-3xl font-black text-slate-800 tracking-tight leading-tight">{{ $selectedCategory->nombre }}</h1>
-        <p class="text-sm font-bold text-blue-600 mt-2 flex items-center">
-            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            Edades: {{ $selectedCategory->edad_min }} a {{ $selectedCategory->edad_max }} años
-        </p>
-    </div>
-    <a href="{{ route('athletes.index') }}" class="inline-flex items-center justify-center px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-bold rounded-2xl transition-all shadow-sm hover:shadow-md whitespace-nowrap group">
-        <svg class="w-4 h-4 mr-2 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-        Volver a Categorías
-    </a>
-</div>
-@else
 <div class="mb-8">
-    <h1 class="text-3xl font-black text-slate-800 tracking-tight leading-tight">Atletas por Categoría</h1>
-    <p class="text-slate-500 mt-2">Organización de atletas agrupados por sus respectivas categorías</p>
+    <h1 class="text-3xl font-black text-slate-800 tracking-tight leading-tight">Atletas</h1>
+    <p class="text-slate-500 mt-2">Gestión completa de atletas del sistema</p>
 </div>
-@endif
 
-@if(isset($selectedCategory))
 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-10">
     <div class="flex items-center w-full lg:w-auto">
         <form action="{{ route('athletes.index') }}" method="GET" id="filter-form" class="flex flex-col sm:flex-row items-center gap-4 w-full">
-            @if(request('category_id'))
-                <input type="hidden" name="category_id" value="{{ request('category_id') }}">
-            @endif
             
             <div class="relative group w-full sm:w-80">
                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -46,7 +25,7 @@
 
             <select name="deuda" onchange="this.form.submit()" 
                     class="block w-full sm:w-52 px-4 py-3.5 border border-slate-200 rounded-2xl leading-5 bg-white text-slate-700 font-bold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 sm:text-sm transition-all shadow-sm cursor-pointer appearance-none bg-no-repeat bg-[right_1rem_center] bg-[length:1em_1em]"
-                    style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2364748b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');">
+                    style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2364748b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-2012.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-2012.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');">
                 <option value="">Todas las mensualidades</option>
                 <option value="al_dia" {{ request('deuda') === 'al_dia' ? 'selected' : '' }}>✅ Al Día</option>
                 <option value="deudores" {{ request('deuda') === 'deudores' ? 'selected' : '' }}>❌ Deudores</option>
