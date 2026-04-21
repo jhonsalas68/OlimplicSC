@@ -11,41 +11,43 @@
 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-10">
     <div class="flex items-center w-full lg:w-auto">
         <form action="{{ route('athletes.index') }}" method="GET" id="filter-form" class="flex flex-col sm:flex-row items-center gap-4 w-full">
-            
+
             <div class="relative group w-full sm:w-80">
                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <svg class="h-5 w-5 text-slate-400 group-hover:text-blue-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                 </div>
-                <input type="text" name="search" value="{{ request('search') }}" 
+                <input type="text" name="search" value="{{ request('search') }}"
                        class="block w-full pl-12 pr-4 py-3.5 border border-slate-200 rounded-2xl leading-5 bg-white placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 sm:text-sm transition-all shadow-sm"
                        placeholder="Buscar por nombre o DNI...">
             </div>
 
-            <select name="deuda" onchange="this.form.submit()" 
+            <select name="deuda" onchange="this.form.submit()"
                     class="block w-full sm:w-52 px-4 py-3.5 border border-slate-200 rounded-2xl leading-5 bg-white text-slate-700 font-bold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 sm:text-sm transition-all shadow-sm cursor-pointer appearance-none bg-no-repeat bg-[right_1rem_center] bg-[length:1em_1em]"
-                    style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2364748b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-2012.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-2012.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');">
+                    style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2364748b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');">
                 <option value="">Todas las mensualidades</option>
-                <option value="al_dia" {{ request('deuda') === 'al_dia' ? 'selected' : '' }}>✅ Al Día</option>
-                <option value="deudores" {{ request('deuda') === 'deudores' ? 'selected' : '' }}>❌ Deudores</option>
+                <option value="al_dia" {{ request('deuda') === 'al_dia' ? 'selected' : '' }}>Al día</option>
+                <option value="debe" {{ request('deuda') === 'debe' ? 'selected' : '' }}>Debe</option>
+            </select>
+
+            <select name="genero" onchange="this.form.submit()"
+                    class="block w-full sm:w-40 px-4 py-3.5 border border-slate-200 rounded-2xl leading-5 bg-white text-slate-700 font-bold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 sm:text-sm transition-all shadow-sm cursor-pointer appearance-none bg-no-repeat bg-[right_1rem_center] bg-[length:1em_1em]"
+                    style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2364748b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');">
+                <option value="">Todos los géneros</option>
+                <option value="Masculino" {{ request('genero') === 'Masculino' ? 'selected' : '' }}>Masculino</option>
+                <option value="Femenino" {{ request('genero') === 'Femenino' ? 'selected' : '' }}>Femenino</option>
+                <option value="Otro" {{ request('genero') === 'Otro' ? 'selected' : '' }}>Otro</option>
             </select>
         </form>
     </div>
 
-    <div class="flex flex-wrap items-center gap-3">
-        <a href="{{ route('athletes.export') }}" class="flex-1 sm:flex-none inline-flex items-center justify-center px-5 py-2.5 bg-white hover:bg-slate-50 text-slate-700 text-sm font-bold rounded-2xl transition-all shadow-sm border border-slate-200 group">
-            <svg class="w-5 h-5 mr-2 text-emerald-600 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div class="flex items-center gap-4 w-full lg:w-auto justify-end">
+        <button onclick="exportToExcel()" class="flex-1 sm:flex-none inline-flex items-center justify-center px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white text-sm font-bold rounded-2xl transition-all shadow-sm hover:shadow-md">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
             Exportar
-        </a>
- 
-        <button id="btn-convocados" onclick="exportSelected()" class="hidden flex-1 sm:flex-none inline-flex items-center justify-center px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-2xl transition-all shadow-lg shadow-blue-200/50 group">
-            <svg class="w-5 h-5 mr-2 transition-transform group-hover:rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-            </svg>
-            Convocados (<span id="selected-count">0</span>)
         </button>
 
         <button onclick="document.getElementById('importModal').classList.remove('hidden')" class="flex-1 sm:flex-none inline-flex items-center justify-center px-5 py-2.5 bg-white hover:bg-slate-50 text-slate-700 text-sm font-bold rounded-2xl transition-all shadow-sm border border-slate-200">
@@ -63,7 +65,115 @@
         </x-admin.button>
     </div>
 </div>
-@endif
+
+<!-- Lista de Atletas -->
+<div class="bg-white rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/50 overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead class="bg-slate-50 border-b border-slate-100">
+                <tr>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Atleta</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Categoría</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Edad</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Estado</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Último Pago</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                @forelse($athletes as $athlete)
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            @if($athlete->foto)
+                                <img class="h-10 w-10 rounded-full object-cover border-2 border-slate-200" src="{{ Storage::url($athlete->foto) }}" alt="Foto">
+                            @else
+                                <div class="h-10 w-10 rounded-full bg-slate-200 flex items-center justify-center">
+                                    <svg class="h-6 w-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                    </svg>
+                                </div>
+                            @endif
+                            <div class="ml-4">
+                                <div class="text-sm font-bold text-slate-900">{{ $athlete->nombre }} {{ $athlete->apellido_paterno }}</div>
+                                <div class="text-sm text-slate-500">{{ $athlete->ci }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            {{ $athlete->category->nombre ?? 'Sin categoría' }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-900 font-bold">
+                        {{ $athlete->edadActual() }} años
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        @if($athlete->pagado_mes_actual ?? false)
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                Al día
+                            </span>
+                        @else
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                                Debe
+                            </span>
+                        @endif
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
+                        {{ $athlete->latestPayment ? $athlete->latestPayment->created_at->format('M Y') : 'Nunca' }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <div class="flex items-center space-x-2">
+                            <a href="{{ route('athletes.show', $athlete) }}" class="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50 transition-colors">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                            </a>
+                            <a href="{{ route('athletes.edit', $athlete) }}" class="text-indigo-600 hover:text-indigo-900 p-1 rounded hover:bg-indigo-50 transition-colors">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                            </a>
+                            <form action="{{ route('athletes.destroy', $athlete) }}" method="POST" class="inline" onsubmit="return confirm('¿Estás seguro de eliminar este atleta?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50 transition-colors">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="6" class="px-6 py-12 text-center text-slate-500">
+                        <svg class="mx-auto h-12 w-12 text-slate-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        <p class="text-lg font-medium text-slate-900 mb-2">No hay atletas registrados</p>
+                        <p class="text-sm">Comienza creando tu primer atleta.</p>
+                    </td>
+                </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+
+    @if($athletes->hasPages())
+    <div class="bg-slate-50 px-6 py-4 border-t border-slate-100">
+        {{ $athletes->appends(request()->query())->links() }}
+    </div>
+    @endif
+</div>
 
 <!-- Import Modal -->
 <div id="importModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -85,7 +195,7 @@
                     <input type="file" name="file" required class="block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-6 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer border border-slate-200 rounded-xl p-2 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
             </div>
-            
+
             <div class="bg-amber-50 border border-amber-100 p-4 rounded-xl">
                 <div class="flex">
                     <svg class="h-5 w-5 text-amber-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -98,6 +208,34 @@
             </div>
 
             <div class="flex justify-end space-x-3 pt-4">
+                <button type="button" onclick="document.getElementById('importModal').classList.add('hidden')" class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                    Cancelar
+                </button>
+                <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                    Importar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function exportToExcel() {
+    window.location.href = '{{ route("athletes.export") }}';
+}
+
+@if(session('success'))
+    // Mostrar notificación de éxito
+    console.log('{{ session('success') }}');
+@endif
+
+@if(session('error'))
+    // Mostrar notificación de error
+    console.log('{{ session('error') }}');
+@endif
+</script>
+
+@endsection
                 <x-admin.button type="button" variant="secondary" onclick="document.getElementById('importModal').classList.add('hidden')">
                     Cancelar
                 </x-admin.button>
