@@ -21,7 +21,13 @@ class AthleteController extends Controller
     public function index(Request $request)
     {
         try {
-            $query = Athlete::with('category');
+            $mesActual = now()->format('Y-m');
+            $query = Athlete::with('category')
+                ->withExists(['payments as pagado_mes_actual' => function ($q) use ($mesActual) {
+                    $q->where('concepto', 'mensualidad')
+                      ->where('mes_correspondiente', $mesActual)
+                      ->where('estado_pago', 'pagado');
+                }]);
 
             if ($request->filled('search')) {
                 $search = $request->search;

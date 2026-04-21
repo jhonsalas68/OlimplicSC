@@ -22,7 +22,13 @@ class CobrosController extends Controller
         $q = trim($request->get('q', ''));
         if (strlen($q) < 2) return response()->json([]);
 
+        $mesActual = now()->format('Y-m');
         $atletas = Athlete::with(['category', 'latestPayment'])
+            ->withExists(['payments as pagado_mes_actual' => function ($q) use ($mesActual) {
+                $q->where('concepto', 'mensualidad')
+                  ->where('mes_correspondiente', $mesActual)
+                  ->where('estado_pago', 'pagado');
+            }])
             ->where(function ($query) use ($q) {
                 $keywords = explode(' ', $q);
                 foreach ($keywords as $word) {
@@ -39,13 +45,14 @@ class CobrosController extends Controller
             })
             ->limit(8)->get()
             ->map(fn(Athlete $a) => [
-                'id'             => $a->id,
-                'ci'             => $a->ci,
-                'nombre_completo'=> trim("{$a->nombre} {$a->apellido_paterno} {$a->apellido_materno}"),
-                'iniciales'      => strtoupper(substr($a->nombre,0,1).substr($a->apellido_paterno??'',0,1)),
-                'foto'           => $a->foto,
-                'categoria'      => $a->category->nombre ?? '—',
-                'ultimo_pago'    => $a->latestPayment?->created_at?->format('M Y'),
+                'id'                => $a->id,
+                'ci'                => $a->ci,
+                'nombre_completo'   => trim("{$a->nombre} {$a->apellido_paterno} {$a->apellido_materno}"),
+                'iniciales'         => strtoupper(substr($a->nombre,0,1).substr($a->apellido_paterno??'',0,1)),
+                'foto'              => $a->foto,
+                'categoria'         => $a->category->nombre ?? '—',
+                'ultimo_pago'       => $a->latestPayment?->mes_correspondiente ?? $a->latestPayment?->created_at?->format('M Y'),
+                'pagado_mes_actual' => $a->pagado_mes_actual,
             ]);
 
         return response()->json($atletas);
@@ -54,16 +61,25 @@ class CobrosController extends Controller
     /** Devuelve datos del atleta para el panel de cobro (AJAX) */
     public function getAtleta(Athlete $athlete)
     {
+        $mesActual = now()->format('Y-m');
         $athlete->loadMissing(['category', 'latestPayment']);
+        $alDia = $athlete->isAlDia();
         $ultimoPago = $athlete->latestPayment;
+        
         return response()->json([
-            'id'             => $athlete->id,
-            'nombre_completo'=> trim("{$athlete->nombre} {$athlete->apellido_paterno} {$athlete->apellido_materno}"),
-            'ci'             => $athlete->ci,
-            'categoria'      => $athlete->category->nombre ?? '—',
-            'foto'           => $athlete->foto,
-            'ultimo_pago'    => $ultimoPago
-                ? ['mes' => $ultimoPago->mes_correspondiente, 'monto' => $ultimoPago->monto, 'fecha' => $ultimoPago->created_at->format('d/m/Y')]
+            'id'                => $athlete->id,
+            'nombre_completo'   => trim("{$athlete->nombre} {$athlete->apellido_paterno} {$athlete->apellido_materno}"),
+            'ci'                => $athlete->ci,
+            'categoria'         => $athlete->category->nombre ?? '—',
+            'foto'              => $athlete->foto,
+            'pagado_mes_actual' => $alDia,
+            'ultimo_pago'       => $ultimoPago
+                ? [
+                    'mes'    => $ultimoPago->mes_correspondiente, 
+                    'monto'  => $ultimoPago->monto, 
+                    'fecha'  => $ultimoPago->created_at->format('d/m/Y'),
+                    'tipo'   => $ultimoPago->concepto
+                  ]
                 : null,
         ]);
     }

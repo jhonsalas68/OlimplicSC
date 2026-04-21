@@ -209,9 +209,16 @@
                         ? `<img src="${avatarSrc}" class="w-10 h-10 rounded-full object-cover flex-shrink-0 border border-slate-100">`
                         : `<div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-red-600 flex items-center justify-center text-white font-bold text-[10px] flex-shrink-0">${atleta.iniciales}</div>`;
                     
+                    const statusBadge = atleta.pagado_mes_actual 
+                        ? '<span class="px-2 py-0.5 rounded text-[8px] font-black uppercase bg-emerald-100 text-emerald-700 border border-emerald-200">Al Día</span>'
+                        : '<span class="px-2 py-0.5 rounded text-[8px] font-black uppercase bg-rose-100 text-rose-700 border border-rose-200">Debe</span>';
+
                     div.innerHTML = `${fotoHtml}
                         <div class="flex-1 min-w-0">
-                            <p class="text-sm font-semibold text-slate-800 truncate">${atleta.nombre_completo}</p>
+                            <div class="flex items-center justify-between gap-2">
+                                <p class="text-sm font-semibold text-slate-800 truncate">${atleta.nombre_completo}</p>
+                                ${statusBadge}
+                            </div>
                             <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">CI: ${atleta.ci} &middot; ${atleta.categoria}</p>
                         </div>`;
                     
@@ -238,7 +245,13 @@
             
         document.getElementById('atleta-nombre').textContent = atleta.nombre_completo;
         document.getElementById('atleta-meta').textContent = `CI: ${atleta.ci} · ${atleta.categoria}`;
-        document.getElementById('atleta-ultimo-pago').textContent = atleta.ultimo_pago ? `Último pago: ${atleta.ultimo_pago}` : 'Sin pagos registrados';
+        
+        const ultimoLabel = atleta.ultimo_pago ? `Último: ${atleta.ultimo_pago}` : 'Sin pagos';
+        const statusHtml = atleta.pagado_mes_actual 
+            ? `<span class="text-emerald-600 font-bold flex items-center gap-1 justify-end"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg> AL DÍA</span>`
+            : `<span class="text-rose-600 font-bold flex items-center gap-1 justify-end"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/></svg> DEBE</span>`;
+            
+        document.getElementById('atleta-ultimo-pago').innerHTML = `${statusHtml} <p class="text-[10px] text-slate-400 mt-0.5">${ultimoLabel}</p>`;
         
         panelVacio.classList.add('hidden');
         panelCobro.classList.remove('hidden');
