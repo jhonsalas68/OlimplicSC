@@ -163,25 +163,24 @@
 </style>
 
 <script>
-// Evitar inicialización múltiple con Turbo
-if (!window.cobrosInitialized) {
-    window.cobrosInitialized = true;
+(function() {
+    let searchTimeout = null;
+    const buscador = document.getElementById('buscador');
+    const resultados = document.getElementById('resultados');
+    const sinResultados = document.getElementById('sin-resultados');
+    const placeholderBusqueda = document.getElementById('placeholder-busqueda');
+    const panelVacio = document.getElementById('panel-vacio');
+    const panelCobro = document.getElementById('panel-cobro');
+    const spinner = document.getElementById('search-spinner');
+    const btnBuscar = document.getElementById('btn-buscar');
+    const searchIcon = document.getElementById('search-icon');
 
-    let searchTimeout=null;
-    const buscador=document.getElementById('buscador');
-    const resultados=document.getElementById('resultados');
-    const sinResultados=document.getElementById('sin-resultados');
-    const placeholderBusqueda=document.getElementById('placeholder-busqueda');
-    const panelVacio=document.getElementById('panel-vacio');
-    const panelCobro=document.getElementById('panel-cobro');
-    const spinner=document.getElementById('search-spinner');
-    const btnBuscar=document.getElementById('btn-buscar');
-    const searchIcon=document.getElementById('search-icon');
+    if (!buscador) return;
 
     function performSearch() {
-        const q=buscador.value.trim();
-        if(q.length<2){
-            resultados.innerHTML='';
+        const q = buscador.value.trim();
+        if (q.length < 2) {
+            resultados.innerHTML = '';
             sinResultados.classList.add('hidden');
             placeholderBusqueda.classList.remove('hidden');
             return;
@@ -192,34 +191,62 @@ if (!window.cobrosInitialized) {
         searchIcon.classList.add('hidden');
 
         fetch(`{{ route('cobros.search') }}?q=${encodeURIComponent(q)}`)
-            .then(r=>r.json())
-            .then(data=>{
+            .then(r => r.json())
+            .then(data => {
                 spinner.classList.add('hidden');
                 searchIcon.classList.remove('hidden');
-                resultados.innerHTML='';
-                if(data.length===0){sinResultados.classList.remove('hidden');return;}
+                resultados.innerHTML = '';
+                if (data.length === 0) {
+                    sinResultados.classList.remove('hidden');
+                    return;
+                }
                 sinResultados.classList.add('hidden');
-                data.forEach(atleta=>{
-                    const div=document.createElement('div');
-                    div.className='atleta-item flex items-center gap-3 p-3 border border-slate-100 rounded-xl cursor-pointer shadow-sm hover:shadow-md transition-all';
+                data.forEach(atleta => {
+                    const div = document.createElement('div');
+                    div.className = 'atleta-item flex items-center gap-3 p-3 border border-slate-100 rounded-xl cursor-pointer shadow-sm hover:shadow-md transition-all';
                     const avatarSrc = atleta.foto ? (atleta.foto.startsWith('http') ? atleta.foto : '/storage/' + atleta.foto) : null;
-                    const fotoHtml=avatarSrc
-                        ?`<img src="${avatarSrc}" class="w-10 h-10 rounded-full object-cover flex-shrink-0 border border-slate-100">`
-                        :`<div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-red-600 flex items-center justify-center text-white font-bold text-[10px] flex-shrink-0">${atleta.iniciales}</div>`;
-                    div.innerHTML=`${fotoHtml}<div class="flex-1 min-w-0"><p class="text-sm font-semibold text-slate-800 truncate">${atleta.nombre_completo}</p><p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">CI: ${atleta.ci} &middot; ${atleta.categoria}</p></div>`;
-                    div.addEventListener('click',()=>seleccionarAtleta(atleta,div));
+                    const fotoHtml = avatarSrc
+                        ? `<img src="${avatarSrc}" class="w-10 h-10 rounded-full object-cover flex-shrink-0 border border-slate-100">`
+                        : `<div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-red-600 flex items-center justify-center text-white font-bold text-[10px] flex-shrink-0">${atleta.iniciales}</div>`;
+                    
+                    div.innerHTML = `${fotoHtml}
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-semibold text-slate-800 truncate">${atleta.nombre_completo}</p>
+                            <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">CI: ${atleta.ci} &middot; ${atleta.categoria}</p>
+                        </div>`;
+                    
+                    div.addEventListener('click', () => seleccionarAtleta(atleta, div));
                     resultados.appendChild(div);
                 });
             })
-            .catch(()=>{
+            .catch(() => {
                 spinner.classList.add('hidden');
                 searchIcon.classList.remove('hidden');
             });
     }
 
-    buscador.addEventListener('input',function(){
+    function seleccionarAtleta(atleta, el) {
+        document.querySelectorAll('.atleta-item').forEach(i => i.classList.remove('selected'));
+        el.classList.add('selected');
+        document.getElementById('athlete_id').value = atleta.id;
+        const avatarEl = document.getElementById('atleta-avatar');
+        const avatarSrc = atleta.foto ? (atleta.foto.startsWith('http') ? atleta.foto : '/storage/' + atleta.foto) : null;
+        
+        avatarEl.innerHTML = avatarSrc 
+            ? `<img src="${avatarSrc}" class="w-full h-full object-cover">` 
+            : atleta.iniciales;
+            
+        document.getElementById('atleta-nombre').textContent = atleta.nombre_completo;
+        document.getElementById('atleta-meta').textContent = `CI: ${atleta.ci} · ${atleta.categoria}`;
+        document.getElementById('atleta-ultimo-pago').textContent = atleta.ultimo_pago ? `Último pago: ${atleta.ultimo_pago}` : 'Sin pagos registrados';
+        
+        panelVacio.classList.add('hidden');
+        panelCobro.classList.remove('hidden');
+    }
+
+    buscador.addEventListener('input', function() {
         clearTimeout(searchTimeout);
-        searchTimeout=setTimeout(performSearch, 500);
+        searchTimeout = setTimeout(performSearch, 500);
     });
 
     buscador.addEventListener('keydown', function(e) {
@@ -235,25 +262,11 @@ if (!window.cobrosInitialized) {
         performSearch();
     });
 
-    function seleccionarAtleta(atleta,el){
-        document.querySelectorAll('.atleta-item').forEach(i=>i.classList.remove('selected'));
-        el.classList.add('selected');
-        document.getElementById('athlete_id').value=atleta.id;
-        const avatarEl=document.getElementById('atleta-avatar');
-        const avatarSrc = atleta.foto ? (atleta.foto.startsWith('http') ? atleta.foto : '/storage/' + atleta.foto) : null;
-        avatarEl.innerHTML=avatarSrc?`<img src="${avatarSrc}" class="w-full h-full object-cover">`:atleta.iniciales;
-        document.getElementById('atleta-nombre').textContent=atleta.nombre_completo;
-        document.getElementById('atleta-meta').textContent=`CI: ${atleta.ci} · ${atleta.categoria}`;
-        document.getElementById('atleta-ultimo-pago').textContent=atleta.ultimo_pago?`Ultimo pago: ${atleta.ultimo_pago}`:'Sin pagos registrados';
-        panelVacio.classList.add('hidden');
-        panelCobro.classList.remove('hidden');
-    }
-
-    document.querySelectorAll('input[name="concepto"]').forEach(radio=>{
-        radio.addEventListener('change',function(){
-            document.getElementById('campo-mes').classList.toggle('hidden',this.value!=='mensualidad');
+    document.querySelectorAll('input[name="concepto"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            document.getElementById('campo-mes').classList.toggle('hidden', this.value !== 'mensualidad');
         });
     });
-}
+})();
 </script>
 @endsection
