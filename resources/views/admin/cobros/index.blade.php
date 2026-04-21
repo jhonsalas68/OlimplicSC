@@ -16,15 +16,23 @@
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
         <h2 class="text-base font-semibold text-slate-700 mb-4">Buscar Atleta</h2>
-        <div class="relative">
-            <input type="text" id="buscador" placeholder="Nombre, apellido o CI..." autocomplete="off"
-                   class="w-full pl-4 pr-10 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm">
-            <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none">
-                <svg id="search-spinner" class="hidden h-4 w-4 text-slate-400 animate-spin" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                </svg>
+        <div class="flex items-center gap-2">
+            <div class="relative flex-1">
+                <input type="text" id="buscador" placeholder="Nombre, apellido o CI..." autocomplete="off"
+                       class="w-full pl-4 pr-10 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm transition-all">
+                <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                    <svg id="search-spinner" class="hidden h-4 w-4 text-blue-500 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                    </svg>
+                    <svg id="search-icon" class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
             </div>
+            <button type="button" id="btn-buscar" class="px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-blue-200/50 flex-shrink-0">
+                Buscar
+            </button>
         </div>
         <div id="resultados" class="mt-3 space-y-2 max-h-96 overflow-y-auto"></div>
         <div id="sin-resultados" class="hidden mt-6 text-center text-slate-400 text-sm py-8">No se encontraron atletas</div>
@@ -167,35 +175,64 @@ if (!window.cobrosInitialized) {
     const panelVacio=document.getElementById('panel-vacio');
     const panelCobro=document.getElementById('panel-cobro');
     const spinner=document.getElementById('search-spinner');
+    const btnBuscar=document.getElementById('btn-buscar');
+    const searchIcon=document.getElementById('search-icon');
 
-    buscador.addEventListener('input',function(){
-        const q=this.value.trim();
-        clearTimeout(searchTimeout);
-        if(q.length<2){resultados.innerHTML='';sinResultados.classList.add('hidden');placeholderBusqueda.classList.remove('hidden');return;}
+    function performSearch() {
+        const q=buscador.value.trim();
+        if(q.length<2){
+            resultados.innerHTML='';
+            sinResultados.classList.add('hidden');
+            placeholderBusqueda.classList.remove('hidden');
+            return;
+        }
+        
         placeholderBusqueda.classList.add('hidden');
         spinner.classList.remove('hidden');
-        searchTimeout=setTimeout(()=>{
-            fetch(`{{ route('cobros.search') }}?q=${encodeURIComponent(q)}`)
-                .then(r=>r.json())
-                .then(data=>{
-                    spinner.classList.add('hidden');
-                    resultados.innerHTML='';
-                    if(data.length===0){sinResultados.classList.remove('hidden');return;}
-                    sinResultados.classList.add('hidden');
-                    data.forEach(atleta=>{
-                        const div=document.createElement('div');
-                        div.className='atleta-item flex items-center gap-3 p-3 border border-slate-100 rounded-xl cursor-pointer';
-                        const avatarSrc = atleta.foto ? (atleta.foto.startsWith('http') ? atleta.foto : '/storage/' + atleta.foto) : null;
-                        const fotoHtml=avatarSrc
-                            ?`<img src="${avatarSrc}" class="w-10 h-10 rounded-full object-cover flex-shrink-0">`
-                            :`<div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-red-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">${atleta.iniciales}</div>`;
-                        div.innerHTML=`${fotoHtml}<div class="flex-1 min-w-0"><p class="text-sm font-semibold text-slate-800 truncate">${atleta.nombre_completo}</p><p class="text-xs text-slate-500">CI: ${atleta.ci} &middot; ${atleta.categoria}</p></div>`;
-                        div.addEventListener('click',()=>seleccionarAtleta(atleta,div));
-                        resultados.appendChild(div);
-                    });
-                })
-                .catch(()=>{spinner.classList.add('hidden');});
-        },300);
+        searchIcon.classList.add('hidden');
+
+        fetch(`{{ route('cobros.search') }}?q=${encodeURIComponent(q)}`)
+            .then(r=>r.json())
+            .then(data=>{
+                spinner.classList.add('hidden');
+                searchIcon.classList.remove('hidden');
+                resultados.innerHTML='';
+                if(data.length===0){sinResultados.classList.remove('hidden');return;}
+                sinResultados.classList.add('hidden');
+                data.forEach(atleta=>{
+                    const div=document.createElement('div');
+                    div.className='atleta-item flex items-center gap-3 p-3 border border-slate-100 rounded-xl cursor-pointer shadow-sm hover:shadow-md transition-all';
+                    const avatarSrc = atleta.foto ? (atleta.foto.startsWith('http') ? atleta.foto : '/storage/' + atleta.foto) : null;
+                    const fotoHtml=avatarSrc
+                        ?`<img src="${avatarSrc}" class="w-10 h-10 rounded-full object-cover flex-shrink-0 border border-slate-100">`
+                        :`<div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-red-600 flex items-center justify-center text-white font-bold text-[10px] flex-shrink-0">${atleta.iniciales}</div>`;
+                    div.innerHTML=`${fotoHtml}<div class="flex-1 min-w-0"><p class="text-sm font-semibold text-slate-800 truncate">${atleta.nombre_completo}</p><p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">CI: ${atleta.ci} &middot; ${atleta.categoria}</p></div>`;
+                    div.addEventListener('click',()=>seleccionarAtleta(atleta,div));
+                    resultados.appendChild(div);
+                });
+            })
+            .catch(()=>{
+                spinner.classList.add('hidden');
+                searchIcon.classList.remove('hidden');
+            });
+    }
+
+    buscador.addEventListener('input',function(){
+        clearTimeout(searchTimeout);
+        searchTimeout=setTimeout(performSearch, 500);
+    });
+
+    buscador.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            clearTimeout(searchTimeout);
+            performSearch();
+        }
+    });
+
+    btnBuscar.addEventListener('click', function() {
+        clearTimeout(searchTimeout);
+        performSearch();
     });
 
     function seleccionarAtleta(atleta,el){
