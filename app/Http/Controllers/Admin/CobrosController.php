@@ -29,10 +29,10 @@ class CobrosController extends Controller
                     $word = trim($word);
                     if ($word !== '') {
                         $query->where(function ($query2) use ($word) {
-                            $query2->where('ci', 'ilike', "%{$word}%")
-                                   ->orWhere('nombre', 'ilike', "%{$word}%")
-                                   ->orWhere('apellido_paterno', 'ilike', "%{$word}%")
-                                   ->orWhere('apellido_materno', 'ilike', "%{$word}%");
+                        $query2->where('ci', 'like', "%{$word}%")
+                               ->orWhere('nombre', 'like', "%{$word}%")
+                               ->orWhere('apellido_paterno', 'like', "%{$word}%")
+                               ->orWhere('apellido_materno', 'like', "%{$word}%");
                         });
                     }
                 }
@@ -77,7 +77,7 @@ class CobrosController extends Controller
             'mes_correspondiente' => 'required_if:concepto,mensualidad|nullable|string|max:7',
             'descripcion'         => 'nullable|string|max:255',
             'monto'               => 'required|numeric|min:0.01',
-            'metodo_pago'         => 'required|in:efectivo,qr,tarjeta',
+            'metodo_pago'         => 'required|in:efectivo,qr',
         ]);
 
         $payment = Payment::create([

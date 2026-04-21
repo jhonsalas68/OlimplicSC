@@ -106,7 +106,7 @@
 
                 <div class="mb-6">
                     <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Metodo de Pago</label>
-                    <div class="grid grid-cols-3 gap-2">
+                    <div class="grid grid-cols-2 gap-2">
                         <label class="metodo-btn cursor-pointer">
                             <input type="radio" name="metodo_pago" value="efectivo" class="sr-only" required>
                             <div class="border-2 border-slate-200 rounded-xl p-2.5 text-center transition-all hover:border-green-400 metodo-card">
@@ -123,15 +123,6 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
                                 </svg>
                                 <span class="text-xs font-semibold text-slate-600 metodo-label">QR</span>
-                            </div>
-                        </label>
-                        <label class="metodo-btn cursor-pointer">
-                            <input type="radio" name="metodo_pago" value="tarjeta" class="sr-only">
-                            <div class="border-2 border-slate-200 rounded-xl p-2.5 text-center transition-all hover:border-purple-400 metodo-card">
-                                <svg class="h-5 w-5 mx-auto mb-1 text-slate-400 metodo-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                                </svg>
-                                <span class="text-xs font-semibold text-slate-600 metodo-label">Tarjeta</span>
                             </div>
                         </label>
                     </div>
@@ -158,9 +149,6 @@
 .metodo-btn input[value="qr"]:checked ~ .metodo-card{border-color:#2563eb;background-color:#eff6ff}
 .metodo-btn input[value="qr"]:checked ~ .metodo-card .metodo-icon{color:#2563eb}
 .metodo-btn input[value="qr"]:checked ~ .metodo-card .metodo-label{color:#1d4ed8}
-.metodo-btn input[value="tarjeta"]:checked ~ .metodo-card{border-color:#7c3aed;background-color:#f5f3ff}
-.metodo-btn input[value="tarjeta"]:checked ~ .metodo-card .metodo-icon{color:#7c3aed}
-.metodo-btn input[value="tarjeta"]:checked ~ .metodo-card .metodo-label{color:#6d28d9}
 .atleta-item{transition:all 0.15s ease}
 .atleta-item:hover{background-color:#eff6ff;border-color:#93c5fd}
 .atleta-item.selected{background-color:#dbeafe;border-color:#2563eb}

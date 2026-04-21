@@ -36,7 +36,6 @@ class PaymentController extends Controller
                         ->orWhere('apellido_paterno', 'ilike', "%$search%")
                         ->orWhere('apellido_materno', 'ilike', "%$search%")
                         ->orWhere('ci', 'ilike', "%$search%")
-                        ->orWhere('id_alfanumerico_unico', 'ilike', "%$search%")
                         ->orWhereRaw("CONCAT(nombre, ' ', apellido_paterno, ' ', COALESCE(apellido_materno,'')) ILIKE ?", ["%$search%"]);
                 })
             );
@@ -97,7 +96,6 @@ class PaymentController extends Controller
                         ->orWhere('apellido_paterno', 'ilike', "%$s%")
                         ->orWhere('apellido_materno', 'ilike', "%$s%")
                         ->orWhere('ci', 'ilike', "%$s%")
-                        ->orWhere('id_alfanumerico_unico', 'ilike', "%$s%")
                         ->orWhereRaw("CONCAT(nombre, ' ', apellido_paterno, ' ', COALESCE(apellido_materno,'')) ILIKE ?", ["%$s%"]);
                 })
             );
