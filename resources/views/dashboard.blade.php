@@ -546,40 +546,45 @@
     </footer>
 
     <script>
-        // Nav active state
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', e => {
-                if (item.getAttribute('href') === '#') {
-                    e.preventDefault();
-                }
-                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-                item.classList.add('active');
+        // Evitar inicialización múltiple con Turbo
+        if (!window.dashboardInitialized) {
+            window.dashboardInitialized = true;
+
+            // Nav active state
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', e => {
+                    if (item.getAttribute('href') === '#') {
+                        e.preventDefault();
+                    }
+                    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                });
             });
-        });
 
-        // Mobile sidebar toggle
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('sidebarOverlay');
-        const menuToggle = document.getElementById('menuToggle');
-        const footer = document.getElementById('contactFooter');
+            // Mobile sidebar toggle
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            const menuToggle = document.getElementById('menuToggle');
+            const footer = document.getElementById('contactFooter');
 
-        // Desktop: mover footer cuando sidebar hace hover
-        sidebar.addEventListener('mouseenter', () => {
-            if (window.innerWidth > 768) footer.style.left = '240px';
-        });
-        sidebar.addEventListener('mouseleave', () => {
-            if (window.innerWidth > 768) footer.style.left = '72px';
-        });
+            // Desktop: mover footer cuando sidebar hace hover
+            sidebar.addEventListener('mouseenter', () => {
+                if (window.innerWidth > 768) footer.style.left = '240px';
+            });
+            sidebar.addEventListener('mouseleave', () => {
+                if (window.innerWidth > 768) footer.style.left = '72px';
+            });
 
-        menuToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('open');
-            overlay.classList.toggle('active');
-        });
+            menuToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('open');
+                overlay.classList.toggle('active');
+            });
 
-        overlay.addEventListener('click', () => {
-            sidebar.classList.remove('open');
-            overlay.classList.remove('active');
-        });
+            overlay.addEventListener('click', () => {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+            });
+        }
     </script>
 </body>
 </html>

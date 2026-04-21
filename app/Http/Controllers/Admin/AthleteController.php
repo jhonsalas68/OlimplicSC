@@ -225,6 +225,23 @@ class AthleteController extends Controller
         return response()->json(['habilitado' => $athlete->habilitado_booleano]);
     }
 
+    public function exportSelected(Request $request)
+    {
+        $ids = json_decode($request->ids);
+        if (!$ids || !is_array($ids)) {
+            return back()->with('error', 'No se seleccionaron alumnos para la exportación.');
+        }
+
+        $athletes = Athlete::whereIn('id', $ids)->with('category')->get();
+        
+        if ($athletes->isEmpty()) {
+            return back()->with('error', 'No se encontraron registros de los atletas seleccionados.');
+        }
+
+        $pdf = Pdf::loadView('admin.athletes.export_pdf', compact('athletes'));
+        return $pdf->download('lista_convocados_olimpic.pdf');
+    }
+
     public function export()
     {
         return Excel::download(new AthleteExport, 'atletas_olimpic.xlsx');

@@ -70,9 +70,12 @@ class UserController extends Controller
             ->implode('');
 
         $username = $initials;
-        $counter = 1;
-        while (User::where('username', $username)->exists()) {
-            $username = $initials . $counter++;
+        if (User::where('username', $username)->exists()) {
+            $counter = 1;
+            while (User::where('username', $username)->exists()) {
+                // Si las iniciales ya existen, añadimos 01, 02, etc.
+                $username = $initials . str_pad($counter++, 2, '0', STR_PAD_LEFT);
+            }
         }
 
         $avatarUrl = null;

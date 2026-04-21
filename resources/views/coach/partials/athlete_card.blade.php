@@ -1,9 +1,12 @@
 <div onclick="toggleAthlete({{ $atleta->id }}, this)" 
      class="group bg-white rounded-2xl border-2 border-slate-100 p-4 transition-all duration-300 cursor-pointer hover:shadow-lg relative overflow-hidden flex flex-col items-center text-center">
     
+    {{-- Hidden Checkbox for data --}}
+    <input type="checkbox" class="athlete-checkbox-data hidden" value="{{ $atleta->id }}">
+    
     {{-- Checkbox Indicator --}}
-    <div class="absolute top-3 right-3 w-5 h-5 rounded-full border-2 border-slate-200 transition-all flex items-center justify-center group-[.border-blue-500]:bg-blue-600 group-[.border-blue-500]:border-blue-600">
-        <svg class="h-3 w-3 text-white opacity-0 group-[.border-blue-500]:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <div class="absolute top-3 right-3 w-5 h-5 rounded-full border-2 border-slate-200 transition-all flex items-center justify-center group-[.border-blue-600]:bg-blue-600 group-[.border-blue-600]:border-blue-600">
+        <svg class="h-3 w-3 text-white opacity-0 group-[.border-blue-600]:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7" />
         </svg>
     </div>

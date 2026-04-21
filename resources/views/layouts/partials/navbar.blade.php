@@ -20,7 +20,7 @@
         </span>
         
         <!-- Notifications (Interactive) -->
-        <div class="relative" x-data="notificationHandler()" x-init="fetchNotifications()">
+        <div class="relative" x-data="notificationHandler()">
             <button @click="open = !open" 
                     id="notification-bell"
                     class="p-2 text-white/80 hover:text-white transition-all hover:bg-white/10 rounded-xl relative group">
@@ -100,23 +100,34 @@ function notificationHandler() {
         open: false,
         notifications: [],
         count: 0,
+        interval: null,
+        init() {
+            this.fetchNotifications();
+            // Evitar duplicación de intervalos al navegar con Turbo
+            if (this.interval) clearInterval(this.interval);
+            this.interval = setInterval(() => {
+                if (!this.open) this.fetchNotifications();
+            }, 60000);
+        },
+        destroy() {
+            if (this.interval) clearInterval(this.interval);
+        },
         fetchNotifications() {
             fetch('{{ route('notifications.index') }}')
                 .then(res => res.json())
                 .then(data => {
                     this.notifications = data.notifications;
                     this.count = data.count;
-                });
-            
-            // Auto refrescar cada 60 segundos
-            setInterval(() => {
-                if(!this.open) this.fetchNotifications();
-            }, 60000);
+                })
+                .catch(err => console.error('Error fetching notifications:', err));
         },
         view(id, url) {
             fetch(`/admin/notifications/${id}/read`, {
                 method: 'POST',
-                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+                headers: { 
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                }
             }).then(() => {
                 window.open(url, '_blank');
                 this.fetchNotifications();
@@ -126,7 +137,10 @@ function notificationHandler() {
         dismiss(id) {
             fetch(`/admin/notifications/${id}/dismiss`, {
                 method: 'POST',
-                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+                headers: { 
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                }
             }).then(() => {
                 this.fetchNotifications();
             });
