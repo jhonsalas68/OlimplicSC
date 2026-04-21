@@ -7,6 +7,7 @@ use App\Models\Athlete;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 use App\Exports\AthleteExport;
 use App\Imports\AthleteImport;
 use Maatwebsite\Excel\Facades\Excel;
@@ -119,8 +120,8 @@ class AthleteController extends Controller
 
         try {
             if ($request->hasFile('foto')) {
-                $path = Storage::disk('r2')->putFile('athletes', $request->file('foto'));
-                $validated['foto'] = Storage::disk('r2')->url($path);
+                $path = Storage::disk('public')->putFile('athletes', $request->file('foto'));
+                $validated['foto'] = Storage::disk('public')->url($path);
             }
 
             $validated['habilitado_booleano'] = $request->has('habilitado_booleano');
@@ -194,8 +195,8 @@ class AthleteController extends Controller
                 if ($athlete->foto) {
                     $this->deleteFile($athlete->foto);
                 }
-                $path = Storage::disk('r2')->putFile('athletes', $request->file('foto'));
-                $validated['foto'] = Storage::disk('r2')->url($path);
+                $path = Storage::disk('public')->putFile('athletes', $request->file('foto'));
+                $validated['foto'] = Storage::disk('public')->url($path);
             }
 
             $validated['habilitado_booleano'] = $request->has('habilitado_booleano');
@@ -234,7 +235,7 @@ class AthleteController extends Controller
 
     public function toggleHabilitado(Athlete $athlete)
     {
-        if (auth()->user()->hasRole('Coach')) {
+        if (Auth::user()->hasRole('Coach')) {
             return response()->json(['error' => 'No autorizado'], 403);
         }
         $athlete->update(['habilitado_booleano' => !$athlete->habilitado_booleano]);
