@@ -7,8 +7,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ActivityLog extends Model
 {
-    // No usamos timestamps estándar porque solo necesitamos created_at
-    public $timestamps = false;
+    // Habilitamos timestamps pero solo para created_at
+    public $timestamps = true;
+    const UPDATED_AT = null;
     
     protected $fillable = [
         'user_id',
