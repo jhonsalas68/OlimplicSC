@@ -220,10 +220,7 @@
                 data.forEach(atleta => {
                     const div = document.createElement('div');
                     div.className = 'atleta-item flex items-center gap-3 p-3 border border-slate-100 rounded-xl cursor-pointer shadow-sm hover:shadow-md transition-all';
-                    const avatarSrc = atleta.foto ? (atleta.foto.startsWith('http') ? atleta.foto : '/storage/' + atleta.foto) : null;
-                    const fotoHtml = avatarSrc
-                        ? `<img src="${avatarSrc}" class="w-10 h-10 rounded-full object-cover flex-shrink-0 border border-slate-100">`
-                        : `<div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-red-600 flex items-center justify-center text-white font-bold text-[10px] flex-shrink-0">${atleta.iniciales}</div>`;
+                    const fotoHtml = `<div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-red-600 flex items-center justify-center text-white font-bold text-[10px] flex-shrink-0">${atleta.iniciales}</div>`;
                     
                     const statusBadge = atleta.pagado_mes_actual 
                         ? '<span class="px-2 py-0.5 rounded text-[8px] font-black uppercase bg-emerald-100 text-emerald-700 border border-emerald-200">Al Día</span>'
@@ -253,11 +250,7 @@
         el.classList.add('selected');
         document.getElementById('athlete_id').value = atleta.id;
         const avatarEl = document.getElementById('atleta-avatar');
-        const avatarSrc = atleta.foto ? (atleta.foto.startsWith('http') ? atleta.foto : '/storage/' + atleta.foto) : null;
-        
-        avatarEl.innerHTML = avatarSrc 
-            ? `<img src="${avatarSrc}" class="w-full h-full object-cover">` 
-            : atleta.iniciales;
+        avatarEl.innerHTML = atleta.iniciales;
             
         document.getElementById('atleta-nombre').textContent = atleta.nombre_completo;
         document.getElementById('atleta-meta').textContent = `CI: ${atleta.ci} · ${atleta.categoria}`;

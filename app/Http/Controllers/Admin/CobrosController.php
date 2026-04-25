@@ -146,7 +146,7 @@ class CobrosController extends Controller
         
         $esPublico = true;
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.cobros.nota', compact('payment', 'esPublico'))
-                  ->setPaper('a4', 'portrait');
+                  ->setPaper([0, 0, 396, 612], 'portrait');
                   
         return $pdf->stream('nota_venta_' . $payment->id . '.pdf');
     }

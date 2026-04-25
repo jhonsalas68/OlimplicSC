@@ -12,12 +12,14 @@
             background: #f1f5f9;
             color: #1e293b;
             min-height: 100vh;
+            display: block !important; /* Force block layout to avoid sidebars */
+            width: 100%;
         }
 
         /* ===== BARRA DE ACCIONES (solo pantalla) ===== */
         .action-bar {
             background: #0b2d69;
-            padding: 15px 30px;
+            padding: 10px 24px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -25,17 +27,15 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
-        .action-bar-title { color: white; font-size: 14px; font-weight: 600; }
-        .action-bar-title span { color: #93c5fd; }
-        .action-btns { display: flex; gap: 10px; }
+        .action-bar-title { color: white; font-size: 14px; font-weight: 700; }
+        .action-btns { display: flex; gap: 12px; }
         .btn-back {
-            background: rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.1);
             color: white;
-            border: 1px solid rgba(255,255,255,0.3);
+            border: 1px solid rgba(255,255,255,0.2);
             padding: 8px 16px;
-            border-radius: 8px;
+            border-radius: 6px;
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
@@ -43,56 +43,51 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            transition: background 0.2s;
         }
-        .btn-back:hover { background: rgba(255,255,255,0.25); }
         .btn-print {
             background: #c61c2c;
             color: white;
             border: none;
             padding: 8px 20px;
-            border-radius: 8px;
+            border-radius: 6px;
             font-size: 13px;
             font-weight: 700;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            transition: background 0.2s;
         }
-        .btn-print:hover { background: #9b1421; }
         .btn-whatsapp {
             background: #25d366;
             color: white;
             border: none;
             padding: 8px 20px;
-            border-radius: 8px;
+            border-radius: 6px;
             font-size: 13px;
             font-weight: 700;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            transition: background 0.2s;
             text-decoration: none;
         }
-        .btn-whatsapp:hover { background: #128c7e; }
 
         /* ===== CONTENEDOR PANTALLA ===== */
         .screen-wrapper {
             display: flex;
             justify-content: center;
             align-items: flex-start;
-            padding: 32px 16px 48px;
+            padding: 40px 20px;
+            background: #f1f5f9;
         }
 
         /* ===== CARD DE NOTA (pantalla) ===== */
         .nota-card {
             background: white;
-            border-radius: 16px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             width: 100%;
-            max-width: 700px; /* Un poco mas ancho para la foto */
+            max-width: 600px;
             overflow: hidden;
         }
 
@@ -156,16 +151,7 @@
         .info-item label { font-size: 9px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px; }
         .info-item span { font-size: 14px; font-weight: 700; color: #1e293b; }
 
-        /* Foto Atleta */
-        .athlete-photo-box {
-            width: 85px; height: 85px;
-            border-radius: 14px;
-            border: 3px solid #f1f5f9;
-            overflow: hidden;
-            background: #f8fafc;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        .athlete-photo-box img { width: 100%; height: 100%; object-fit: cover; }
+
 
         /* Concepto box - ROJO */
         .concepto-box {
@@ -246,7 +232,7 @@
 
         /* ===== PRINT (B&W SAVE INK) ===== */
         @media print {
-            @page { size: portrait; margin: 0.5in; }
+            @page { size: 5.5in 8.5in; margin: 0.3in; }
             body { background: white; color: black; }
             .action-bar { display: none !important; }
             .screen-wrapper { padding: 0; display: block; }
@@ -357,51 +343,22 @@
             {{-- Atleta --}}
             <div class="section">
                 <div class="section-title">Datos del Atleta</div>
-                <div style="display: flex; gap: 20px; align-items: flex-start;">
-                    @if($payment->athlete->foto)
-                        <div class="athlete-photo-box">
-                            @php
-                                $fotoRaw = $payment->athlete->foto;
-                                $fotoFinal = null;
-                                
-                                if (str_starts_with($fotoRaw, 'http')) {
-                                    $fotoFinal = $fotoRaw;
-                                } else {
-                                    // Base64 encoding for PDF reliability
-                                    $fullPath = public_path('storage/' . $fotoRaw);
-                                    if (file_exists($fullPath)) {
-                                        $type = pathinfo($fullPath, PATHINFO_EXTENSION);
-                                        $data = file_get_contents($fullPath);
-                                        $fotoFinal = 'data:image/' . $type . ';base64,' . base64_encode($data);
-                                    } else {
-                                        $fotoFinal = asset('storage/' . $fotoRaw);
-                                    }
-                                }
-                            @endphp
-                            <img src="{{ $fotoFinal }}" alt="Foto Atleta">
-                        </div>
-                    @else
-                        <div class="athlete-photo-box" style="display: flex; align-items: center; justify-content: center; background: #eff6ff; color: #2563eb; font-weight: 800; font-size: 24px;">
-                            {{ substr($payment->athlete->nombre, 0, 1) }}{{ substr($payment->athlete->apellido_paterno, 0, 1) }}
-                        </div>
-                    @endif
-                    <div class="info-grid" style="flex: 1;">
-                        <div class="info-item">
-                            <label>Nombre Completo</label>
-                            <span>{{ trim($payment->athlete->nombre . ' ' . $payment->athlete->apellido_paterno . ' ' . $payment->athlete->apellido_materno) }}</span>
-                        </div>
-                        <div class="info-item">
-                            <label>Cedula de Identidad</label>
-                            <span>{{ $payment->athlete->ci }}</span>
-                        </div>
-                        <div class="info-item">
-                            <label>Categoria</label>
-                            <span>{{ $payment->athlete->category->nombre ?? '—' }}</span>
-                        </div>
-                        <div class="info-item">
-                            <label>Concepto</label>
-                            <span class="text-blue-700">{{ $payment->concepto === 'mensualidad' ? 'Mensualidad' : 'Articulo Deportivo' }}</span>
-                        </div>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <label>Nombre Completo</label>
+                        <span>{{ trim($payment->athlete->nombre . ' ' . $payment->athlete->apellido_paterno . ' ' . $payment->athlete->apellido_materno) }}</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Cedula de Identidad</label>
+                        <span>{{ $payment->athlete->ci }}</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Categoria</label>
+                        <span>{{ $payment->athlete->category->nombre ?? '—' }}</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Concepto</label>
+                        <span class="text-blue-700">{{ $payment->concepto === 'mensualidad' ? 'Mensualidad' : 'Articulo Deportivo' }}</span>
                     </div>
                 </div>
             </div>
