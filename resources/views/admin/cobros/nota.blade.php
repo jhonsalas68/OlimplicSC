@@ -133,9 +133,9 @@
         }
 
         /* ===== CUERPO ===== */
-        .nota-body { padding: 30px; }
+        .nota-body { padding: 20px 30px; }
 
-        .section { margin-bottom: 25px; }
+        .section { margin-bottom: 15px; }
         .section-title {
             font-size: 10px;
             font-weight: 800;
@@ -214,11 +214,7 @@
         .cobrador-info label { font-size: 9px; color: #94a3b8; text-transform: uppercase; font-weight: 700; }
         .cobrador-info span { font-size: 14px; font-weight: 700; color: #1e293b; }
 
-        /* Firmas */
-        .firmas { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 10px; }
-        .firma-item { text-align: center; }
-        .firma-linea { border-top: 1px dashed #cbd5e1; padding-top: 10px; margin-top: 40px; }
-        .firma-linea span { font-size: 11px; color: #94a3b8; font-weight: 600; }
+
 
         /* Footer */
         .nota-footer {
@@ -421,15 +417,7 @@
                 </div>
             </div>
 
-            {{-- Firmas --}}
-            <div class="firmas">
-                <div class="firma-item">
-                    <div class="firma-linea"><span>Firma del Cobrador</span></div>
-                </div>
-                <div class="firma-item">
-                    <div class="firma-linea"><span>Firma del Atleta / Tutor</span></div>
-                </div>
-            </div>
+
         </div>
 
         {{-- FOOTER --}}
