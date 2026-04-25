@@ -90,14 +90,14 @@
             border-radius: 16px;
             box-shadow: 0 4px 24px rgba(0,0,0,0.10);
             width: 100%;
-            max-width: 560px;
+            max-width: 700px; /* Un poco mas ancho para la foto */
             overflow: hidden;
         }
 
         /* ===== HEADER DE LA NOTA ===== */
         .nota-header {
-            background: linear-gradient(135deg, #0b2d69 0%, #06193b 100%);
-            padding: 24px;
+            background: #0b2d69;
+            padding: 30px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -105,70 +105,84 @@
         }
         .nota-header-left { display: flex; align-items: center; gap: 14px; }
         
-        /* Contenedor adaptado para el banner como logo */
         .nota-logo-box { 
-            height: 54px; 
-            width: 140px; 
+            height: 60px; 
+            width: 150px; 
             background-color: white; 
             border-radius: 8px; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
         }
+        .nota-logo-box img { width: 100%; height: auto; }
         
-        .nota-club-name { color: white; font-size: 17px; font-weight: 800; line-height: 1.2; }
-        .nota-club-sub { color: #93c5fd; font-size: 10px; margin-top: 2px; }
+        .nota-club-name { color: white; font-size: 20px; font-weight: 800; line-height: 1.2; }
+        .nota-club-sub { color: #93c5fd; font-size: 11px; margin-top: 2px; }
         .nota-header-right { text-align: right; flex-shrink: 0; }
-        .nota-num-label { color: #93c5fd; font-size: 9px; text-transform: uppercase; letter-spacing: 1px; }
-        .nota-num { color: white; font-size: 22px; font-weight: 900; line-height: 1; }
-        .nota-fecha { color: #bfdbfe; font-size: 10px; margin-top: 4px; }
+        .nota-num-label { color: #93c5fd; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+        .nota-num { color: white; font-size: 28px; font-weight: 900; line-height: 1; margin: 4px 0; }
+        .nota-fecha { color: #bfdbfe; font-size: 11px; margin-bottom: 8px; }
         .badge-pagado {
             display: inline-block;
             background: #22c55e;
             color: white;
-            font-size: 9px;
+            font-size: 10px;
             font-weight: 700;
-            padding: 2px 10px;
+            padding: 4px 14px;
             border-radius: 20px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 6px;
         }
 
         /* ===== CUERPO ===== */
-        .nota-body { padding: 24px; }
+        .nota-body { padding: 30px; }
 
-        .section { margin-bottom: 20px; }
+        .section { margin-bottom: 25px; }
         .section-title {
-            font-size: 9px;
-            font-weight: 700;
+            font-size: 10px;
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.2px;
             color: #94a3b8;
-            margin-bottom: 10px;
-            padding-bottom: 6px;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
             border-bottom: 1px solid #f1f5f9;
         }
 
-        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 20px; }
-        .info-item label { font-size: 9px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 2px; }
-        .info-item span { font-size: 13px; font-weight: 600; color: #1e293b; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px 30px; }
+        .info-item label { font-size: 9px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px; }
+        .info-item span { font-size: 14px; font-weight: 700; color: #1e293b; }
 
-        /* Concepto box */
+        /* Foto Atleta */
+        .athlete-photo-box {
+            width: 85px; height: 85px;
+            border-radius: 14px;
+            border: 3px solid #f1f5f9;
+            overflow: hidden;
+            background: #f8fafc;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .athlete-photo-box img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* Concepto box - ROJO */
         .concepto-box {
-            background: linear-gradient(135deg, #c61c2c, #991220);
-            border-radius: 12px;
-            padding: 16px 18px;
-            margin-bottom: 16px;
+            background: #c61c2c;
+            border-radius: 14px;
+            padding: 24px;
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 12px;
+            color: white;
         }
-        .concepto-box-left .concepto-tipo-label { font-size: 9px; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 0.8px; }
-        .concepto-box-left .concepto-tipo { font-size: 16px; font-weight: 800; color: white; margin-top: 2px; }
-        .concepto-box-left .concepto-desc { font-size: 11px; color: rgba(255,255,255,0.8); margin-top: 4px; }
-        .concepto-box-left .concepto-mes { font-size: 10px; color: rgba(255,255,255,0.65); margin-top: 2px; }
-        .concepto-box-right .monto-label { font-size: 9px; color: rgba(255,255,255,0.7); text-align: right; }
-        .concepto-box-right .monto-valor { font-size: 26px; font-weight: 900; color: white; text-align: right; line-height: 1; }
+        .concepto-tipo-label { font-size: 10px; color: rgba(255,255,255,0.8); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+        .concepto-tipo { font-size: 20px; font-weight: 900; margin-top: 4px; }
+        .concepto-desc { font-size: 12px; color: rgba(255,255,255,0.9); margin-top: 6px; }
+        .concepto-mes { font-size: 11px; color: rgba(255,255,255,0.7); margin-top: 4px; }
+        .monto-label { font-size: 10px; color: rgba(255,255,255,0.8); text-align: right; font-weight: 600; }
+        .monto-valor { font-size: 34px; font-weight: 900; text-align: right; line-height: 1; }
 
         /* Metodo de pago */
         .metodo-row {
@@ -177,86 +191,98 @@
             justify-content: space-between;
             background: #f8fafc;
             border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 12px 16px;
+            border-radius: 12px;
+            padding: 16px 20px;
             margin-bottom: 20px;
         }
-        .metodo-row-label { font-size: 11px; color: #64748b; font-weight: 600; }
+        .metodo-row-label { font-size: 12px; color: #64748b; font-weight: 700; }
         .metodo-badge {
-            font-size: 12px;
-            font-weight: 700;
-            padding: 5px 14px;
+            font-size: 13px;
+            font-weight: 800;
+            padding: 6px 18px;
             border-radius: 20px;
+            background: #dcfce7;
+            color: #15803d;
         }
-        .metodo-efectivo { background: #dcfce7; color: #15803d; }
-        .metodo-qr { background: #dbeafe; color: #1d4ed8; }
-        .metodo-tarjeta { background: #f3e8ff; color: #7c3aed; }
 
         /* Cobrador */
         .cobrador-row {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 15px;
             background: #f8fafc;
             border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 12px 16px;
-            margin-bottom: 20px;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 25px;
         }
         .cobrador-avatar {
-            width: 36px; height: 36px;
+            width: 40px; height: 40px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #0b2d69, #c61c2c);
+            background: #0b2d69;
             display: flex; align-items: center; justify-content: center;
-            color: white; font-weight: 700; font-size: 13px; flex-shrink: 0;
+            color: white; font-weight: 800; font-size: 15px;
         }
-        .cobrador-info label { font-size: 9px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; display: block; }
-        .cobrador-info span { font-size: 13px; font-weight: 600; color: #1e293b; }
+        .cobrador-info label { font-size: 9px; color: #94a3b8; text-transform: uppercase; font-weight: 700; }
+        .cobrador-info span { font-size: 14px; font-weight: 700; color: #1e293b; }
 
         /* Firmas */
-        .firmas { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 8px; }
+        .firmas { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 10px; }
         .firma-item { text-align: center; }
-        .firma-linea { border-top: 1px dashed #cbd5e1; padding-top: 8px; margin-top: 36px; }
-        .firma-linea span { font-size: 10px; color: #94a3b8; }
+        .firma-linea { border-top: 1px dashed #cbd5e1; padding-top: 10px; margin-top: 40px; }
+        .firma-linea span { font-size: 11px; color: #94a3b8; font-weight: 600; }
 
         /* Footer */
         .nota-footer {
             background: #f8fafc;
             border-top: 1px solid #e2e8f0;
-            padding: 14px 24px;
+            padding: 20px;
             text-align: center;
         }
-        .nota-footer p { font-size: 10px; color: #94a3b8; line-height: 1.6; }
-        .nota-footer .highlight { color: #c61c2c; font-weight: 700; }
+        .nota-footer p { font-size: 11px; color: #64748b; line-height: 1.6; }
+        .nota-footer .highlight { color: #c61c2c; font-weight: 800; }
 
-        /* ===== PRINT ===== */
+        /* ===== PRINT (B&W SAVE INK) ===== */
         @media print {
-            @page { size: 5.5in 8.5in; margin: 0.3in; }
-            body { background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            @page { size: portrait; margin: 0.5in; }
+            body { background: white; color: black; }
             .action-bar { display: none !important; }
             .screen-wrapper { padding: 0; display: block; }
-            .nota-card {
-                border-radius: 0;
-                box-shadow: none;
-                max-width: 100%;
-                width: 100%;
+            .nota-card { box-shadow: none; border: 1px solid #000; border-radius: 0; max-width: 100%; }
+            
+            /* Header B&W */
+            .nota-header { background: white !important; border-bottom: 2px solid black; padding: 15px; }
+            .nota-club-name, .nota-num, .nota-num-label, .nota-fecha, .nota-club-sub { color: black !important; }
+            .badge-pagado { border: 1px solid black; color: black !important; background: white !important; }
+            
+            /* Concepto B&W */
+            .concepto-box { 
+                background: white !important; 
+                color: black !important; 
+                border: 2px solid black !important; 
+                padding: 15px;
             }
-            .nota-header,
-            .concepto-box,
-            .badge-pagado,
-            .metodo-badge,
-            .cobrador-avatar { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .concepto-tipo-label, .concepto-desc, .concepto-mes, .monto-label { color: black !important; }
+            
+            /* Otros elementos */
+            .metodo-row, .cobrador-row, .nota-footer { background: white !important; border: 1px solid black !important; }
+            .metodo-badge { background: white !important; border: 1px solid black; color: black !important; }
+            .cobrador-avatar { border: 1px solid black; background: white !important; color: black !important; }
+            .section-title { border-bottom: 1px solid black; color: black !important; }
+            .athlete-photo-box { border: 1px solid black; filter: grayscale(100%); }
+            .nota-logo-box { border: 1px solid black; filter: grayscale(100%); }
         }
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 600px) {
-            .nota-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+            .nota-header { flex-direction: column; align-items: flex-start; gap: 15px; }
             .nota-header-right { text-align: left; }
             .info-grid { grid-template-columns: 1fr; }
             .concepto-box { flex-direction: column; align-items: flex-start; }
-            .concepto-box-right .monto-valor { font-size: 22px; }
-            .concepto-box-right .monto-label { text-align: left; }
-            .firmas { grid-template-columns: 1fr; gap: 16px; }
+            .concepto-box-right { width: 100%; }
+            .monto-valor { font-size: 28px; text-align: left; margin-top: 5px; }
+            .monto-label { text-align: left; }
+            .firmas { grid-template-columns: 1fr; gap: 20px; }
         }
     </style>
 </head>
@@ -307,7 +333,9 @@
         {{-- HEADER --}}
         <div class="nota-header">
             <div class="nota-header-left">
-                <div class="nota-logo-box" style="background-image: url('{{ asset('images/banner-login.jpg') }}'); background-size: 280px auto; background-position: -8px center; background-repeat: no-repeat;"></div>
+                <div class="nota-logo-box">
+                    <img src="{{ public_path('images/banner-login.jpg') }}" alt="Logo" onerror="this.src='{{ asset('images/banner-login.jpg') }}'">
+                </div>
                 <div>
                     <div class="nota-club-name">Club OlimpicSC</div>
                     <div class="nota-club-sub">Santa Cruz, Bolivia</div>
@@ -317,7 +345,7 @@
                 <div class="nota-num-label">Nota de Venta</div>
                 <div class="nota-num">#{{ str_pad($payment->id, 5, "0", STR_PAD_LEFT) }}</div>
                 <div class="nota-fecha">{{ $payment->created_at->format('d/m/Y H:i') }}</div>
-                <div><span class="badge-pagado">✓ Pagado</span></div>
+                <div><span class="badge-pagado">PAGADO</span></div>
             </div>
         </div>
 
@@ -327,23 +355,39 @@
             {{-- Atleta --}}
             <div class="section">
                 <div class="section-title">Datos del Atleta</div>
-                <div class="info-grid">
-                    <div class="info-item">
-                        <label>Nombre Completo</label>
-                        <span>{{ trim($payment->athlete->nombre . ' ' . $payment->athlete->apellido_paterno . ' ' . $payment->athlete->apellido_materno) }}</span>
-                    </div>
-                    <div class="info-item">
-                        <label>Cedula de Identidad</label>
-                        <span>{{ $payment->athlete->ci }}</span>
-                    </div>
-
-                    <div class="info-item">
-                        <label>Categoria</label>
-                        <span>{{ $payment->athlete->category->nombre ?? '—' }}</span>
-                    </div>
-                    <div class="info-item">
-                        <label>Concepto</label>
-                        <span class="text-blue-700">{{ $payment->concepto === 'mensualidad' ? 'Mensualidad' : 'Articulo Deportivo' }}</span>
+                <div style="display: flex; gap: 20px; align-items: flex-start;">
+                    @if($payment->athlete->foto)
+                        <div class="athlete-photo-box">
+                            @php
+                                $fotoPath = $payment->athlete->foto;
+                                if (!str_starts_with($fotoPath, 'http')) {
+                                    $fotoPath = public_path('storage/' . $fotoPath);
+                                }
+                            @endphp
+                            <img src="{{ $fotoPath }}" alt="Foto Atleta">
+                        </div>
+                    @else
+                        <div class="athlete-photo-box" style="display: flex; align-items: center; justify-content: center; background: #eff6ff; color: #2563eb; font-weight: 800; font-size: 24px;">
+                            {{ substr($payment->athlete->nombre, 0, 1) }}{{ substr($payment->athlete->apellido_paterno, 0, 1) }}
+                        </div>
+                    @endif
+                    <div class="info-grid" style="flex: 1;">
+                        <div class="info-item">
+                            <label>Nombre Completo</label>
+                            <span>{{ trim($payment->athlete->nombre . ' ' . $payment->athlete->apellido_paterno . ' ' . $payment->athlete->apellido_materno) }}</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Cedula de Identidad</label>
+                            <span>{{ $payment->athlete->ci }}</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Categoria</label>
+                            <span>{{ $payment->athlete->category->nombre ?? '—' }}</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Concepto</label>
+                            <span class="text-blue-700">{{ $payment->concepto === 'mensualidad' ? 'Mensualidad' : 'Articulo Deportivo' }}</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -380,7 +424,7 @@
 
             {{-- Metodo de pago --}}
             @php
-                $metodoLabel = ['efectivo' => '💵 Efectivo', 'qr' => '📱 QR', 'tarjeta' => '💳 Tarjeta'][$payment->metodo_pago] ?? $payment->metodo_pago;
+                $metodoLabel = ['efectivo' => 'Efectivo', 'qr' => 'QR', 'tarjeta' => 'Tarjeta'][$payment->metodo_pago] ?? $payment->metodo_pago;
                 $metodoClass = ['efectivo' => 'metodo-efectivo', 'qr' => 'metodo-qr', 'tarjeta' => 'metodo-tarjeta'][$payment->metodo_pago] ?? '';
             @endphp
             <div class="metodo-row">
