@@ -94,20 +94,20 @@
         /* ===== HEADER DE LA NOTA ===== */
         .nota-header {
             background: #0b2d69;
-            padding: 30px;
+            padding: 15px 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 16px;
+            gap: 12px;
         }
-        .nota-header-left { display: flex; align-items: center; gap: 14px; }
+        .nota-header-left { display: flex; align-items: center; gap: 10px; }
         
         .nota-logo-box { 
-            height: 60px; 
-            width: 150px; 
+            height: 40px; 
+            width: 100px; 
             background-color: white; 
-            border-radius: 8px; 
-            padding: 5px;
+            border-radius: 6px; 
+            padding: 3px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -115,27 +115,27 @@
         }
         .nota-logo-box img { width: 100%; height: auto; }
         
-        .nota-club-name { color: white; font-size: 20px; font-weight: 800; line-height: 1.2; }
-        .nota-club-sub { color: #93c5fd; font-size: 11px; margin-top: 2px; }
+        .nota-club-name { color: white; font-size: 16px; font-weight: 800; line-height: 1.1; }
+        .nota-club-sub { color: #93c5fd; font-size: 9px; margin-top: 1px; }
         .nota-header-right { text-align: right; flex-shrink: 0; }
-        .nota-num-label { color: #93c5fd; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
-        .nota-num { color: white; font-size: 28px; font-weight: 900; line-height: 1; margin: 4px 0; }
-        .nota-fecha { color: #bfdbfe; font-size: 11px; margin-bottom: 8px; }
+        .nota-num-label { color: #93c5fd; font-size: 8px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; }
+        .nota-num { color: white; font-size: 18px; font-weight: 900; line-height: 1; margin: 2px 0; }
+        .nota-fecha { color: #bfdbfe; font-size: 9px; margin-bottom: 4px; }
         .badge-pagado {
             display: inline-block;
             background: #22c55e;
             color: white;
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 700;
-            padding: 4px 14px;
+            padding: 2px 10px;
             border-radius: 20px;
             text-transform: uppercase;
         }
 
         /* ===== CUERPO ===== */
-        .nota-body { padding: 20px 30px; }
+        .nota-body { padding: 15px 20px; }
 
-        .section { margin-bottom: 15px; }
+        .section { margin-bottom: 12px; }
         .section-title {
             font-size: 10px;
             font-weight: 800;
@@ -147,30 +147,30 @@
             border-bottom: 1px solid #f1f5f9;
         }
 
-        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px 30px; }
-        .info-item label { font-size: 9px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px; }
-        .info-item span { font-size: 14px; font-weight: 700; color: #1e293b; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 20px; }
+        .info-item label { font-size: 8px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 2px; }
+        .info-item span { font-size: 12px; font-weight: 700; color: #1e293b; }
 
 
 
         /* Concepto box - ROJO */
         .concepto-box {
             background: #c61c2c;
-            border-radius: 14px;
-            padding: 24px;
-            margin-bottom: 20px;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 12px;
+            gap: 10px;
             color: white;
         }
-        .concepto-tipo-label { font-size: 10px; color: rgba(255,255,255,0.8); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
-        .concepto-tipo { font-size: 20px; font-weight: 900; margin-top: 4px; }
-        .concepto-desc { font-size: 12px; color: rgba(255,255,255,0.9); margin-top: 6px; }
-        .concepto-mes { font-size: 11px; color: rgba(255,255,255,0.7); margin-top: 4px; }
-        .monto-label { font-size: 10px; color: rgba(255,255,255,0.8); text-align: right; font-weight: 600; }
-        .monto-valor { font-size: 34px; font-weight: 900; text-align: right; line-height: 1; }
+        .concepto-tipo-label { font-size: 8px; color: rgba(255,255,255,0.8); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+        .concepto-tipo { font-size: 16px; font-weight: 900; margin-top: 2px; }
+        .concepto-desc { font-size: 10px; color: rgba(255,255,255,0.9); margin-top: 3px; }
+        .concepto-mes { font-size: 9px; color: rgba(255,255,255,0.7); margin-top: 2px; }
+        .monto-label { font-size: 8px; color: rgba(255,255,255,0.8); text-align: right; font-weight: 600; }
+        .monto-valor { font-size: 24px; font-weight: 900; text-align: right; line-height: 1; }
 
         /* Metodo de pago */
         .metodo-row {
@@ -179,15 +179,15 @@
             justify-content: space-between;
             background: #f8fafc;
             border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 16px 20px;
-            margin-bottom: 20px;
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin-bottom: 12px;
         }
-        .metodo-row-label { font-size: 12px; color: #64748b; font-weight: 700; }
+        .metodo-row-label { font-size: 10px; color: #64748b; font-weight: 700; }
         .metodo-badge {
-            font-size: 13px;
+            font-size: 11px;
             font-weight: 800;
-            padding: 6px 18px;
+            padding: 4px 12px;
             border-radius: 20px;
             background: #dcfce7;
             color: #15803d;
@@ -197,22 +197,22 @@
         .cobrador-row {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
             background: #f8fafc;
             border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 16px 20px;
-            margin-bottom: 25px;
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin-bottom: 15px;
         }
         .cobrador-avatar {
-            width: 40px; height: 40px;
+            width: 30px; height: 30px;
             border-radius: 50%;
             background: #0b2d69;
             display: flex; align-items: center; justify-content: center;
-            color: white; font-weight: 800; font-size: 15px;
+            color: white; font-weight: 800; font-size: 12px;
         }
-        .cobrador-info label { font-size: 9px; color: #94a3b8; text-transform: uppercase; font-weight: 700; }
-        .cobrador-info span { font-size: 14px; font-weight: 700; color: #1e293b; }
+        .cobrador-info label { font-size: 8px; color: #94a3b8; text-transform: uppercase; font-weight: 700; }
+        .cobrador-info span { font-size: 12px; font-weight: 700; color: #1e293b; }
 
 
 
@@ -220,10 +220,10 @@
         .nota-footer {
             background: #f8fafc;
             border-top: 1px solid #e2e8f0;
-            padding: 20px;
+            padding: 12px;
             text-align: center;
         }
-        .nota-footer p { font-size: 11px; color: #64748b; line-height: 1.6; }
+        .nota-footer p { font-size: 9px; color: #64748b; line-height: 1.4; }
         .nota-footer .highlight { color: #c61c2c; font-weight: 800; }
 
         /* ===== PRINT (B&W SAVE INK) ===== */
