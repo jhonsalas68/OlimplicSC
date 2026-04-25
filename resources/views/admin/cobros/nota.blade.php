@@ -398,16 +398,14 @@
 
             {{-- Cobrador --}}
             @php
-                $cobradorNombre = trim(($payment->cobrador->nombre ?? '') . ' ' . ($payment->cobrador->apellido_paterno ?? ''));
-                if(!$cobradorNombre) $cobradorNombre = $payment->cobrador->name ?? 'Sistema';
-                $cobradorIniciales = strtoupper(substr($cobradorNombre, 0, 1));
+                $cobradorNombre = trim(
+                    ($payment->cobrador?->name ?? '') . ' ' . 
+                    ($payment->cobrador?->apellido_paterno ?? '') . ' ' . 
+                    ($payment->cobrador?->apellido_materno ?? '')
+                );
+                if(!$cobradorNombre) $cobradorNombre = 'Sistema';
             @endphp
             <div class="cobrador-row">
-                @if($payment->cobrador && $payment->cobrador->avatar)
-                    <img src="{{ $payment->cobrador->avatar_url }}" class="cobrador-avatar object-cover" alt="Avatar">
-                @else
-                    <div class="cobrador-avatar">{{ $cobradorIniciales }}</div>
-                @endif
                 <div class="cobrador-info">
                     <label>Cobrado por</label>
                     <span>{{ $cobradorNombre }}</span>
