@@ -17,13 +17,15 @@
         /* ===== BARRA DE ACCIONES (solo pantalla) ===== */
         .action-bar {
             background: #0b2d69;
-            padding: 12px 24px;
+            padding: 15px 30px;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            width: 100%;
             position: sticky;
             top: 0;
             z-index: 100;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
         .action-bar-title { color: white; font-size: 14px; font-weight: 600; }
         .action-bar-title span { color: #93c5fd; }
@@ -359,12 +361,24 @@
                     @if($payment->athlete->foto)
                         <div class="athlete-photo-box">
                             @php
-                                $fotoPath = $payment->athlete->foto;
-                                if (!str_starts_with($fotoPath, 'http')) {
-                                    $fotoPath = public_path('storage/' . $fotoPath);
+                                $fotoRaw = $payment->athlete->foto;
+                                $fotoFinal = null;
+                                
+                                if (str_starts_with($fotoRaw, 'http')) {
+                                    $fotoFinal = $fotoRaw;
+                                } else {
+                                    // Base64 encoding for PDF reliability
+                                    $fullPath = public_path('storage/' . $fotoRaw);
+                                    if (file_exists($fullPath)) {
+                                        $type = pathinfo($fullPath, PATHINFO_EXTENSION);
+                                        $data = file_get_contents($fullPath);
+                                        $fotoFinal = 'data:image/' . $type . ';base64,' . base64_encode($data);
+                                    } else {
+                                        $fotoFinal = asset('storage/' . $fotoRaw);
+                                    }
                                 }
                             @endphp
-                            <img src="{{ $fotoPath }}" alt="Foto Atleta">
+                            <img src="{{ $fotoFinal }}" alt="Foto Atleta">
                         </div>
                     @else
                         <div class="athlete-photo-box" style="display: flex; align-items: center; justify-content: center; background: #eff6ff; color: #2563eb; font-weight: 800; font-size: 24px;">
