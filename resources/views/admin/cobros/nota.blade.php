@@ -317,11 +317,8 @@
         {{-- HEADER --}}
         <div class="nota-header">
             <div class="nota-header-left">
-                <div class="nota-logo-box">
-                    <img src="{{ public_path('images/banner-login.jpg') }}" alt="Logo" onerror="this.src='{{ asset('images/banner-login.jpg') }}'">
-                </div>
                 <div>
-                    <div class="nota-club-name">Club OlimpicSC</div>
+                    <div class="nota-club-name">Club Olympic SC</div>
                     <div class="nota-club-sub">Santa Cruz, Bolivia</div>
                 </div>
             </div>
@@ -423,7 +420,7 @@
         {{-- FOOTER --}}
         <div class="nota-footer">
             <p>
-                <span class="highlight">Club OlimpicSC</span> &middot;
+                <span class="highlight">Club Olympic SC</span> &middot;
                 club.olympic.sc@gmail.com &middot; +591 69039107
             </p>
             <p>Calle Ignacio Salvatierra, Cuarto Anillo y Radial 27, Santa Cruz, Bolivia</p>
