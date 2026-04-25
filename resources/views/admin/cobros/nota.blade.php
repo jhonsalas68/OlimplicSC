@@ -59,6 +59,22 @@
             transition: background 0.2s;
         }
         .btn-print:hover { background: #9b1421; }
+        .btn-whatsapp {
+            background: #25d366;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.2s;
+            text-decoration: none;
+        }
+        .btn-whatsapp:hover { background: #128c7e; }
 
         /* ===== CONTENEDOR PANTALLA ===== */
         .screen-wrapper {
@@ -247,6 +263,7 @@
 <body>
 
 {{-- BARRA DE ACCIONES --}}
+@if(!isset($esPublico) || !$esPublico)
 <div class="action-bar">
     <div class="action-bar-title">
         Nota de Venta <span>#{{ str_pad($payment->id, 5, "0", STR_PAD_LEFT) }}</span>
@@ -258,8 +275,30 @@
         <button onclick="window.print()" class="btn-print">
             🖨 Imprimir
         </button>
+        @if($payment->whatsapp_number)
+            @php
+                $atletaNombre = trim($payment->athlete->nombre . ' ' . $payment->athlete->apellido_paterno);
+                $conceptoLabel = $payment->concepto === 'mensualidad' ? 'Mensualidad' : 'Artículo Deportivo';
+                $montoFormatted = number_format($payment->monto, 2);
+                $publicUrl = route('cobros.download_pdf', $payment->external_id);
+                $mensaje = "Hola {$atletaNombre}, esta es su nota de venta de OlimpicSC.\n\n" .
+                           "*Detalle:* {$conceptoLabel}\n" .
+                           "*Monto:* Bs. {$montoFormatted}\n" .
+                           "*Fecha:* " . $payment->created_at->format('d/m/Y') . "\n\n" .
+                           "*Descargar PDF:* {$publicUrl}\n\n" .
+                           "¡Gracias por su pago!";
+                $waUrl = "https://wa.me/591" . $payment->whatsapp_number . "?text=" . urlencode($mensaje);
+            @endphp
+            <a href="{{ $waUrl }}" target="_blank" class="btn-whatsapp">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.246 2.248 3.484 5.237 3.483 8.417-.003 6.557-5.338 11.892-11.893 11.892-1.997-.001-3.951-.5-5.688-1.448l-6.308 1.652zm6.799-3.814c1.543.917 3.31 1.398 5.103 1.399h.005c5.454 0 9.893-4.438 9.895-9.892.001-2.641-1.027-5.127-2.896-6.996s-4.355-2.896-6.998-2.897c-5.453 0-9.891 4.439-9.894 9.894-.001 1.756.459 3.468 1.329 4.972l-.875 3.195 3.268-.857zm11.361-4.947c-.273-.137-1.62-.8-1.87-.891-.249-.09-.431-.137-.613.137-.182.273-.706.891-.865 1.072-.158.182-.317.204-.59.068-.273-.137-1.15-.424-2.19-1.353-.809-.721-1.355-1.612-1.513-1.886-.158-.273-.017-.422.12-.558.122-.122.273-.318.409-.477.136-.159.182-.273.272-.455.09-.181.046-.341-.023-.477-.068-.137-.613-1.477-.841-2.022-.222-.533-.448-.46-.613-.468h-.523c-.182 0-.477.067-.727.341-.25.272-.954.932-.954 2.271 0 1.34.977 2.636 1.114 2.818.136.182 1.921 2.934 4.653 4.111.649.279 1.157.446 1.552.571.652.207 1.245.178 1.713.108.522-.078 1.62-.662 1.848-1.27.227-.609.227-1.133.159-1.272-.068-.138-.25-.227-.523-.364z"/>
+                </svg>
+                WhatsApp
+            </a>
+        @endif
     </div>
 </div>
+@endif
 
 {{-- CONTENIDO --}}
 <div class="screen-wrapper">

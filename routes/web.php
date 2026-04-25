@@ -102,3 +102,7 @@ Route::middleware(['auth', 'prevent-back-history'])->prefix('admin')->group(func
         Route::get('/activity-logs', [\App\Http\Controllers\Admin\ActivityLogController::class, 'index'])->name('admin.activity-logs.index');
     });
 });
+
+// Public Routes for Receipts (External Access)
+Route::get('/nota-publica/{external_id}', [\App\Http\Controllers\Admin\CobrosController::class, 'notaPublica'])->name('cobros.nota_publica');
+Route::get('/nota-pdf/{external_id}', [\App\Http\Controllers\Admin\CobrosController::class, 'downloadPublicPdf'])->name('cobros.download_pdf');

@@ -19,7 +19,19 @@ class Payment extends Model
         'descripcion',
         'cobrado_por',
         'metodo_pago',
+        'whatsapp_number',
+        'external_id',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+        static::creating(function ($model) {
+            if (empty($model->external_id)) {
+                $model->external_id = (string) \Illuminate\Support\Str::uuid();
+            }
+        });
+    }
 
     public function athlete(): BelongsTo
     {

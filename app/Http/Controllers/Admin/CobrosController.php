@@ -94,6 +94,7 @@ class CobrosController extends Controller
             'descripcion'         => 'nullable|string|max:255',
             'monto'               => 'required|numeric|min:0.01',
             'metodo_pago'         => 'required|in:efectivo,qr',
+            'whatsapp_number'     => 'nullable|string|max:20',
         ]);
 
         $payment = Payment::create([
@@ -103,6 +104,7 @@ class CobrosController extends Controller
             'descripcion'         => $validated['descripcion'] ?? null,
             'monto'               => $validated['monto'],
             'metodo_pago'         => $validated['metodo_pago'],
+            'whatsapp_number'     => $validated['whatsapp_number'] ?? null,
             'estado_pago'         => 'pagado',
             'cobrado_por'         => Auth::id(),
         ]);
@@ -123,5 +125,29 @@ class CobrosController extends Controller
     {
         $payment->load('athlete.category', 'cobrador');
         return view('admin.cobros.nota', compact('payment'));
+    }
+
+    /** Nota de venta pública (sin auth) */
+    public function notaPublica($external_id)
+    {
+        $payment = Payment::where('external_id', $external_id)->firstOrFail();
+        $payment->load('athlete.category', 'cobrador');
+        
+        // Pasamos una variable para ocultar botones administrativos en la vista pública si fuera necesario
+        $esPublico = true;
+        return view('admin.cobros.nota', compact('payment', 'esPublico'));
+    }
+
+    /** Descargar PDF público */
+    public function downloadPublicPdf($external_id)
+    {
+        $payment = Payment::where('external_id', $external_id)->firstOrFail();
+        $payment->load('athlete.category', 'cobrador');
+        
+        $esPublico = true;
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.cobros.nota', compact('payment', 'esPublico'))
+                  ->setPaper('a4', 'portrait');
+                  
+        return $pdf->stream('nota_venta_' . $payment->id . '.pdf');
     }
 }

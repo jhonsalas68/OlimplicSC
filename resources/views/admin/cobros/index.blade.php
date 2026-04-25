@@ -136,6 +136,22 @@
                     </div>
                 </div>
 
+                <div class="mb-6">
+                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">
+                        WhatsApp para Nota <span class="text-slate-400 font-normal normal-case">(opcional)</span>
+                    </label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-3 flex items-center text-slate-400">
+                            <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.246 2.248 3.484 5.237 3.483 8.417-.003 6.557-5.338 11.892-11.893 11.892-1.997-.001-3.951-.5-5.688-1.448l-6.308 1.652zm6.799-3.814c1.543.917 3.31 1.398 5.103 1.399h.005c5.454 0 9.893-4.438 9.895-9.892.001-2.641-1.027-5.127-2.896-6.996s-4.355-2.896-6.998-2.897c-5.453 0-9.891 4.439-9.894 9.894-.001 1.756.459 3.468 1.329 4.972l-.875 3.195 3.268-.857zm11.361-4.947c-.273-.137-1.62-.8-1.87-.891-.249-.09-.431-.137-.613.137-.182.273-.706.891-.865 1.072-.158.182-.317.204-.59.068-.273-.137-1.15-.424-2.19-1.353-.809-.721-1.355-1.612-1.513-1.886-.158-.273-.017-.422.12-.558.122-.122.273-.318.409-.477.136-.159.182-.273.272-.455.09-.181.046-.341-.023-.477-.068-.137-.613-1.477-.841-2.022-.222-.533-.448-.46-.613-.468h-.523c-.182 0-.477.067-.727.341-.25.272-.954.932-.954 2.271 0 1.34.977 2.636 1.114 2.818.136.182 1.921 2.934 4.653 4.111.649.279 1.157.446 1.552.571.652.207 1.245.178 1.713.108.522-.078 1.62-.662 1.848-1.27.227-.609.227-1.133.159-1.272-.068-.138-.25-.227-.523-.364z"/>
+                            </svg>
+                        </span>
+                        <input type="tel" name="whatsapp_number" placeholder="7XXXXXXXX"
+                               class="w-full pl-10 pr-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                               title="Ingresa el número de celular para enviar la nota">
+                    </div>
+                </div>
+
                 <button type="submit" class="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-xl shadow-sm transition-all flex items-center justify-center gap-2">
                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
