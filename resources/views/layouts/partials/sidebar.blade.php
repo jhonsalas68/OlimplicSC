@@ -23,7 +23,8 @@
 
             @if(auth()->user()->hasRole('Coach'))
             {{-- ===== SIDEBAR COACH ===== --}}
-            <h3 class="px-4 text-[10px] font-black text-blue-300 uppercase tracking-[0.2em] mb-3 opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+            <h3 class="px-4 text-[10px] font-black text-blue-300 uppercase tracking-[0.2em] mb-3 transition-opacity duration-300 whitespace-nowrap"
+                :class="sidebarOpen ? 'opacity-100' : 'opacity-0 group-hover/sidebar:opacity-100'">
                 Estrategia
             </h3>
 
@@ -35,7 +36,8 @@
 
             @else
             {{-- ===== SIDEBAR ADMIN ===== --}}
-            <h3 class="px-4 text-[10px] font-black text-blue-300 uppercase tracking-[0.2em] mb-3 opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+            <h3 class="px-4 text-[10px] font-black text-blue-300 uppercase tracking-[0.2em] mb-3 transition-opacity duration-300 whitespace-nowrap"
+                :class="sidebarOpen ? 'opacity-100' : 'opacity-0 group-hover/sidebar:opacity-100'">
                 Administración
             </h3>
 
@@ -46,7 +48,8 @@
             <x-sidebar-link href="{{ route('users.index') }}" icon="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" label="Usuarios y Roles" :active="request()->routeIs('users.*')" />
 
             <div class="pt-6">
-                <h3 class="px-4 text-[10px] font-black text-blue-300 uppercase tracking-[0.2em] mb-3 opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+                <h3 class="px-4 text-[10px] font-black text-blue-300 uppercase tracking-[0.2em] mb-3 transition-opacity duration-300 whitespace-nowrap"
+                    :class="sidebarOpen ? 'opacity-100' : 'opacity-0 group-hover/sidebar:opacity-100'">
                     Finanzas & Operación
                 </h3>
 
@@ -61,7 +64,8 @@
 
             @if(auth()->user()->hasRole('SuperAdmin'))
             <div class="pt-6">
-                <h3 class="px-4 text-[10px] font-black text-blue-300 uppercase tracking-[0.2em] mb-3 opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+                <h3 class="px-4 text-[10px] font-black text-blue-300 uppercase tracking-[0.2em] mb-3 transition-opacity duration-300 whitespace-nowrap"
+                    :class="sidebarOpen ? 'opacity-100' : 'opacity-0 group-hover/sidebar:opacity-100'">
                     Sistema & Soporte
                 </h3>
                 <x-sidebar-link href="{{ route('superadmin.index') }}" icon="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" label="Mantenimiento" :active="request()->routeIs('superadmin.*')" />
@@ -82,7 +86,8 @@
                      src="{{ auth()->user()->avatar_url }}" alt="Avatar">
                 <span class="absolute -bottom-1 -right-1 h-4 w-4 bg-emerald-500 border-2 border-[#0b2d69] rounded-full"></span>
             </div>
-            <div class="ml-3 min-w-0 opacity-0 group-hover/sidebar:opacity-100 transition-all duration-300 flex-1">
+            <div class="ml-3 min-w-0 transition-all duration-300 flex-1"
+                 :class="sidebarOpen ? 'opacity-100' : 'opacity-0 group-hover/sidebar:opacity-100'">
                 <p class="text-sm font-bold text-white truncate leading-none mb-1">{{ auth()->user()->name ?? 'Usuario' }}</p>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf

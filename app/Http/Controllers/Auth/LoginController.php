@@ -23,7 +23,14 @@ class LoginController extends Controller
 
         $user = User::where('username', $credentials['username'])->first();
 
-        if ($user && !$user->is_active) {
+        if (!$user) {
+            \App\Services\ActivityLogger::logGuest('login_fallido', "Usuario no encontrado: {$credentials['username']}");
+            return back()->withErrors([
+                'username' => 'No existe ese usuario.',
+            ]);
+        }
+
+        if (!$user->is_active) {
             \App\Services\ActivityLogger::logGuest('login_fallido', "Intento de inicio de sesión de usuario inactivo: {$credentials['username']}");
             return back()->withErrors([
                 'username' => 'Tu cuenta no está habilitada. Contacta al administrador.',
@@ -43,9 +50,9 @@ class LoginController extends Controller
             return redirect()->intended('/admin/dashboard');
         }
 
-        \App\Services\ActivityLogger::logGuest('login_fallido', "Credenciales incorrectas para el usuario: {$credentials['username']}");
+        \App\Services\ActivityLogger::logGuest('login_fallido', "Contraseña incorrecta para el usuario: {$credentials['username']}");
         return back()->withErrors([
-            'username' => 'Las credenciales proporcionadas no coinciden con nuestros registros.',
+            'password' => 'Contraseña incorrecta.',
         ]);
     }
 
