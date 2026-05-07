@@ -49,8 +49,17 @@ class PaymentController extends Controller
             $query->where('concepto', $request->concepto);
         }
 
+        if ($request->filled('estado_pago')) {
+            $query->where('estado_pago', $request->estado_pago);
+        }
+
+        if ($request->filled('category_id')) {
+            $query->whereHas('athlete', fn($q) => $q->where('category_id', $request->category_id));
+        }
+
         $payments = $query->latest()->paginate(15);
-        return view('admin.payments.index', compact('payments'));
+        $categories = \App\Models\Category::all();
+        return view('admin.payments.index', compact('payments', 'categories'));
     }
 
     public function exportPdf(Request $request)
@@ -102,6 +111,10 @@ class PaymentController extends Controller
         }
         if ($request->filled('metodo'))  $query->where('metodo_pago', $request->metodo);
         if ($request->filled('concepto')) $query->where('concepto', $request->concepto);
+        if ($request->filled('estado_pago')) $query->where('estado_pago', $request->estado_pago);
+        if ($request->filled('category_id')) {
+            $query->whereHas('athlete', fn($q) => $q->where('category_id', $request->category_id));
+        }
     }
 
     private function filtrosLabel(Request $request): string

@@ -48,6 +48,14 @@ class AthleteController extends Controller
                 $query->where('genero', $request->genero);
             }
 
+            if ($request->filled('tiene_seguro')) {
+                $query->where('tiene_seguro', $request->tiene_seguro);
+            }
+
+            if ($request->filled('estado')) {
+                $query->where('habilitado_booleano', $request->estado);
+            }
+
             if ($request->filled('deuda')) {
                 if ($request->deuda === 'al_dia') {
                     $query->alDia();
@@ -61,7 +69,8 @@ class AthleteController extends Controller
 
             // Agrupación por categorías para el dashboard inicial
             $athletesByCategory = [];
-            if (!$request->filled('category_id') && !$request->filled('search')) {
+            $hasFilters = $request->filled('search') || $request->filled('category_id') || $request->filled('genero') || $request->filled('deuda') || $request->filled('tiene_seguro') || $request->filled('estado');
+            if (!$hasFilters) {
                 foreach ($categories as $cat) {
                     $catAtletas = Athlete::where('category_id', $cat->id)->take(3)->get();
                     if ($catAtletas->isNotEmpty()) {

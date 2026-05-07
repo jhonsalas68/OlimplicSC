@@ -59,7 +59,7 @@
 
 {{-- FILTROS AVANZADOS --}}
 <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/40 mb-10" x-data="{ rango: '{{ $stats['rango'] }}' }">
-    <form method="GET" action="{{ route('admin.reports.index') }}" class="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
+    <form method="GET" action="{{ route('admin.reports.index') }}" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
         <div>
             <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Modalidad de Filtro</label>
             <select name="rango" x-model="rango" class="w-full bg-slate-50 border border-slate-100 text-slate-700 rounded-2xl px-4 py-3 outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-600 font-bold appearance-none cursor-pointer">
@@ -108,9 +108,28 @@
             <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Método</label>
             <select name="metodo" class="w-full bg-slate-50 border border-slate-100 text-slate-700 rounded-2xl px-4 py-3 outline-none focus:ring-4 focus:ring-blue-100 font-bold appearance-none cursor-pointer">
                 <option value="todos">Todos los métodos</option>
-                <option value="efectivo" {{ $stats['metodo'] === 'efectivo' ? 'selected' : '' }}>💵 Efectivo</option>
-                <option value="qr" {{ $stats['metodo'] === 'qr' ? 'selected' : '' }}>📱 QR</option>
-                <option value="tarjeta" {{ $stats['metodo'] === 'tarjeta' ? 'selected' : '' }}>💳 Tarjeta</option>
+                <option value="efectivo" {{ request('metodo') === 'efectivo' ? 'selected' : '' }}>💵 Efectivo</option>
+                <option value="qr" {{ request('metodo') === 'qr' ? 'selected' : '' }}>📱 QR</option>
+                <option value="tarjeta" {{ request('metodo') === 'tarjeta' ? 'selected' : '' }}>💳 Tarjeta</option>
+            </select>
+        </div>
+
+        <div>
+            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Concepto</label>
+            <select name="concepto" class="w-full bg-slate-50 border border-slate-100 text-slate-700 rounded-2xl px-4 py-3 outline-none focus:ring-4 focus:ring-blue-100 font-bold appearance-none cursor-pointer">
+                <option value="todos">Todos los conceptos</option>
+                <option value="mensualidad" {{ request('concepto') === 'mensualidad' ? 'selected' : '' }}>Mensualidad</option>
+                <option value="articulo_deportivo" {{ request('concepto') === 'articulo_deportivo' ? 'selected' : '' }}>Artículo Deportivo</option>
+            </select>
+        </div>
+
+        <div>
+            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Categoría</label>
+            <select name="category_id" class="w-full bg-slate-50 border border-slate-100 text-slate-700 rounded-2xl px-4 py-3 outline-none focus:ring-4 focus:ring-blue-100 font-bold appearance-none cursor-pointer">
+                <option value="todas">Todas las categorías</option>
+                @foreach($stats['categories'] ?? [] as $cat)
+                    <option value="{{ $cat->id }}" {{ request('category_id') == $cat->id ? 'selected' : '' }}>{{ $cat->nombre }}</option>
+                @endforeach
             </select>
         </div>
 

@@ -19,7 +19,7 @@
 {{-- FILTROS --}}
 <form action="{{ route('payments.index') }}" method="GET" id="filtros-form">
 <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 mb-5">
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 items-end">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-8 gap-4 items-end">
 
         {{-- Búsqueda --}}
         <div class="lg:col-span-2">
@@ -62,6 +62,28 @@
             </select>
         </div>
 
+        {{-- Categoría --}}
+        <div class="sm:col-span-1">
+            <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Categoría</label>
+            <select name="category_id" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">Todas</option>
+                @foreach($categories as $cat)
+                    <option value="{{ $cat->id }}" {{ request('category_id') == $cat->id ? 'selected' : '' }}>{{ $cat->nombre }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        {{-- Estado --}}
+        <div class="sm:col-span-1">
+            <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Estado</label>
+            <select name="estado_pago" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">Todos</option>
+                <option value="pagado" {{ request('estado_pago') == 'pagado' ? 'selected' : '' }}>Pagado</option>
+                <option value="pendiente" {{ request('estado_pago') == 'pendiente' ? 'selected' : '' }}>Pendiente</option>
+                <option value="devuelto" {{ request('estado_pago') == 'devuelto' ? 'selected' : '' }}>Devuelto</option>
+            </select>
+        </div>
+
         {{-- Botones --}}
         <div class="flex gap-2 sm:col-span-1 lg:col-span-1">
             <button type="submit"
@@ -81,7 +103,7 @@
 @php
     $totalMonto   = $payments->sum('monto');
     $mesLabel     = request('mes') ? \Carbon\Carbon::createFromFormat('Y-m', request('mes'))->translatedFormat('F Y') : 'Todos los meses';
-    $queryString  = http_build_query(array_filter(request()->only(['search','mes','metodo','concepto'])));
+    $queryString  = http_build_query(array_filter(request()->only(['search','mes','metodo','concepto','estado_pago','category_id'])));
 @endphp
 <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
     <div class="flex items-center gap-3 flex-wrap">

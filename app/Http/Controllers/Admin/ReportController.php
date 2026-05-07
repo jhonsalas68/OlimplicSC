@@ -39,6 +39,16 @@ class ReportController extends Controller
         if ($metodo !== 'todos') {
             $query->where('metodo_pago', $metodo);
         }
+
+        $concepto = $request->get('concepto', 'todos');
+        if ($concepto !== 'todos') {
+            $query->where('concepto', $concepto);
+        }
+
+        $categoria = $request->get('category_id', 'todas');
+        if ($categoria !== 'todas') {
+            $query->whereHas('athlete', fn($q) => $q->where('category_id', $categoria));
+        }
         
         // Optimización: Cálculos de totales en una sola consulta de base de datos (Ultra rápido)
         $totales = (clone $query)->selectRaw("
@@ -85,6 +95,7 @@ class ReportController extends Controller
             'por_metodo' => $porMetodo,
             'pagos' => $pagosFiltrados,
             'historial_meses' => $historialMeses,
+            'categories' => \App\Models\Category::all(),
         ];
 
         return view('admin.reports.index', compact('stats'));
@@ -116,6 +127,16 @@ class ReportController extends Controller
         
         if ($metodo !== 'todos') {
             $query->where('metodo_pago', $metodo);
+        }
+        
+        $concepto = $request->get('concepto', 'todos');
+        if ($concepto !== 'todos') {
+            $query->where('concepto', $concepto);
+        }
+
+        $categoria = $request->get('category_id', 'todas');
+        if ($categoria !== 'todas') {
+            $query->whereHas('athlete', fn($q) => $q->where('category_id', $categoria));
         }
         
         $pagosFiltrados = $query->with(['athlete.category'])->latest()->get();
@@ -153,6 +174,16 @@ class ReportController extends Controller
         
         if ($metodo !== 'todos') {
             $query->where('metodo_pago', $metodo);
+        }
+
+        $concepto = $request->get('concepto', 'todos');
+        if ($concepto !== 'todos') {
+            $query->where('concepto', $concepto);
+        }
+
+        $categoria = $request->get('category_id', 'todas');
+        if ($categoria !== 'todas') {
+            $query->whereHas('athlete', fn($q) => $q->where('category_id', $categoria));
         }
         
         $pagos = $query->with(['athlete', 'cobrador'])->latest()->get();

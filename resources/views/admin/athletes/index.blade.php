@@ -10,40 +10,66 @@
 
 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-10">
     <div class="flex items-center w-full lg:w-auto">
-        <form action="{{ route('athletes.index') }}" method="GET" id="filter-form" class="flex flex-col sm:flex-row items-center gap-4 w-full">
-
-            <div class="flex items-center gap-2 w-full sm:w-auto">
-                <div class="relative group w-full sm:w-80">
+        <form action="{{ route('athletes.index') }}" method="GET" id="filter-form" class="flex flex-col lg:flex-row flex-wrap items-center gap-3 w-full">
+            <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                <div class="relative group w-full sm:w-64">
                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                         <svg class="h-5 w-5 text-slate-400 group-hover:text-blue-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
                     </div>
                     <input type="text" name="search" value="{{ request('search') }}"
-                           class="block w-full pl-12 pr-4 py-3.5 border border-slate-200 rounded-2xl leading-5 bg-white placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 sm:text-sm transition-all shadow-sm"
+                           class="block w-full pl-12 pr-4 py-3 border border-slate-200 rounded-2xl leading-5 bg-white placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 sm:text-sm transition-all shadow-sm"
                            placeholder="Buscar por nombre o DNI...">
                 </div>
-                <button type="submit" class="inline-flex items-center justify-center px-6 py-3.5 bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl transition-all shadow-lg shadow-blue-200/50">
+                <button type="submit" class="inline-flex items-center justify-center px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl transition-all shadow-lg shadow-blue-200/50">
                     Buscar
                 </button>
             </div>
 
-            <select name="deuda" onchange="this.form.submit()"
-                    class="block w-full sm:w-52 px-4 py-3.5 border border-slate-200 rounded-2xl leading-5 bg-white text-slate-700 font-bold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 sm:text-sm transition-all shadow-sm cursor-pointer appearance-none bg-no-repeat bg-[right_1rem_center] bg-[length:1em_1em]"
-                    style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2364748b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');">
-                <option value="">Todas las mensualidades</option>
-                <option value="al_dia" {{ request('deuda') === 'al_dia' ? 'selected' : '' }}>Al día</option>
-                <option value="debe" {{ request('deuda') === 'debe' ? 'selected' : '' }}>Debe</option>
-            </select>
+            <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                <select name="category_id" onchange="this.form.submit()"
+                        class="block w-full sm:w-40 px-4 py-3 border border-slate-200 rounded-2xl leading-5 bg-white text-slate-700 font-bold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 sm:text-sm transition-all shadow-sm cursor-pointer appearance-none bg-no-repeat bg-[right_1rem_center] bg-[length:1em_1em]"
+                        style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2364748b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');">
+                    <option value="">Categorías</option>
+                    @foreach($categories as $cat)
+                        <option value="{{ $cat->id }}" {{ request('category_id') == $cat->id ? 'selected' : '' }}>{{ $cat->nombre }}</option>
+                    @endforeach
+                </select>
 
-            <select name="genero" onchange="this.form.submit()"
-                    class="block w-full sm:w-40 px-4 py-3.5 border border-slate-200 rounded-2xl leading-5 bg-white text-slate-700 font-bold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 sm:text-sm transition-all shadow-sm cursor-pointer appearance-none bg-no-repeat bg-[right_1rem_center] bg-[length:1em_1em]"
-                    style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2364748b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');">
-                <option value="">Todos los géneros</option>
-                <option value="Masculino" {{ request('genero') === 'Masculino' ? 'selected' : '' }}>Masculino</option>
-                <option value="Femenino" {{ request('genero') === 'Femenino' ? 'selected' : '' }}>Femenino</option>
-                <option value="Otro" {{ request('genero') === 'Otro' ? 'selected' : '' }}>Otro</option>
-            </select>
+                <select name="deuda" onchange="this.form.submit()"
+                        class="block w-full sm:w-40 px-4 py-3 border border-slate-200 rounded-2xl leading-5 bg-white text-slate-700 font-bold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 sm:text-sm transition-all shadow-sm cursor-pointer appearance-none bg-no-repeat bg-[right_1rem_center] bg-[length:1em_1em]"
+                        style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2364748b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');">
+                    <option value="">Mensualidades</option>
+                    <option value="al_dia" {{ request('deuda') === 'al_dia' ? 'selected' : '' }}>Al día</option>
+                    <option value="debe" {{ request('deuda') === 'debe' ? 'selected' : '' }}>Debe</option>
+                </select>
+
+                <select name="genero" onchange="this.form.submit()"
+                        class="block w-full sm:w-36 px-4 py-3 border border-slate-200 rounded-2xl leading-5 bg-white text-slate-700 font-bold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 sm:text-sm transition-all shadow-sm cursor-pointer appearance-none bg-no-repeat bg-[right_1rem_center] bg-[length:1em_1em]"
+                        style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2364748b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');">
+                    <option value="">Género</option>
+                    <option value="Masculino" {{ request('genero') === 'Masculino' ? 'selected' : '' }}>Masculino</option>
+                    <option value="Femenino" {{ request('genero') === 'Femenino' ? 'selected' : '' }}>Femenino</option>
+                    <option value="Otro" {{ request('genero') === 'Otro' ? 'selected' : '' }}>Otro</option>
+                </select>
+
+                <select name="tiene_seguro" onchange="this.form.submit()"
+                        class="block w-full sm:w-40 px-4 py-3 border border-slate-200 rounded-2xl leading-5 bg-white text-slate-700 font-bold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 sm:text-sm transition-all shadow-sm cursor-pointer appearance-none bg-no-repeat bg-[right_1rem_center] bg-[length:1em_1em]"
+                        style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2364748b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');">
+                    <option value="">Seguro Médico</option>
+                    <option value="1" {{ request('tiene_seguro') === '1' ? 'selected' : '' }}>Con Seguro</option>
+                    <option value="0" {{ request('tiene_seguro') === '0' ? 'selected' : '' }}>Sin Seguro</option>
+                </select>
+
+                <select name="estado" onchange="this.form.submit()"
+                        class="block w-full sm:w-36 px-4 py-3 border border-slate-200 rounded-2xl leading-5 bg-white text-slate-700 font-bold focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 sm:text-sm transition-all shadow-sm cursor-pointer appearance-none bg-no-repeat bg-[right_1rem_center] bg-[length:1em_1em]"
+                        style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2364748b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');">
+                    <option value="">Estado</option>
+                    <option value="1" {{ request('estado') === '1' ? 'selected' : '' }}>Habilitado</option>
+                    <option value="0" {{ request('estado') === '0' ? 'selected' : '' }}>Inhabilitado</option>
+                </select>
+            </div>
         </form>
     </div>
 
@@ -119,7 +145,7 @@
     </div>
 @endif
 
-@if(!request('category_id') && !request('search'))
+@if(!request('category_id') && !request('search') && !request('genero') && !request('deuda') && !request('tiene_seguro') && !request('estado'))
     {{-- MODO DASHBOARD / WIDGETS --}}
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 mb-12">
         @foreach($athletesByCategory as $group)
