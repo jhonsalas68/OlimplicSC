@@ -48,12 +48,26 @@ class AthleteController extends Controller
                 $query->where('genero', $request->genero);
             }
 
-            if ($request->filled('tiene_seguro')) {
-                $query->where('tiene_seguro', $request->tiene_seguro);
+            if ($request->has('tiene_seguro') && $request->tiene_seguro !== null && $request->tiene_seguro !== '') {
+                if ($request->tiene_seguro == '0') {
+                    $query->where(function($q) {
+                        $q->where('tiene_seguro', 0)
+                          ->orWhereNull('tiene_seguro');
+                    });
+                } else {
+                    $query->where('tiene_seguro', 1);
+                }
             }
 
-            if ($request->filled('estado')) {
-                $query->where('habilitado_booleano', $request->estado);
+            if ($request->has('estado') && $request->estado !== null && $request->estado !== '') {
+                if ($request->estado == '0') {
+                    $query->where(function($q) {
+                        $q->where('habilitado_booleano', 0)
+                          ->orWhereNull('habilitado_booleano');
+                    });
+                } else {
+                    $query->where('habilitado_booleano', 1);
+                }
             }
 
             if ($request->filled('deuda')) {
