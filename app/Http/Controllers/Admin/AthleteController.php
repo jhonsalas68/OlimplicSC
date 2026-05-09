@@ -51,22 +51,22 @@ class AthleteController extends Controller
             if ($request->has('tiene_seguro') && $request->tiene_seguro !== null && $request->tiene_seguro !== '') {
                 if ($request->tiene_seguro == '0') {
                     $query->where(function($q) {
-                        $q->where('tiene_seguro', 0)
+                        $q->where('tiene_seguro', false)
                           ->orWhereNull('tiene_seguro');
                     });
                 } else {
-                    $query->where('tiene_seguro', 1);
+                    $query->where('tiene_seguro', true);
                 }
             }
 
             if ($request->has('estado') && $request->estado !== null && $request->estado !== '') {
                 if ($request->estado == '0') {
                     $query->where(function($q) {
-                        $q->where('habilitado_booleano', 0)
+                        $q->where('habilitado_booleano', false)
                           ->orWhereNull('habilitado_booleano');
                     });
                 } else {
-                    $query->where('habilitado_booleano', 1);
+                    $query->where('habilitado_booleano', true);
                 }
             }
 
@@ -83,7 +83,7 @@ class AthleteController extends Controller
 
             // Agrupación por categorías para el dashboard inicial
             $athletesByCategory = [];
-            $hasFilters = $request->filled('search') || $request->filled('category_id') || $request->filled('genero') || $request->filled('deuda') || $request->filled('tiene_seguro') || $request->filled('estado');
+            $hasFilters = $request->filled('search') || $request->filled('category_id') || $request->filled('genero') || $request->filled('deuda') || ($request->has('tiene_seguro') && $request->tiene_seguro !== null && $request->tiene_seguro !== '') || ($request->has('estado') && $request->estado !== null && $request->estado !== '');
             if (!$hasFilters) {
                 foreach ($categories as $cat) {
                     $catAtletas = Athlete::where('category_id', $cat->id)->take(3)->get();
@@ -97,14 +97,15 @@ class AthleteController extends Controller
                 }
             }
 
-            return view('admin.athletes.index', compact('athletes', 'categories', 'athletesByCategory', 'selectedCategory'));
+            return view('admin.athletes.index', compact('athletes', 'categories', 'athletesByCategory', 'selectedCategory', 'hasFilters'));
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Error en AthleteController@index: ' . $e->getMessage() . ' - ' . $e->getTraceAsString());
             return view('admin.athletes.index', [
                 'athletes' => collect([]),
                 'categories' => Category::all(),
                 'athletesByCategory' => [],
-                'selectedCategory' => null
+                'selectedCategory' => null,
+                'hasFilters' => false
             ])->with('error', 'Error al cargar los atletas. Por favor, intenta nuevamente.');
         }
     }

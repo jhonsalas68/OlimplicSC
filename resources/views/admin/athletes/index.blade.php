@@ -145,7 +145,7 @@
     </div>
 @endif
 
-@if(!request('category_id') && !request('search') && !request('genero') && !request('deuda') && !request('tiene_seguro') && !request('estado'))
+@if(!$hasFilters)
     {{-- MODO DASHBOARD / WIDGETS --}}
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 mb-12">
         @foreach($athletesByCategory as $group)
