@@ -228,20 +228,23 @@
 
         /* ===== PRINT (COLOR PORTRAIT MEDIA CARTA) ===== */
         @media print {
-            @page { size: 5.5in 8.5in portrait; margin: 0.2in; }
-            html, body { width: 100%; min-height: auto; margin: 0; padding: 0; }
-            body { background: white; color: #1e293b; }
+            @page { size: 5.5in 8.5in portrait; margin: 0; }
+            html, body { width: 5.5in; height: 8.5in; min-height: auto; margin: 0; padding: 0; }
+            body { background: white; color: #1e293b; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .action-bar { display: none !important; }
-            .screen-wrapper { padding: 0; display: block; background: white; }
+            .screen-wrapper { padding: 0; margin: 0; display: block; background: white; }
             .nota-card {
                 box-shadow: none;
                 border: 1px solid #cbd5e1;
                 border-radius: 0;
-                width: calc(100% - 0.4in);
-                max-width: calc(100% - 0.4in);
-                margin: 0 auto;
-                min-height: 7.9in;
+                width: 5.5in;
+                max-width: 5.5in;
+                margin: 0;
+                min-height: 8.5in;
                 page-break-inside: avoid;
+                background: white;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
             }
             .btn-print, .btn-whatsapp, .btn-back { display: none !important; }
             
