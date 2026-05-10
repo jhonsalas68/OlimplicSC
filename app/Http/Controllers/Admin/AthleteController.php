@@ -18,64 +18,74 @@ class AthleteController extends Controller
 {
     use FileStorageHelper;
 
+    private function getFilteredAthletesQuery(Request $request)
+    {
+        $mesActual = now()->format('Y-m');
+        $query = Athlete::with('category')
+            ->withExists(['payments as pagado_mes_actual' => function ($q) use ($mesActual) {
+                $q->where('concepto', 'mensualidad')
+                  ->where('mes_correspondiente', $mesActual)
+                  ->where('estado_pago', 'pagado');
+            }]);
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('nombre', 'LIKE', "%$search%")
+                  ->orWhere('apellido_paterno', 'LIKE', "%$search%")
+                  ->orWhere('ci', 'LIKE', "%$search%");
+            });
+        }
+
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        if ($request->filled('genero')) {
+            $query->where('genero', $request->genero);
+        }
+
+        if ($request->has('tiene_seguro') && $request->tiene_seguro !== null && $request->tiene_seguro !== '') {
+            if ($request->tiene_seguro == '0') {
+                $query->where(function($q) {
+                    $q->where('tiene_seguro', false)
+                      ->orWhereNull('tiene_seguro');
+                });
+            } else {
+                $query->where('tiene_seguro', true);
+            }
+        }
+
+        if ($request->has('estado') && $request->estado !== null && $request->estado !== '') {
+            if ($request->estado == '0') {
+                $query->where(function($q) {
+                    $q->where('habilitado_booleano', false)
+                      ->orWhereNull('habilitado_booleano');
+                });
+            } else {
+                $query->where('habilitado_booleano', true);
+            }
+        }
+
+        if ($request->filled('deuda')) {
+            if ($request->deuda === 'al_dia') {
+                $query->alDia();
+            } else {
+                $query->debe();
+            }
+        }
+
+        return $query;
+    }
+
     public function index(Request $request)
     {
         try {
-            $mesActual = now()->format('Y-m');
-            $query = Athlete::with('category')
-                ->withExists(['payments as pagado_mes_actual' => function ($q) use ($mesActual) {
-                    $q->where('concepto', 'mensualidad')
-                      ->where('mes_correspondiente', $mesActual)
-                      ->where('estado_pago', 'pagado');
-                }]);
-
-            if ($request->filled('search')) {
-                $search = $request->search;
-                $query->where(function($q) use ($search) {
-                    $q->where('nombre', 'LIKE', "%$search%")
-                      ->orWhere('apellido_paterno', 'LIKE', "%$search%")
-                      ->orWhere('ci', 'LIKE', "%$search%");
-                });
-            }
+            $query = $this->getFilteredAthletesQuery($request);
 
             $selectedCategory = null;
             if ($request->filled('category_id')) {
-                $query->where('category_id', $request->category_id);
                 $selectedCategory = Category::find($request->category_id);
-            }
-
-            if ($request->filled('genero')) {
-                $query->where('genero', $request->genero);
-            }
-
-            if ($request->has('tiene_seguro') && $request->tiene_seguro !== null && $request->tiene_seguro !== '') {
-                if ($request->tiene_seguro == '0') {
-                    $query->where(function($q) {
-                        $q->where('tiene_seguro', false)
-                          ->orWhereNull('tiene_seguro');
-                    });
-                } else {
-                    $query->where('tiene_seguro', true);
-                }
-            }
-
-            if ($request->has('estado') && $request->estado !== null && $request->estado !== '') {
-                if ($request->estado == '0') {
-                    $query->where(function($q) {
-                        $q->where('habilitado_booleano', false)
-                          ->orWhereNull('habilitado_booleano');
-                    });
-                } else {
-                    $query->where('habilitado_booleano', true);
-                }
-            }
-
-            if ($request->filled('deuda')) {
-                if ($request->deuda === 'al_dia') {
-                    $query->alDia();
-                } else {
-                    $query->debe();
-                }
             }
 
             $athletes = $query->latest()->paginate(15)->withQueryString();
@@ -304,9 +314,19 @@ class AthleteController extends Controller
         return $pdf->download('lista_convocados_olimpic.pdf');
     }
 
-    public function export()
+    public function export(Request $request)
     {
-        return Excel::download(new AthleteExport, 'atletas_olimpic.xlsx');
+        $query = $this->getFilteredAthletesQuery($request);
+        $athletes = $query->get();
+        return Excel::download(new AthleteExport($athletes), 'atletas_olimpic.xlsx');
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $query = $this->getFilteredAthletesQuery($request);
+        $athletes = $query->get();
+        $pdf = Pdf::loadView('admin.athletes.export_pdf', compact('athletes'));
+        return $pdf->download('lista_atletas_olimpic.pdf');
     }
 
     public function import(Request $request) 

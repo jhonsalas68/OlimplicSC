@@ -19,6 +19,13 @@ use PhpOffice\PhpSpreadsheet\Style\Border;
 
 class AthleteExport implements FromCollection, WithHeadings, WithMapping, WithStyles, WithColumnWidths, WithTitle, WithEvents
 {
+    protected $athletes;
+
+    public function __construct($athletes = null)
+    {
+        $this->athletes = $athletes ?: Athlete::with('category')->get();
+    }
+
     public function title(): string
     {
         return 'Atletas OlimpicSC';
@@ -26,7 +33,7 @@ class AthleteExport implements FromCollection, WithHeadings, WithMapping, WithSt
 
     public function collection()
     {
-        return Athlete::with('category')->get();
+        return $this->athletes;
     }
 
     public function headings(): array

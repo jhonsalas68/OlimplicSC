@@ -56,6 +56,7 @@ Route::middleware(['auth', 'prevent-back-history'])->prefix('admin')->group(func
 
         // Acciones administrativas de atletas
         Route::get('/athletes/export', [\App\Http\Controllers\Admin\AthleteController::class, 'export'])->name('athletes.export');
+        Route::get('/athletes/export/pdf', [\App\Http\Controllers\Admin\AthleteController::class, 'exportPdf'])->name('athletes.export.pdf');
         Route::post('/athletes/import', [\App\Http\Controllers\Admin\AthleteController::class, 'import'])->name('athletes.import');
         Route::post('/athletes/{athlete}/toggle-habilitado', [\App\Http\Controllers\Admin\AthleteController::class, 'toggleHabilitado'])->name('athletes.toggle-habilitado');
         Route::resource('athletes', \App\Http\Controllers\Admin\AthleteController::class)->except(['index', 'show']);
