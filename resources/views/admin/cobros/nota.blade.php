@@ -226,35 +226,35 @@
         .nota-footer p { font-size: 9px; color: #64748b; line-height: 1.4; }
         .nota-footer .highlight { color: #c61c2c; font-weight: 800; }
 
-        /* ===== PRINT (B&W SAVE INK) ===== */
+        /* ===== PRINT (COLOR LANDSCAPE MEDIA CARTA) ===== */
         @media print {
-            @page { size: 5.5in 8.5in; margin: 0.3in; }
-            body { background: white; color: black; }
+            @page { size: 8.5in 5.5in landscape; margin: 0.3in; }
+            body { background: white; color: #1e293b; }
             .action-bar { display: none !important; }
             .screen-wrapper { padding: 0; display: block; }
-            .nota-card { box-shadow: none; border: 1px solid #000; border-radius: 0; max-width: 100%; }
+            .nota-card { box-shadow: none; border: 1px solid #cbd5e1; border-radius: 0; max-width: 100%; }
+            .btn-print, .btn-whatsapp, .btn-back { display: none !important; }
             
-            /* Header B&W */
-            .nota-header { background: white !important; border-bottom: 2px solid black; padding: 15px; }
-            .nota-club-name, .nota-num, .nota-num-label, .nota-fecha, .nota-club-sub { color: black !important; }
-            .badge-pagado { border: 1px solid black; color: black !important; background: white !important; }
+            /* Header */
+            .nota-header { background: white !important; border-bottom: 1px solid #cbd5e1; padding: 15px; }
+            .nota-club-name, .nota-num, .nota-num-label, .nota-fecha, .nota-club-sub { color: inherit !important; }
+            .badge-pagado { border: none !important; color: white !important; background: #22c55e !important; }
             
-            /* Concepto B&W */
+            /* Concepto */
             .concepto-box { 
                 background: white !important; 
-                color: black !important; 
-                border: 2px solid black !important; 
+                color: inherit !important; 
+                border: 1px solid #cbd5e1 !important; 
                 padding: 15px;
             }
-            .concepto-tipo-label, .concepto-desc, .concepto-mes, .monto-label { color: black !important; }
+            .concepto-tipo-label, .concepto-desc, .concepto-mes, .monto-label { color: inherit !important; }
             
             /* Otros elementos */
-            .metodo-row, .cobrador-row, .nota-footer { background: white !important; border: 1px solid black !important; }
-            .metodo-badge { background: white !important; border: 1px solid black; color: black !important; }
-            .cobrador-avatar { border: 1px solid black; background: white !important; color: black !important; }
-            .section-title { border-bottom: 1px solid black; color: black !important; }
-            .athlete-photo-box { border: 1px solid black; filter: grayscale(100%); }
-            .nota-logo-box { border: 1px solid black; filter: grayscale(100%); }
+            .metodo-row, .cobrador-row, .nota-footer { background: white !important; border: 1px solid #cbd5e1 !important; }
+            .metodo-badge { background: #e2e8f0 !important; border: 1px solid #cbd5e1 !important; color: #1e293b !important; }
+            .cobrador-avatar { border: 1px solid #cbd5e1; background: #0b2d69 !important; color: white !important; }
+            .section-title { border-bottom: 1px solid #e2e8f0; color: inherit !important; }
+            .athlete-photo-box, .nota-logo-box { border: 1px solid #cbd5e1; filter: none !important; }
         }
 
         /* ===== RESPONSIVE ===== */
