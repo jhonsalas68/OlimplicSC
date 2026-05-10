@@ -240,6 +240,8 @@
                 width: 5.5in;
                 max-width: 5.5in;
                 margin: 0;
+                margin-top: 0;
+                padding-top: 0;
                 min-height: 8.5in;
                 page-break-inside: avoid;
                 background: white;
