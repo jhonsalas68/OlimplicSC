@@ -259,14 +259,42 @@
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 600px) {
-            .nota-header { flex-direction: column; align-items: flex-start; gap: 15px; }
-            .nota-header-right { text-align: left; }
-            .info-grid { grid-template-columns: 1fr; }
-            .concepto-box { flex-direction: column; align-items: flex-start; }
-            .concepto-box-right { width: 100%; }
-            .monto-valor { font-size: 28px; text-align: left; margin-top: 5px; }
-            .monto-label { text-align: left; }
-            .firmas { grid-template-columns: 1fr; gap: 20px; }
+            /* General Wrapper */
+            .screen-wrapper { padding: 15px 10px; }
+            
+            /* Action bar: botones más accesibles y proporcionales para móvil */
+            .action-bar { flex-direction: column; align-items: stretch; gap: 12px; padding: 12px 15px; }
+            .action-bar-title { text-align: center; font-size: 15px; }
+            .action-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; }
+            .btn-back, .btn-print { justify-content: center; padding: 10px; font-size: 13px; width: 100%; }
+            .btn-whatsapp { grid-column: span 2; justify-content: center; padding: 12px; font-size: 14px; width: 100%; }
+
+            /* Ajustes en Header para movil */
+            .nota-header { padding: 15px; flex-direction: row; justify-content: space-between; align-items: flex-start; gap: 8px; }
+            .nota-header-right { text-align: right; }
+            .nota-logo-box { width: 80px; height: 32px; }
+            .nota-club-name { font-size: 14px; }
+            .nota-num { font-size: 15px; }
+            
+            /* Cuerpo y Grid */
+            .nota-body { padding: 15px; }
+            .info-grid { grid-template-columns: 1fr; gap: 10px; }
+            
+            /* Concepto Box */
+            .concepto-box { flex-direction: column; align-items: flex-start; gap: 10px; padding: 15px; }
+            .concepto-box-right { 
+                width: 100%; 
+                display: flex; 
+                justify-content: space-between; 
+                align-items: center; 
+                border-top: 1px solid rgba(255,255,255,0.2); 
+                padding-top: 10px; 
+            }
+            .monto-label { text-align: left; margin-bottom: 0; }
+            .monto-valor { font-size: 22px; text-align: right; margin-top: 0; }
+            
+            /* Filas inferiores */
+            .metodo-row, .cobrador-row { padding: 12px 15px; }
         }
     </style>
 </head>
