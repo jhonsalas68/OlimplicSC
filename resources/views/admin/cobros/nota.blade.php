@@ -118,9 +118,9 @@
         .nota-club-name { color: white; font-size: 16px; font-weight: 800; line-height: 1.1; }
         .nota-club-sub { color: #93c5fd; font-size: 9px; margin-top: 1px; }
         .nota-header-right { text-align: right; flex-shrink: 0; }
-        .nota-num-label { color: #93c5fd; font-size: 8px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; }
+        .nota-num-label { color: white; font-size: 8px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; }
         .nota-num { color: white; font-size: 18px; font-weight: 900; line-height: 1; margin: 2px 0; }
-        .nota-fecha { color: #bfdbfe; font-size: 9px; margin-bottom: 4px; }
+        .nota-fecha { color: white; font-size: 9px; margin-bottom: 4px; opacity: 0.85; }
         .badge-pagado {
             display: inline-block;
             background: #22c55e;
@@ -250,7 +250,8 @@
             
             /* Header */
             .nota-header { background: #0b2d69 !important; border-bottom: 1px solid #88a6d6; padding: 15px 18px; }
-            .nota-club-name, .nota-num, .nota-num-label, .nota-fecha, .nota-club-sub { color: inherit !important; }
+            .nota-club-name, .nota-num, .nota-num-label, .nota-fecha, .nota-club-sub { color: white !important; }
+            .nota-fecha { opacity: 0.85 !important; }
             .badge-pagado { border: none !important; color: white !important; background: #22c55e !important; }
             
             /* Concepto */
