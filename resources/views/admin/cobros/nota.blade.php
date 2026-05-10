@@ -226,35 +226,45 @@
         .nota-footer p { font-size: 9px; color: #64748b; line-height: 1.4; }
         .nota-footer .highlight { color: #c61c2c; font-weight: 800; }
 
-        /* ===== PRINT (COLOR LANDSCAPE MEDIA CARTA) ===== */
+        /* ===== PRINT (COLOR PORTRAIT MEDIA CARTA) ===== */
         @media print {
-            @page { size: 8.5in 5.5in landscape; margin: 0.3in; }
+            @page { size: 5.5in 8.5in portrait; margin: 0.2in; }
+            html, body { width: 100%; min-height: auto; margin: 0; padding: 0; }
             body { background: white; color: #1e293b; }
             .action-bar { display: none !important; }
-            .screen-wrapper { padding: 0; display: block; }
-            .nota-card { box-shadow: none; border: 1px solid #cbd5e1; border-radius: 0; max-width: 100%; }
+            .screen-wrapper { padding: 0; display: block; background: white; }
+            .nota-card {
+                box-shadow: none;
+                border: 1px solid #cbd5e1;
+                border-radius: 0;
+                width: calc(100% - 0.4in);
+                max-width: calc(100% - 0.4in);
+                margin: 0 auto;
+                min-height: 7.9in;
+                page-break-inside: avoid;
+            }
             .btn-print, .btn-whatsapp, .btn-back { display: none !important; }
             
             /* Header */
-            .nota-header { background: white !important; border-bottom: 1px solid #cbd5e1; padding: 15px; }
+            .nota-header { background: #0b2d69 !important; border-bottom: 1px solid #88a6d6; padding: 15px 18px; }
             .nota-club-name, .nota-num, .nota-num-label, .nota-fecha, .nota-club-sub { color: inherit !important; }
             .badge-pagado { border: none !important; color: white !important; background: #22c55e !important; }
             
             /* Concepto */
             .concepto-box { 
-                background: white !important; 
-                color: inherit !important; 
-                border: 1px solid #cbd5e1 !important; 
-                padding: 15px;
+                background: #c61c2c !important; 
+                color: white !important; 
+                border: 1px solid #fca5a5 !important; 
+                padding: 15px 20px;
             }
-            .concepto-tipo-label, .concepto-desc, .concepto-mes, .monto-label { color: inherit !important; }
+            .concepto-tipo-label, .concepto-desc, .concepto-mes, .monto-label { color: rgba(255,255,255,0.9) !important; }
             
             /* Otros elementos */
-            .metodo-row, .cobrador-row, .nota-footer { background: white !important; border: 1px solid #cbd5e1 !important; }
-            .metodo-badge { background: #e2e8f0 !important; border: 1px solid #cbd5e1 !important; color: #1e293b !important; }
+            .metodo-row, .cobrador-row, .nota-footer { background: #f8fafc !important; border: 1px solid #e2e8f0 !important; }
+            .metodo-badge { background: #dcfce7 !important; border: 1px solid #bbf7d0 !important; color: #15803d !important; }
             .cobrador-avatar { border: 1px solid #cbd5e1; background: #0b2d69 !important; color: white !important; }
-            .section-title { border-bottom: 1px solid #e2e8f0; color: inherit !important; }
-            .athlete-photo-box, .nota-logo-box { border: 1px solid #cbd5e1; filter: none !important; }
+            .section-title { border-bottom: 1px solid #e2e8f0; color: #94a3b8 !important; }
+            .athlete-photo-box, .nota-logo-box { border: 1px solid #cbd5e1; filter: none !important; background: white !important; }
         }
 
         /* ===== RESPONSIVE ===== */
