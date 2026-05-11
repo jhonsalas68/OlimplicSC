@@ -18,10 +18,11 @@
                             @php
                                 $user = auth()->user();
                                 $isCoach = $user->hasRole('Coach');
-                                $shouldShow = !$isCoach || ($user->category_id == $category->id);
+                                $coachCategories = $user->categories->pluck('id')->toArray();
+                                $shouldShow = !$isCoach || in_array($category->id, $coachCategories);
                             @endphp
                             @if($shouldShow)
-                                <option value="{{ $category->id }}" {{ (old('category_id', $training->category_id ?? ($isCoach ? $user->category_id : '')) == $category->id) ? 'selected' : '' }}>
+                                <option value="{{ $category->id }}" {{ (old('category_id', $training->category_id ?? '') == $category->id) ? 'selected' : '' }}>
                                     {{ $category->nombre }}
                                 </option>
                             @endif

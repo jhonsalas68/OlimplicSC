@@ -19,7 +19,7 @@ class Category extends Model
 
     /**
      * Devuelve la categoría correcta según la edad cumplida.
-     * Reglas: ≤13 Pre Infantil | ≤15 Infantil | ≤17 Menores | ≤19 Juvenil | 20+ Libre
+     * Reglas: ≤13 Pre Infantil | ≤15 Infantil | ≤17 Menores | ≤19 Juvenil | 20+ Ascenso
      */
     public static function resolverPorEdad(int $edad): self
     {
@@ -32,7 +32,7 @@ class Category extends Model
             ->first();
 
         if (!$categoria) {
-            // Si por alguna razón extrema no la encuentra, asignar la de mayor rango (Libre)
+            // Si por alguna razón extrema no la encuentra, asignar la de mayor rango (Ascenso)
             $categoria = static::orderBy('edad_max', 'desc')->firstOrFail();
         }
 

@@ -60,7 +60,8 @@ class UserController extends Controller
             'email'           => 'required|email|unique:users,email',
             'is_active'       => 'boolean',
             'role'            => 'required|string|exists:roles,name|not_in:SuperAdmin,Student',
-            'category_id'     => 'nullable|exists:categories,id',
+            'category_ids'    => 'nullable|array',
+            'category_ids.*'  => 'exists:categories,id',
             'avatar'          => 'nullable|image|max:5120',
         ]);
 
@@ -93,11 +94,16 @@ class UserController extends Controller
             'ci'               => $validated['ci'],
             'password'         => Hash::make($validated['ci']),
             'is_active'        => $request->boolean('is_active', true),
-            'category_id'      => $validated['category_id'] ?? null,
+            'category_id'      => $validated['category_ids'][0] ?? null,
             'avatar'           => $avatarUrl,
         ]);
 
         $user->syncRoles([$validated['role']]);
+        
+        // Sincronizar las categorías si es coach
+        if ($request->filled('category_ids') && $request->role === 'Coach') {
+            $user->categories()->sync($validated['category_ids']);
+        }
 
         \App\Services\ActivityLogger::log(
             'creacion_usuario', 
@@ -134,7 +140,8 @@ class UserController extends Controller
             'ci'               => 'required|string|max:20|unique:users,ci,' . $user->id,
             'password'         => 'nullable|string|min:6|confirmed',
             'role'             => 'required|string|exists:roles,name|not_in:SuperAdmin,Student',
-            'category_id'      => 'nullable|exists:categories,id',
+            'category_ids'     => 'nullable|array',
+            'category_ids.*'   => 'exists:categories,id',
             'avatar'           => 'nullable|image|max:5120',
         ]);
 
@@ -145,7 +152,7 @@ class UserController extends Controller
             'email'            => $validated['email'],
             'ci'               => $validated['ci'],
             'is_active'        => $request->has('is_active'),
-            'category_id'      => $validated['category_id'] ?? null,
+            'category_id'      => $validated['category_ids'][0] ?? null,
         ];
         
         if ($request->hasFile('avatar')) {
@@ -162,6 +169,11 @@ class UserController extends Controller
 
         $user->update($userData);
         $user->syncRoles([$validated['role']]);
+        
+        // Sincronizar las categorías si es coach
+        if ($request->filled('category_ids') && $request->role === 'Coach') {
+            $user->categories()->sync($validated['category_ids']);
+        }
 
         \App\Services\ActivityLogger::log(
             'edicion_usuario', 

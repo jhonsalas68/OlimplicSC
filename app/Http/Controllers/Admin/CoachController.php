@@ -14,114 +14,133 @@ class CoachController extends Controller
     public function dashboard()
     {
         $user = Auth::user();
-        $category = $user->category;
+        $userCategories = $user->categories;
+        $myCategoryIds = $userCategories->pluck('id')->toArray();
+        $myCategories = $userCategories; // Para la vista
 
-        $planificaciones = $category
-            ? Training::with(['category', 'coach'])->where('category_id', $category->id)->latest()->get()
+        $planificaciones = !empty($myCategoryIds)
+            ? Training::with(['category', 'coach'])->whereIn('category_id', $myCategoryIds)->latest()->get()
             : collect();
 
         $mesActual = now()->format('Y-m');
-        $atletas = $category
+        $atletas = !empty($myCategoryIds)
             ? Athlete::with('category')
                 ->withExists(['payments as pagado_mes_actual' => function ($q) use ($mesActual) {
                     $q->where('concepto', 'mensualidad')
                       ->where('mes_correspondiente', $mesActual)
                       ->where('estado_pago', 'pagado');
                 }])
-                ->where('category_id', $category->id)
+                ->whereIn('category_id', $myCategoryIds)
                 ->orderBy('apellido_paterno')
                 ->get()
             : collect();
 
-        return view('coach.dashboard', compact('user', 'category', 'planificaciones', 'atletas'));
+        return view('coach.dashboard', compact('user', 'myCategories', 'planificaciones', 'atletas'));
     }
 
-    /** Lista de atletas agrupados por categoria, la del coach primero */
+    /** Lista de atletas agrupados por categoria */
     public function atletas(Request $request)
     {
         $user = Auth::user();
-        $myCategory = $user->category;
-        $verTodas = $request->has('ver_todas');
-        
-        // Optimización: Si no se pide ver todas, solo cargamos los de nuestra categoría
+        $userCategories = $user->categories;
+        $myCategoryIds = $userCategories->pluck('id')->toArray();
+        $myCategories = $userCategories;
+
         $mesActual = now()->format('Y-m');
-        $query = Athlete::with(['category'])
+
+        // 1. MIS ATLETAS (Sección Superior)
+        $queryPropios = Athlete::with(['category'])
             ->withExists(['payments as pagado_mes_actual' => function ($q) use ($mesActual) {
                 $q->where('concepto', 'mensualidad')
                   ->where('mes_correspondiente', $mesActual)
                   ->where('estado_pago', 'pagado');
             }]);
         
-        if (!$verTodas && $myCategory) {
-            $query->where('category_id', $myCategory->id);
+        if ($request->filled('category_id')) {
+            if (in_array($request->category_id, $myCategoryIds)) {
+                $queryPropios->where('category_id', $request->category_id);
+            } else {
+                $queryPropios->whereIn('category_id', $myCategoryIds);
+            }
+        } else {
+            $queryPropios->whereIn('category_id', $myCategoryIds);
         }
 
-        // Filtro por estado de pago (Mensualidad)
+        if ($request->filled('genero')) {
+            $queryPropios->where('genero', $request->genero);
+        }
+
         if ($request->filled('deuda')) {
             if ($request->deuda === 'al_dia') {
-                $query->alDia();
+                $queryPropios->alDia();
             } elseif ($request->deuda === 'deudores') {
-                $query->debe();
+                $queryPropios->debe();
             }
         }
 
-        $allAtletas = $query->orderBy('category_id')
-            ->orderBy('apellido_paterno')
-            ->get();
+        $atletasPropios = $queryPropios->orderBy('apellido_paterno')->get();
 
-        $atletasPropios = collect();
-        $atletasOtros = collect();
+        // 2. BUSCADOR GENERAL (Todas las categorías - Sección Inferior)
+        $queryGeneral = Athlete::with(['category'])
+            ->withExists(['payments as pagado_mes_actual' => function ($q) use ($mesActual) {
+                $q->where('concepto', 'mensualidad')
+                  ->where('mes_correspondiente', $mesActual)
+                  ->where('estado_pago', 'pagado');
+            }]);
 
-        if ($myCategory) {
-            $atletasPropios = $allAtletas->where('category_id', $myCategory->id)->values();
-            if ($verTodas) {
-                $atletasOtros = $allAtletas->where('category_id', '!=', $myCategory->id)
-                    ->groupBy(fn($a) => $a->category?->nombre ?? 'Sin Categoría');
-            }
-        } elseif ($verTodas) {
-            $atletasOtros = $allAtletas->groupBy(fn($a) => $a->category?->nombre ?? 'Sin Categoría');
+        if ($request->filled('search')) {
+            $s = $request->search;
+            $queryGeneral->where(function($q) use ($s) {
+                $q->where('nombre', 'like', "%$s%")
+                  ->orWhere('apellido_paterno', 'like', "%$s%")
+                  ->orWhere('ci', 'like', "%$s%");
+            });
         }
 
-        // Obtener todas las categorías con conteos
-        $categories = \App\Models\Category::withCount('athletes')->get()->map(function($cat) use ($myCategory) {
+        if ($request->filled('genero_gen')) {
+            $queryGeneral->where('genero', $request->genero_gen);
+        }
+
+        if ($request->filled('deuda_gen')) {
+            if ($request->deuda_gen === 'al_dia') {
+                $queryGeneral->alDia();
+            } elseif ($request->deuda_gen === 'deudores') {
+                $queryGeneral->debe();
+            }
+        }
+
+        // Si no hay búsqueda ni filtros, mostramos los últimos 10 de todo el club o nada? 
+        // Vamos a mostrar los 15 más recientes si no hay filtros para que no esté vacío.
+        $atletasGeneral = ($request->filled('search') || $request->filled('genero_gen') || $request->filled('deuda_gen'))
+            ? $queryGeneral->orderBy('apellido_paterno')->paginate(20)->withQueryString()
+            : $queryGeneral->latest()->limit(10)->get();
+
+        $categories = $userCategories->map(function($cat) {
             return [
                 'category' => $cat,
-                'is_mine' => $myCategory && $cat->id === $myCategory->id,
-                'count' => $cat->athletes_count,
+                'is_mine' => true,
+                'count' => $cat->athletes()->count(),
             ];
         });
 
-        return view('coach.atletas', compact('user', 'myCategory', 'atletasPropios', 'atletasOtros', 'categories', 'verTodas'));
+        return view('coach.atletas', compact('user', 'myCategories', 'atletasPropios', 'atletasGeneral', 'categories'));
     }
 
-    /** Planificaciones agrupadas por categoria */
+    /** Planificaciones de sus categorías */
     public function planificaciones(Request $request)
     {
         $user = Auth::user();
-        $myCategory = $user->category;
-        $verTodas = $request->has('ver_todas');
+        $userCategories = $user->categories;
+        $myCategoryIds = $userCategories->pluck('id')->toArray();
+        $myCategories = $userCategories;
 
         $query = Training::with(['category', 'coach']);
         
-        if (!$verTodas && $myCategory) {
-            $query->where('category_id', $myCategory->id);
-        }
+        // Solo las suyas
+        $query->whereIn('category_id', $myCategoryIds);
 
-        $allTrainings = $query->latest()->get();
+        $planificacionesPropias = $query->latest()->get();
 
-        $planificacionesPropias = collect();
-        $planificacionesOtras = collect();
-
-        if ($myCategory) {
-            $planificacionesPropias = $allTrainings->where('category_id', $myCategory->id)->values();
-            if ($verTodas) {
-                $planificacionesOtras = $allTrainings->where('category_id', '!=', $myCategory->id)
-                    ->groupBy(fn($t) => $t->category?->nombre ?? 'Otras Categorías');
-            }
-        } elseif ($verTodas) {
-            $planificacionesOtras = $allTrainings->groupBy(fn($t) => $t->category?->nombre ?? 'Otras Categorías');
-        }
-
-        return view('coach.planificaciones', compact('user', 'myCategory', 'planificacionesPropias', 'planificacionesOtras', 'verTodas'));
+        return view('coach.planificaciones', compact('user', 'myCategories', 'planificacionesPropias'));
     }
 }

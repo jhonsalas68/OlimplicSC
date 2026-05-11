@@ -197,7 +197,7 @@ const CATEGORIAS = [
     { nombre: 'Infantil',     min: 14, max: 15 },
     { nombre: 'Menores',      min: 16, max: 17 },
     { nombre: 'Juvenil',      min: 18, max: 19 },
-    { nombre: 'Libre',        min: 20, max: 99 },
+    { nombre: 'Ascenso',      min: 20, max: 99 },
 ];
 
 function calcularEdad(fechaNac) {

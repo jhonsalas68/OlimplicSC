@@ -63,6 +63,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Relación many-to-many con categorías (para coaches con múltiples categorías)
+     */
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class, 'category_user');
+    }
+
+    /**
      * Get the user's avatar URL or a default placeholder.
      */
     public function getAvatarUrlAttribute(): string
