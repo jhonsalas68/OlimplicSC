@@ -5,13 +5,10 @@
 @section('content')
 <div x-data="{ 
     selectedIds: [], 
-    openConvocar: false,
     updateSelected() {
         const ids = Array.from(document.querySelectorAll('.athlete-checkbox-data:checked')).map(cb => cb.value);
         this.selectedIds = ids;
-        const sIds = document.getElementById('selected-ids-input');
         const eIds = document.getElementById('export-ids-input');
-        if(sIds) sIds.value = JSON.stringify(ids);
         if(eIds) eIds.value = JSON.stringify(ids);
     }
 }" @athlete-selected.window="updateSelected()">
@@ -57,70 +54,21 @@
             </select>
         </form>
 
-        <div id="selection-panel" x-show="selectedIds.length > 0 && !openConvocar" x-cloak 
-             class="fixed bottom-8 right-8 z-[40] flex flex-col sm:flex-row gap-3 animate-in slide-in-from-bottom-8 duration-500">
+        <div id="selection-panel" x-show="selectedIds.length > 0" x-cloak 
+             class="fixed bottom-8 right-8 z-[60] flex flex-col sm:flex-row gap-3 animate-in slide-in-from-bottom-8 duration-500">
             
-            <button @click="openConvocar = true" 
-                    class="inline-flex items-center gap-3 px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-black uppercase tracking-[0.2em] rounded-2xl transition-all shadow-2xl shadow-blue-200 group whitespace-nowrap border-b-4 border-blue-800 active:border-b-0 active:translate-y-1">
-                <svg class="h-5 w-5 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                Generar Convocatoria (<span x-text="selectedIds.length"></span>)
-            </button>
-
             <button @click="$refs.exportForm.submit()" 
-                    class="inline-flex items-center gap-3 px-8 py-4 bg-red-600 hover:bg-red-700 text-white text-[11px] font-black uppercase tracking-[0.2em] rounded-2xl transition-all shadow-2xl shadow-red-200 group whitespace-nowrap border-b-4 border-red-800 active:border-b-0 active:translate-y-1">
-                <svg class="h-5 w-5 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                Exportar Lista PDF (<span x-text="selectedIds.length"></span>)
+                    class="inline-flex items-center gap-3 px-10 py-5 bg-red-600 hover:bg-red-700 text-white text-xs font-black uppercase tracking-[0.2em] rounded-2xl transition-all shadow-2xl shadow-red-200 group whitespace-nowrap border-b-4 border-red-800 active:border-b-0 active:translate-y-1">
+                <svg class="h-6 w-6 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                Exportar Convocados (PDF) <span class="bg-white/20 px-3 py-1 rounded-lg ml-2" x-text="selectedIds.length"></span>
             </button>
         </div>
-    </div>
-</div>
 
-{{-- MODAL DE CONVOCATORIA --}}
-<div x-show="openConvocar" x-cloak class="fixed inset-0 z-50 overflow-y-auto" role="dialog" aria-modal="true">
-    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <div x-show="openConvocar" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-slate-900/60 transition-opacity" aria-hidden="true"></div>
-        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-        <div x-show="openConvocar" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" class="inline-block align-bottom bg-white rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-slate-100">
-            <div class="bg-white p-6 sm:p-8">
-                <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-xl font-black text-slate-800 tracking-tight">Subir Convocatoria</h3>
-                    <button @click="openConvocar = false" class="text-slate-400 hover:text-slate-600 transition-colors">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                    </button>
-                </div>
-                <form action="{{ route('trainings.store') }}" method="POST" enctype="multipart/form-data" class="space-y-5">
-                    @csrf
-                    <input type="hidden" name="ids" id="selected-ids-input">
-                    <div>
-                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Categoría asignada</label>
-                        <select name="category_id" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold focus:border-blue-600 transition-all outline-none">
-                            @foreach($myCategories as $cat)
-                                <option value="{{ $cat->id }}">{{ $cat->nombre }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Fecha del Evento</label>
-                        <input type="date" name="fecha" required value="{{ date('Y-m-d') }}" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold focus:border-blue-600 transition-all outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Planificación (PDF)</label>
-                        <input type="file" name="pdf" accept=".pdf" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold text-slate-500 file:mr-4 file:py-1 file:px-4 file:rounded-lg file:border-0 file:text-[10px] file:font-black file:bg-blue-600 file:text-white file:uppercase hover:file:bg-blue-700 cursor-pointer">
-                    </div>
-                    <div class="pt-4 flex flex-col gap-3">
-                        <button type="submit" class="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black uppercase tracking-widest rounded-2xl transition-all shadow-xl shadow-blue-200 flex items-center justify-center gap-2 group">
-                            <svg class="h-5 w-5 group-hover:translate-y-[-2px] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
-                            Registrar Planificación
-                        </button>
-                    </div>
-                </form>
-                {{-- Hidden Export Form --}}
-                <form x-ref="exportForm" action="{{ route('athletes.export.selected') }}" method="POST" class="hidden">
-                    @csrf
-                    <input type="hidden" name="ids" id="export-ids-input">
-                </form>
-            </div>
-        </div>
+        {{-- Hidden Export Form --}}
+        <form x-ref="exportForm" action="{{ route('athletes.export.selected') }}" method="POST" class="hidden">
+            @csrf
+            <input type="hidden" name="ids" id="export-ids-input">
+        </form>
     </div>
 </div>
 
