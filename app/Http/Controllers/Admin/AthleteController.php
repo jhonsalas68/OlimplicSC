@@ -182,7 +182,7 @@ class AthleteController extends Controller
             return redirect()->route('athletes.index')->with('success', 'Atleta registrado correctamente.');
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Error en AthleteController@store: ' . $e->getMessage());
-            return redirect()->route('athletes.create')->with('error', 'Ocurrió un error inesperado al registrar al atleta.');
+            return redirect()->back()->withInput()->with('error', 'Error al registrar: ' . $e->getMessage());
         }
     }
 
@@ -259,7 +259,7 @@ class AthleteController extends Controller
             return redirect()->route('athletes.index')->with('success', 'Atleta actualizado correctamente.');
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Error en AthleteController@update: ' . $e->getMessage());
-            return redirect()->route('athletes.edit', $athlete)->with('error', 'Ocurrió un error al actualizar el perfil.');
+            return redirect()->back()->withInput()->with('error', 'Error al actualizar: ' . $e->getMessage());
         }
     }
 

@@ -55,23 +55,28 @@ class TrainingController extends Controller
             $data['file_path_pdf'] = Storage::disk('r2')->url($path);
         }
 
-        $training = Training::create($data);
+        try {
+            $training = Training::create($data);
 
-        // Notificar a todos los usuarios (excepto a quien lo subió, opcionalmente)
-        $usersToNotify = User::all();
-        $coachName = auth()->user()->name;
-        $categoryName = Category::find($validated['category_id'])->nombre ?? '—';
-        
-        Notification::send($usersToNotify, new TrainingUploaded($training, $coachName, $categoryName));
+            // Notificar a todos los usuarios
+            $usersToNotify = User::all();
+            $coachName = auth()->user()->name;
+            $categoryName = Category::find($validated['category_id'])->nombre ?? '—';
+            
+            Notification::send($usersToNotify, new TrainingUploaded($training, $coachName, $categoryName));
 
-        \App\Services\ActivityLogger::log(
-            'subida_planificacion', 
-            "Nueva planificación subida para la categoría {$categoryName}.",
-            $training
-        );
+            \App\Services\ActivityLogger::log(
+                'subida_planificacion', 
+                "Nueva planificación subida para la categoría {$categoryName}.",
+                $training
+            );
 
-        $route = auth()->user()->hasRole('Coach') ? 'coach.planificaciones' : 'trainings.index';
-        return redirect()->route($route)->with('success', 'Planificación registrada correctamente.');
+            $route = auth()->user()->hasRole('Coach') ? 'coach.planificaciones' : 'trainings.index';
+            return redirect()->route($route)->with('success', 'Planificación registrada correctamente.');
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error en TrainingController@store: ' . $e->getMessage());
+            return redirect()->back()->withInput()->with('error', 'Error al registrar planificación: ' . $e->getMessage());
+        }
     }
 
     public function edit(Training $training)
