@@ -29,6 +29,7 @@
                 <th>C.I.</th>
                 <th>Categoría</th>
                 <th>Género</th>
+                <th>Seguro Médico</th>
             </tr>
         </thead>
         <tbody>
@@ -38,6 +39,15 @@
                 <td>{{ $athlete->ci }}</td>
                 <td><span class="category-badge">{{ $athlete->category->nombre ?? 'N/A' }}</span></td>
                 <td>{{ $athlete->genero }}</td>
+                <td>
+                    @if($athlete->tiene_seguro)
+                        <div style="font-weight: bold; color: #10b981;">SÍ</div>
+                        <div style="font-size: 10px; color: #666;">{{ $athlete->seguro_compania }}</div>
+                        <div style="font-size: 10px; color: #666;">{{ $athlete->seguro_contacto }}</div>
+                    @else
+                        <div style="color: #ef4444;">NO</div>
+                    @endif
+                </td>
             </tr>
             @endforeach
         </tbody>

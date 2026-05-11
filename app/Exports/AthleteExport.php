@@ -47,12 +47,14 @@ class AthleteExport implements FromCollection, WithHeadings, WithMapping, WithSt
             'Fecha de Nacimiento',  // G - Formato: DD/MM/AAAA
             'Género',               // H - Masculino / Femenino
             'Alergias',             // I - Opcional
-            'Seguro Médico',        // J - Opcional
-            'Tutor Nombres',        // K - Opcional
-            'Tutor Ape. Paterno',   // L - Opcional
-            'Tutor Ape. Materno',   // M - Opcional
-            'Tutor Teléfono',       // N - Opcional
-            'Habilitado',           // O - SÍ / NO
+            'Tiene Seguro',         // J - SÍ / NO
+            'Aseguradora',          // K - Opcional
+            'Teléfono Seguro',       // L - Opcional
+            'Tutor Nombres',        // M - Opcional
+            'Tutor Ape. Paterno',   // N - Opcional
+            'Tutor Ape. Materno',   // O - Opcional
+            'Tutor Teléfono',       // P - Opcional
+            'Habilitado',           // Q - SÍ / NO
         ];
     }
 
@@ -67,7 +69,9 @@ class AthleteExport implements FromCollection, WithHeadings, WithMapping, WithSt
             $athlete->fecha_nacimiento?->format('d/m/Y'),
             $athlete->genero,
             $athlete->alergias,
-            $athlete->seguro_medico,
+            $athlete->tiene_seguro ? 'SÍ' : 'NO',
+            $athlete->seguro_compania,
+            $athlete->seguro_contacto,
             $athlete->nombre_padre,
             $athlete->apellido_paterno_padre,
             $athlete->apellido_materno_padre,
@@ -87,12 +91,14 @@ class AthleteExport implements FromCollection, WithHeadings, WithMapping, WithSt
             'F' => 18,  // Fecha Nacimiento
             'G' => 13,  // Género
             'H' => 22,  // Alergias
-            'I' => 22,  // Seguro Médico
-            'J' => 20,  // Tutor Nombres
-            'K' => 20,  // Tutor Ape. Paterno
-            'L' => 20,  // Tutor Ape. Materno
-            'M' => 18,  // Tutor Teléfono
-            'N' => 12,  // Habilitado
+            'I' => 12,  // Tiene Seguro
+            'J' => 22,  // Aseguradora
+            'K' => 18,  // Teléfono Seguro
+            'L' => 20,  // Tutor Nombres
+            'M' => 20,  // Tutor Ape. Paterno
+            'N' => 20,  // Tutor Ape. Materno
+            'O' => 18,  // Tutor Teléfono
+            'P' => 12,  // Habilitado
         ];
     }
 
@@ -131,7 +137,7 @@ class AthleteExport implements FromCollection, WithHeadings, WithMapping, WithSt
             AfterSheet::class => function (AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
                 $lastRow = $sheet->getHighestRow();
-                $lastCol = 'N';
+                $lastCol = 'P';
 
                 // Altura de la fila de encabezado
                 $sheet->getRowDimension(1)->setRowHeight(40);
@@ -158,7 +164,7 @@ class AthleteExport implements FromCollection, WithHeadings, WithMapping, WithSt
                 }
 
                 // Centrar columnas específicas
-                $centerCols = ['D', 'E', 'F', 'G', 'M', 'N'];
+                $centerCols = ['D', 'E', 'F', 'G', 'I', 'K', 'O', 'P'];
                 foreach ($centerCols as $col) {
                     $sheet->getStyle("{$col}2:{$col}{$lastRow}")->getAlignment()
                         ->setHorizontal(Alignment::HORIZONTAL_CENTER);
