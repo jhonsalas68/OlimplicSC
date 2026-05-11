@@ -325,7 +325,7 @@ class AthleteController extends Controller
     {
         $query = $this->getFilteredAthletesQuery($request);
         $athletes = $query->get();
-        $pdf = Pdf::loadView('admin.athletes.export_pdf', compact('athletes'));
+        $pdf = Pdf::loadView('admin.athletes.export_data_pdf', compact('athletes'));
         return $pdf->download('lista_atletas_olimpic.pdf');
     }
 

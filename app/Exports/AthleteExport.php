@@ -50,11 +50,15 @@ class AthleteExport implements FromCollection, WithHeadings, WithMapping, WithSt
             'Tiene Seguro',         // J - SÍ / NO
             'Aseguradora',          // K - Opcional
             'Teléfono Seguro',       // L - Opcional
-            'Tutor Nombres',        // M - Opcional
-            'Tutor Ape. Paterno',   // N - Opcional
-            'Tutor Ape. Materno',   // O - Opcional
-            'Tutor Teléfono',       // P - Opcional
-            'Habilitado',           // Q - SÍ / NO
+            'Tutor Relación',       // M - Ej: Padre, Madre...
+            'Tutor Nombres',        // N - Opcional
+            'Tutor Ape. Paterno',   // O - Opcional
+            'Tutor Ape. Materno',   // P - Opcional
+            'Tutor Teléfono',       // Q - Opcional
+            'Contacto Emergencia',  // R - Nombre (Mayores edad)
+            'Contacto Teléfono',    // S - Opcional
+            'Contacto Relación',    // T - Ej: Cónyuge, Amigo...
+            'Habilitado',           // U - SÍ / NO
         ];
     }
 
@@ -72,10 +76,14 @@ class AthleteExport implements FromCollection, WithHeadings, WithMapping, WithSt
             $athlete->tiene_seguro ? 'SÍ' : 'NO',
             $athlete->seguro_compania,
             $athlete->seguro_contacto,
+            $athlete->relacion_contacto,
             $athlete->nombre_padre,
             $athlete->apellido_paterno_padre,
             $athlete->apellido_materno_padre,
             $athlete->telefono_padre,
+            $athlete->contacto_nombre,
+            $athlete->contacto_telefono,
+            $athlete->contacto_relacion,
             $athlete->habilitado_booleano ? 'SÍ' : 'NO',
         ];
     }
@@ -94,11 +102,15 @@ class AthleteExport implements FromCollection, WithHeadings, WithMapping, WithSt
             'I' => 12,  // Tiene Seguro
             'J' => 22,  // Aseguradora
             'K' => 18,  // Teléfono Seguro
-            'L' => 20,  // Tutor Nombres
-            'M' => 20,  // Tutor Ape. Paterno
-            'N' => 20,  // Tutor Ape. Materno
-            'O' => 18,  // Tutor Teléfono
-            'P' => 12,  // Habilitado
+            'L' => 18,  // Tutor Relación
+            'M' => 20,  // Tutor Nombres
+            'N' => 20,  // Tutor Ape. Paterno
+            'O' => 20,  // Tutor Ape. Materno
+            'P' => 18,  // Tutor Teléfono
+            'Q' => 22,  // Contacto Emergencia
+            'R' => 18,  // Contacto Teléfono
+            'S' => 18,  // Contacto Relación
+            'T' => 12,  // Habilitado
         ];
     }
 
@@ -137,7 +149,7 @@ class AthleteExport implements FromCollection, WithHeadings, WithMapping, WithSt
             AfterSheet::class => function (AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
                 $lastRow = $sheet->getHighestRow();
-                $lastCol = 'P';
+                $lastCol = 'T';
 
                 // Altura de la fila de encabezado
                 $sheet->getRowDimension(1)->setRowHeight(40);
@@ -164,7 +176,7 @@ class AthleteExport implements FromCollection, WithHeadings, WithMapping, WithSt
                 }
 
                 // Centrar columnas específicas
-                $centerCols = ['D', 'E', 'F', 'G', 'I', 'K', 'O', 'P'];
+                $centerCols = ['D', 'E', 'F', 'G', 'I', 'K', 'P', 'R', 'S', 'T'];
                 foreach ($centerCols as $col) {
                     $sheet->getStyle("{$col}2:{$col}{$lastRow}")->getAlignment()
                         ->setHorizontal(Alignment::HORIZONTAL_CENTER);
