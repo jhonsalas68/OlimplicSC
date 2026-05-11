@@ -58,7 +58,10 @@
     </div>
 
     {{-- Categorías (solo para Coach) --}}
-    <div class="md:col-span-2" id="campo-categorias" style="display:none;">
+    @php
+        $isCoach = old('role', isset($user) ? $user->roles->first()?->name : '') === 'Coach';
+    @endphp
+    <div class="md:col-span-2" id="campo-categorias" style="display: {{ $isCoach ? 'block' : 'none' }};">
         <div class="flex items-center justify-between mb-2">
             <label class="block text-sm font-semibold text-slate-700">
                 Categorías del Coach

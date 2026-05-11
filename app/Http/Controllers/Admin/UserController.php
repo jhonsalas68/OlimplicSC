@@ -121,6 +121,7 @@ class UserController extends Controller
             return back()->with('error', 'La cuenta de SuperAdmin es intocable y no puede ser editada.');
         }
 
+        $user->load(['roles', 'categories']); // Aseguramos carga de relaciones
         $roles = Role::whereNotIn('name', ['SuperAdmin', 'Student'])->get();
         $categories = Category::orderBy('edad_min')->get();
         return view('admin.users.edit', compact('user', 'roles', 'categories'));
