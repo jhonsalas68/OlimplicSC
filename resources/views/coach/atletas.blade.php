@@ -50,7 +50,6 @@
                 <option value="">Género: Todos</option>
                 <option value="Masculino" {{ request('genero') === 'Masculino' ? 'selected' : '' }}>♂️ Masculino</option>
                 <option value="Femenino" {{ request('genero') === 'Femenino' ? 'selected' : '' }}>♀️ Femenino</option>
-                <option value="Otro" {{ request('genero') === 'Otro' ? 'selected' : '' }}>⚧️ Otro</option>
             </select>
         </form>
 
