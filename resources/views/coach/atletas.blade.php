@@ -57,8 +57,8 @@
             </select>
         </form>
 
-        <div id="selection-panel" x-show="selectedIds.length > 0" x-cloak 
-             class="fixed bottom-8 right-8 z-[60] flex flex-col sm:flex-row gap-3 animate-in slide-in-from-bottom-8 duration-500">
+        <div id="selection-panel" x-show="selectedIds.length > 0 && !openConvocar" x-cloak 
+             class="fixed bottom-8 right-8 z-[40] flex flex-col sm:flex-row gap-3 animate-in slide-in-from-bottom-8 duration-500">
             
             <button @click="openConvocar = true" 
                     class="inline-flex items-center gap-3 px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-black uppercase tracking-[0.2em] rounded-2xl transition-all shadow-2xl shadow-blue-200 group whitespace-nowrap border-b-4 border-blue-800 active:border-b-0 active:translate-y-1">
