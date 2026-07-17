@@ -110,6 +110,22 @@ class CobrosController extends Controller
         ]);
 
         $atleta = Athlete::find($validated['athlete_id']);
+
+        // Si es una mensualidad, actualizamos automáticamente las fechas de habilitación del atleta
+        if ($validated['concepto'] === 'mensualidad') {
+            $mesCorrespondiente = $validated['mes_correspondiente'] ?? now()->format('Y-m');
+            try {
+                $fechaExpiracion = \Carbon\Carbon::createFromFormat('Y-m', $mesCorrespondiente)->endOfMonth()->format('Y-m-d');
+                $atleta->update([
+                    'habilitado_booleano' => true,
+                    'fecha_pago_habilitacion' => now()->format('Y-m-d'),
+                    'fecha_vencimiento_habilitacion' => $fechaExpiracion,
+                ]);
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error("Error al calcular fecha de vencimiento de habilitación: " . $e->getMessage());
+            }
+        }
+
         \App\Services\ActivityLogger::log(
             'venta_realizada', 
             "Cobro realizado a {$atleta->nombre} {$atleta->apellido_paterno} por un monto de Bs. {$validated['monto']}.",

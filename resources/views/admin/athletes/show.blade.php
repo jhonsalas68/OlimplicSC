@@ -45,14 +45,14 @@
         </div>
         <div class="px-6 mb-6 relative z-10">
             <div class="flex flex-col sm:flex-row sm:items-end gap-5">
-                <div class="-mt-12 w-24 h-24 rounded-2xl border-4 border-white shadow-md overflow-hidden bg-slate-50 flex-shrink-0 relative">
+                <div class="-mt-12 w-24 h-24 rounded-2xl border-4 border-white shadow-md overflow-hidden bg-slate-50 flex-shrink-0 relative {{ $athlete->foto ? 'cursor-zoom-in hover:shadow-lg transition-shadow' : '' }}">
                     @if($athlete->foto)
                         @php
                             $optimizedFoto = str_starts_with($athlete->foto, 'http') 
                                  ? $athlete->foto 
                                  : asset('storage/' . $athlete->foto);
                         @endphp
-                        <img src="{{ $optimizedFoto }}" class="w-full h-full object-cover">
+                        <img src="{{ $optimizedFoto }}" data-ci="{{ $athlete->ci }}" class="w-full h-full object-cover lightbox-trigger" alt="Foto de Perfil">
                     @else
                         <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#0b2d69] to-[#c61c2c] text-white font-black text-3xl">
                             {{ strtoupper(substr($athlete->nombre,0,1).substr($athlete->apellido_paterno??'',0,1)) }}
@@ -68,14 +68,29 @@
                             {{ $athlete->category->nombre ?? 'Sin categoría' }}
                         </span>
                         
-                        {{-- Estado de Mensualidad --}}
-                        @if(isset($alDia) && $alDia)
-                            <span class="text-xs font-bold text-emerald-700 bg-emerald-100 px-2.5 py-1 rounded-md shadow-sm border border-emerald-200 cursor-default flex items-center gap-1.5" title="Tiene pagada la mensualidad de este mes">
-                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Mensualidad al día ({{ ucfirst(now()->translatedFormat('F')) }})
+                        {{-- Badge 1: Estado Deportivo (Habilitado / Inhabilitado) --}}
+                        @if($athlete->habilitado_booleano)
+                            <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md shadow-sm border border-emerald-200 cursor-default flex items-center gap-1.5" title="Habilitado para jugar">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Habilitado{{ $athlete->fecha_habilitacion ? ' el ' . $athlete->fecha_habilitacion->format('d/m/Y') : '' }}
                             </span>
                         @else
-                            <span class="text-xs font-bold text-red-700 bg-red-100 px-2.5 py-1 rounded-md shadow-sm border border-red-200 cursor-default flex items-center gap-1.5" title="No ha pagado la mensualidad de este mes aún">
-                                <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span> Debe {{ ucfirst(now()->translatedFormat('F')) }}
+                            <span class="text-xs font-bold text-red-700 bg-red-50 px-2.5 py-1 rounded-md shadow-sm border border-red-200 cursor-default flex items-center gap-1.5" title="Inhabilitado para jugar">
+                                <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Inhabilitado
+                            </span>
+                        @endif
+
+                        {{-- Badge 2: Estado Administrativo (Vigencia de Mensualidad) --}}
+                        @php
+                            $mensualidadInfo = $athlete->estadoMensualidadInfo();
+                        @endphp
+                        
+                        @if($mensualidadInfo['status'] === 'al_dia')
+                            <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md shadow-sm border border-emerald-200 cursor-default flex items-center gap-1.5" title="{{ $mensualidadInfo['desc'] }}">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> {{ $mensualidadInfo['desc'] }}
+                            </span>
+                        @else
+                            <span class="text-xs font-bold text-red-700 bg-red-50 px-2.5 py-1 rounded-md shadow-sm border border-red-200 cursor-default flex items-center gap-1.5" title="{{ $mensualidadInfo['desc'] }}">
+                                <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span> {{ $mensualidadInfo['desc'] }}
                             </span>
                         @endif
                     </div>
@@ -159,6 +174,118 @@
         </div>
     </div>
 
+    {{-- Documentos y Credenciales --}}
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 mb-4">
+        <h2 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Documentación y Credenciales</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {{-- Tarjeta C.I. --}}
+            <div class="bg-slate-50 border border-slate-100 rounded-2xl p-4 flex flex-col">
+                <div class="flex items-center gap-2 mb-3">
+                    <span class="p-1.5 bg-blue-50 text-blue-600 rounded-lg">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M21 12h-4m4 4h-4m4-8h-4"/></svg>
+                    </span>
+                    <h3 class="text-xs font-black text-slate-700 uppercase tracking-wider">Carnet de Identidad (C.I.)</h3>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 mt-1 flex-1">
+                    @if($athlete->ci_anverso || $athlete->ci_reverso)
+                        <div class="flex flex-col items-center">
+                            @if($athlete->ci_anverso)
+                                <div class="relative w-full h-24 rounded-lg overflow-hidden border border-slate-200 shadow-sm hover:shadow-md transition-shadow cursor-zoom-in group bg-white">
+                                    <img src="{{ $athlete->ci_anverso }}" data-ci="{{ $athlete->ci }}" class="w-full h-full object-contain lightbox-trigger group-hover:scale-105 transition-transform duration-300" alt="C.I. Anverso">
+                                    <div class="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors pointer-events-none"></div>
+                                </div>
+                            @else
+                                <div class="w-full h-24 rounded-lg bg-slate-100 border border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400">
+                                    <span class="text-[9px] font-bold uppercase">Sin Anverso</span>
+                                </div>
+                            @endif
+                            <span class="text-[9px] font-bold text-slate-400 mt-1 uppercase">Anverso</span>
+                        </div>
+
+                        <div class="flex flex-col items-center">
+                            @if($athlete->ci_reverso)
+                                <div class="relative w-full h-24 rounded-lg overflow-hidden border border-slate-200 shadow-sm hover:shadow-md transition-shadow cursor-zoom-in group bg-white">
+                                    <img src="{{ $athlete->ci_reverso }}" data-ci="{{ $athlete->ci }}" class="w-full h-full object-contain lightbox-trigger group-hover:scale-105 transition-transform duration-300" alt="C.I. Reverso">
+                                    <div class="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors pointer-events-none"></div>
+                                </div>
+                            @else
+                                <div class="w-full h-24 rounded-lg bg-slate-100 border border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400">
+                                    <span class="text-[9px] font-bold uppercase">Sin Reverso</span>
+                                </div>
+                            @endif
+                            <span class="text-[9px] font-bold text-slate-400 mt-1 uppercase">Reverso</span>
+                        </div>
+                    @else
+                        <div class="col-span-2 py-6 text-center text-xs text-slate-400 italic">
+                            No se han subido fotos del carnet.
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+            {{-- Tarjeta Carnet Atleta --}}
+            <div class="bg-slate-50 border border-slate-100 rounded-2xl p-4 flex flex-col">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="p-1.5 bg-red-50 text-red-600 rounded-lg">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 009 11V5.071c.0-2.147-1.442-4.043-3.558-4.571m11.116 20.407A13.916 13.916 0 0015 11V5.071c0-2.147 1.442-4.043 3.558-4.571M12 11v6m0-6V5"/></svg>
+                        </span>
+                        <h3 class="text-xs font-black text-slate-700 uppercase tracking-wider">Carnet de Atleta</h3>
+                    </div>
+                    @if($athlete->tiene_carnet_atleta)
+                        <span class="px-2 py-0.5 text-[9px] font-bold bg-emerald-100 text-emerald-700 rounded border border-emerald-200">Activo</span>
+                    @else
+                        <span class="px-2 py-0.5 text-[9px] font-bold bg-slate-200 text-slate-500 rounded border border-slate-300">No aplica</span>
+                    @endif
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 mt-1 flex-1">
+                    @if($athlete->tiene_carnet_atleta)
+                        @if($athlete->carnet_atleta_anverso || $athlete->carnet_atleta_reverso)
+                            <div class="flex flex-col items-center">
+                                @if($athlete->carnet_atleta_anverso)
+                                    <div class="relative w-full h-24 rounded-lg overflow-hidden border border-slate-200 shadow-sm hover:shadow-md transition-shadow cursor-zoom-in group bg-white">
+                                        <img src="{{ $athlete->carnet_atleta_anverso }}" data-ci="{{ $athlete->ci }}" class="w-full h-full object-contain lightbox-trigger group-hover:scale-105 transition-transform duration-300" alt="Carnet Atleta Anverso">
+                                        <div class="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors pointer-events-none"></div>
+                                    </div>
+                                @else
+                                    <div class="w-full h-24 rounded-lg bg-slate-100 border border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400">
+                                        <span class="text-[9px] font-bold uppercase">Sin Anverso</span>
+                                    </div>
+                                @endif
+                                <span class="text-[9px] font-bold text-slate-400 mt-1 uppercase">Anverso</span>
+                            </div>
+
+                            <div class="flex flex-col items-center">
+                                @if($athlete->carnet_atleta_reverso)
+                                    <div class="relative w-full h-24 rounded-lg overflow-hidden border border-slate-200 shadow-sm hover:shadow-md transition-shadow cursor-zoom-in group bg-white">
+                                        <img src="{{ $athlete->carnet_atleta_reverso }}" data-ci="{{ $athlete->ci }}" class="w-full h-full object-contain lightbox-trigger group-hover:scale-105 transition-transform duration-300" alt="Carnet Atleta Reverso">
+                                        <div class="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors pointer-events-none"></div>
+                                    </div>
+                                @else
+                                    <div class="w-full h-24 rounded-lg bg-slate-100 border border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400">
+                                        <span class="text-[9px] font-bold uppercase">Sin Reverso</span>
+                                    </div>
+                                @endif
+                                <span class="text-[9px] font-bold text-slate-400 mt-1 uppercase">Reverso</span>
+                            </div>
+                        @else
+                            <div class="col-span-2 py-6 text-center text-xs text-slate-400 italic">
+                                Carnet activo, pero no se han subido fotos.
+                            </div>
+                        @endif
+                    @else
+                        <div class="col-span-2 py-6 text-center text-xs text-slate-400 italic">
+                            Este atleta no cuenta con carnet de afiliado.
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+
     {{-- Últimos pagos (Solo para Admins) --}}
     @if($pagos->count() && (auth()->user()->hasRole('Admin') || auth()->user()->hasRole('SuperAdmin')))
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
@@ -184,6 +311,82 @@
 
 </div>
 
+{{-- Lightbox Modal --}}
+<div id="lightbox-modal" class="hidden fixed inset-0 z-[100] bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4 transition-all duration-300 opacity-0">
+    <button id="lightbox-close" class="absolute top-4 right-4 text-white hover:text-slate-300 p-3 hover:bg-white/10 rounded-full transition-colors cursor-pointer focus:outline-none">
+        <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+    <div class="max-w-4xl max-h-[85vh] w-full flex flex-col items-center justify-center relative">
+        <img id="lightbox-img" class="max-w-full max-h-[80vh] rounded-xl object-contain shadow-2xl scale-95 transition-transform duration-300" src="" alt="Vista ampliada">
+        
+        <div class="flex flex-col sm:flex-row items-center gap-4 mt-4 bg-slate-900/60 px-6 py-3 rounded-2xl backdrop-blur-sm">
+            <p id="lightbox-caption" class="text-slate-300 text-sm font-bold uppercase tracking-wider"></p>
+            <span class="hidden sm:inline text-slate-600">|</span>
+            <a id="lightbox-download" href="" download target="_blank" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                Descargar Imagen
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const triggers = document.querySelectorAll('.lightbox-trigger');
+    const modal = document.getElementById('lightbox-modal');
+    const modalImg = document.getElementById('lightbox-img');
+    const caption = document.getElementById('lightbox-caption');
+    const closeBtn = document.getElementById('lightbox-close');
+    const downloadBtn = document.getElementById('lightbox-download');
+
+    if (triggers.length && modal && modalImg) {
+        triggers.forEach(trigger => {
+            trigger.addEventListener('click', (e) => {
+                const src = e.target.src;
+                const alt = e.target.alt || 'Documento';
+                
+                modalImg.src = src;
+                caption.textContent = alt;
+                
+                if (downloadBtn) {
+                    downloadBtn.href = src;
+                    // Genera un nombre de archivo limpio para la descarga
+                    const fileExtension = src.split('.').pop().split('?')[0] || 'jpg';
+                    const formattedName = alt.toLowerCase().replace(/[^a-z0-9]/g, '_');
+                    downloadBtn.download = `atleta_${formattedName}_${e.target.dataset.ci || 'doc'}.${fileExtension}`;
+                }
+                
+                // Mostrar con transiciones fijas
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                modal.style.opacity = '1';
+                modalImg.classList.remove('scale-95');
+                modalImg.classList.add('scale-100');
+            });
+        });
+
+        const closeModal = () => {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            modalImg.src = '';
+            caption.textContent = '';
+        };
+
+        closeBtn.addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal || e.target.closest('#lightbox-close')) {
+                closeModal();
+            }
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+                closeModal();
+            }
+        });
+    }
+});
+</script>
+
 @if(auth()->user()->hasRole('Admin') || auth()->user()->hasRole('SuperAdmin'))
 <script>
 function toggleHabilitado(id) {
@@ -196,17 +399,7 @@ function toggleHabilitado(id) {
     })
     .then(r => r.json())
     .then(data => {
-        const h = data.habilitado;
-        const btn   = document.getElementById('btn-toggle');
-        const dot   = document.getElementById('toggle-dot');
-        const label = document.getElementById('toggle-label');
-
-        btn.className = `inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold border-2 transition-all ${
-            h ? 'bg-emerald-50 border-emerald-300 text-emerald-700 hover:bg-red-50 hover:border-red-300 hover:text-red-600'
-              : 'bg-red-50 border-red-300 text-red-600 hover:bg-emerald-50 hover:border-emerald-300 hover:text-emerald-700'
-        }`;
-        dot.className   = `w-2.5 h-2.5 rounded-full ${h ? 'bg-emerald-500' : 'bg-red-500'}`;
-        label.textContent = h ? 'Habilitado' : 'Inhabilitado';
+        window.location.reload();
     });
 }
 </script>

@@ -140,8 +140,16 @@ class AthleteController extends Controller
             'fecha_nacimiento'        => 'required|date',
             'genero'                  => 'nullable|in:Masculino,Femenino',
             'foto'                    => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+            'ci_anverso'              => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+            'ci_reverso'              => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+            'tiene_carnet_atleta'     => 'nullable|boolean',
+            'carnet_atleta_anverso'   => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+            'carnet_atleta_reverso'   => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
             'alergias'                => 'nullable|string',
             'habilitado_booleano'     => 'nullable|boolean',
+            'fecha_habilitacion'      => 'nullable|date',
+            'fecha_pago_habilitacion' => 'nullable|date',
+            'fecha_vencimiento_habilitacion' => 'nullable|date',
             'tiene_seguro'            => 'nullable|boolean',
             'seguro_compania'         => 'nullable|string|max:255',
             'seguro_contacto'         => 'nullable|string|max:255',
@@ -161,11 +169,52 @@ class AthleteController extends Controller
         ]);
 
         try {
+            $ci = $request->ci;
+            $folder = "athletes/{$ci}";
+
+            // Subida de foto de perfil
             if ($request->hasFile('foto')) {
                 $file = $request->file('foto');
-                $filename = uniqid() . '.' . $file->getClientOriginalExtension();
-                $path = Storage::disk('r2')->putFileAs('athletes', $file, $filename);
+                $filename = "perfil_" . uniqid() . '.' . $file->getClientOriginalExtension();
+                $path = Storage::disk('r2')->putFileAs($folder, $file, $filename);
                 $validated['foto'] = Storage::disk('r2')->url($path);
+            }
+
+            // Subida de CI Anverso
+            if ($request->hasFile('ci_anverso')) {
+                $file = $request->file('ci_anverso');
+                $filename = "ci_anverso_" . uniqid() . '.' . $file->getClientOriginalExtension();
+                $path = Storage::disk('r2')->putFileAs($folder, $file, $filename);
+                $validated['ci_anverso'] = Storage::disk('r2')->url($path);
+            }
+
+            // Subida de CI Reverso
+            if ($request->hasFile('ci_reverso')) {
+                $file = $request->file('ci_reverso');
+                $filename = "ci_reverso_" . uniqid() . '.' . $file->getClientOriginalExtension();
+                $path = Storage::disk('r2')->putFileAs($folder, $file, $filename);
+                $validated['ci_reverso'] = Storage::disk('r2')->url($path);
+            }
+
+            $validated['tiene_carnet_atleta'] = $request->has('tiene_carnet_atleta');
+
+            // Subida de Carnet de Atleta (solo si tiene_carnet_atleta es verdadero)
+            if ($validated['tiene_carnet_atleta']) {
+                if ($request->hasFile('carnet_atleta_anverso')) {
+                    $file = $request->file('carnet_atleta_anverso');
+                    $filename = "carnet_atleta_anverso_" . uniqid() . '.' . $file->getClientOriginalExtension();
+                    $path = Storage::disk('r2')->putFileAs($folder, $file, $filename);
+                    $validated['carnet_atleta_anverso'] = Storage::disk('r2')->url($path);
+                }
+                if ($request->hasFile('carnet_atleta_reverso')) {
+                    $file = $request->file('carnet_atleta_reverso');
+                    $filename = "carnet_atleta_reverso_" . uniqid() . '.' . $file->getClientOriginalExtension();
+                    $path = Storage::disk('r2')->putFileAs($folder, $file, $filename);
+                    $validated['carnet_atleta_reverso'] = Storage::disk('r2')->url($path);
+                }
+            } else {
+                $validated['carnet_atleta_anverso'] = null;
+                $validated['carnet_atleta_reverso'] = null;
             }
 
             $validated['habilitado_booleano'] = $request->has('habilitado_booleano');
@@ -214,8 +263,16 @@ class AthleteController extends Controller
             'fecha_nacimiento'        => 'required|date',
             'genero'                  => 'nullable|in:Masculino,Femenino',
             'foto'                    => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+            'ci_anverso'              => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+            'ci_reverso'              => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+            'tiene_carnet_atleta'     => 'nullable|boolean',
+            'carnet_atleta_anverso'   => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+            'carnet_atleta_reverso'   => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
             'alergias'                => 'nullable|string',
             'habilitado_booleano'     => 'nullable|boolean',
+            'fecha_habilitacion'      => 'nullable|date',
+            'fecha_pago_habilitacion' => 'nullable|date',
+            'fecha_vencimiento_habilitacion' => 'nullable|date',
             'tiene_seguro'            => 'nullable|boolean',
             'seguro_compania'         => 'nullable|string|max:255',
             'seguro_contacto'         => 'nullable|string|max:255',
@@ -235,14 +292,104 @@ class AthleteController extends Controller
         ]);
 
         try {
+            $ci = $request->ci;
+            $folder = "athletes/{$ci}";
+
+            // 1. Manejo del cambio de C.I. (mover carpeta en R2 si cambia)
+            if ($request->ci !== $athlete->ci) {
+                $oldCi = $athlete->ci;
+                $oldFolder = "athletes/{$oldCi}";
+                
+                try {
+                    $files = Storage::disk('r2')->files($oldFolder);
+                    if (!empty($files)) {
+                        foreach ($files as $file) {
+                            $newPath = str_replace($oldFolder, $folder, $file);
+                            Storage::disk('r2')->move($file, $newPath);
+                        }
+                        
+                        // Reemplazar la base de la URL en los campos existentes para apuntar al nuevo path
+                        $oldBaseUrl = Storage::disk('r2')->url($oldFolder);
+                        $newBaseUrl = Storage::disk('r2')->url($folder);
+                        
+                        foreach (['foto', 'ci_anverso', 'ci_reverso', 'carnet_atleta_anverso', 'carnet_atleta_reverso'] as $field) {
+                            if ($athlete->$field) {
+                                $athlete->$field = str_replace($oldBaseUrl, $newBaseUrl, $athlete->$field);
+                            }
+                        }
+                        // Guardamos temporalmente en el modelo los paths actualizados
+                        $athlete->save();
+                    }
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::warning("No se pudo renombrar la carpeta en R2 al cambiar el CI: " . $e->getMessage());
+                }
+            }
+
+            // 2. Subida y reemplazo de foto de perfil
             if ($request->hasFile('foto')) {
                 if ($athlete->foto) {
                     $this->deleteFile($athlete->foto);
                 }
                 $file = $request->file('foto');
-                $filename = uniqid() . '.' . $file->getClientOriginalExtension();
-                $path = Storage::disk('r2')->putFileAs('athletes', $file, $filename);
+                $filename = "perfil_" . uniqid() . '.' . $file->getClientOriginalExtension();
+                $path = Storage::disk('r2')->putFileAs($folder, $file, $filename);
                 $validated['foto'] = Storage::disk('r2')->url($path);
+            }
+
+            // 3. Subida y reemplazo de CI Anverso
+            if ($request->hasFile('ci_anverso')) {
+                if ($athlete->ci_anverso) {
+                    $this->deleteFile($athlete->ci_anverso);
+                }
+                $file = $request->file('ci_anverso');
+                $filename = "ci_anverso_" . uniqid() . '.' . $file->getClientOriginalExtension();
+                $path = Storage::disk('r2')->putFileAs($folder, $file, $filename);
+                $validated['ci_anverso'] = Storage::disk('r2')->url($path);
+            }
+
+            // 4. Subida y reemplazo de CI Reverso
+            if ($request->hasFile('ci_reverso')) {
+                if ($athlete->ci_reverso) {
+                    $this->deleteFile($athlete->ci_reverso);
+                }
+                $file = $request->file('ci_reverso');
+                $filename = "ci_reverso_" . uniqid() . '.' . $file->getClientOriginalExtension();
+                $path = Storage::disk('r2')->putFileAs($folder, $file, $filename);
+                $validated['ci_reverso'] = Storage::disk('r2')->url($path);
+            }
+
+            $validated['tiene_carnet_atleta'] = $request->has('tiene_carnet_atleta');
+
+            // 5. Subida y reemplazo de Carnet de Atleta
+            if ($validated['tiene_carnet_atleta']) {
+                if ($request->hasFile('carnet_atleta_anverso')) {
+                    if ($athlete->carnet_atleta_anverso) {
+                        $this->deleteFile($athlete->carnet_atleta_anverso);
+                    }
+                    $file = $request->file('carnet_atleta_anverso');
+                    $filename = "carnet_atleta_anverso_" . uniqid() . '.' . $file->getClientOriginalExtension();
+                    $path = Storage::disk('r2')->putFileAs($folder, $file, $filename);
+                    $validated['carnet_atleta_anverso'] = Storage::disk('r2')->url($path);
+                }
+                if ($request->hasFile('carnet_atleta_reverso')) {
+                    if ($athlete->carnet_atleta_reverso) {
+                        $this->deleteFile($athlete->carnet_atleta_reverso);
+                    }
+                    $file = $request->file('carnet_atleta_reverso');
+                    $filename = "carnet_atleta_reverso_" . uniqid() . '.' . $file->getClientOriginalExtension();
+                    $path = Storage::disk('r2')->putFileAs($folder, $file, $filename);
+                    $validated['carnet_atleta_reverso'] = Storage::disk('r2')->url($path);
+                }
+            } else {
+                // Si ya no tiene carnet de atleta, eliminar las fotos existentes de R2 y BD
+                if ($athlete->carnet_atleta_anverso) {
+                    $this->deleteFile($athlete->carnet_atleta_anverso);
+                }
+                if ($athlete->carnet_atleta_reverso) {
+                    $this->deleteFile($athlete->carnet_atleta_reverso);
+                }
+                $validated['carnet_atleta_anverso'] = null;
+                $validated['carnet_atleta_reverso'] = null;
             }
 
             $validated['habilitado_booleano'] = $request->has('habilitado_booleano');
@@ -265,9 +412,13 @@ class AthleteController extends Controller
 
     public function destroy(Athlete $athlete)
     {
-        if ($athlete->foto) {
-            $this->deleteFile($athlete->foto);
+        // Eliminar todas las imágenes del atleta de Cloudflare R2
+        foreach (['foto', 'ci_anverso', 'ci_reverso', 'carnet_atleta_anverso', 'carnet_atleta_reverso'] as $field) {
+            if ($athlete->$field) {
+                $this->deleteFile($athlete->$field);
+            }
         }
+
         \App\Services\ActivityLogger::log(
             'eliminacion_atleta', 
             "Atleta eliminado del sistema: {$athlete->nombre} {$athlete->apellido_paterno}.",
@@ -284,7 +435,12 @@ class AthleteController extends Controller
         if (Auth::user()->hasRole('Coach')) {
             return response()->json(['error' => 'No autorizado'], 403);
         }
-        $athlete->update(['habilitado_booleano' => !$athlete->habilitado_booleano]);
+        
+        $nuevoEstado = !$athlete->habilitado_booleano;
+        $athlete->update([
+            'habilitado_booleano' => $nuevoEstado,
+            'fecha_habilitacion' => $nuevoEstado ? ($athlete->fecha_habilitacion ?: now()) : null
+        ]);
         
         $estado = $athlete->habilitado_booleano ? 'Habilitado' : 'Deshabilitado';
         \App\Services\ActivityLogger::log(

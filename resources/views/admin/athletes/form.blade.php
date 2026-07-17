@@ -176,16 +176,214 @@
         </div>
     </div>
 
+    {{-- ── DOCUMENTACIÓN DE IDENTIDAD ── --}}
+    <div class="md:col-span-2 bg-white p-8 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/40 relative overflow-hidden mb-4">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-red-50/20 rounded-full -mr-32 -mt-32 blur-3xl"></div>
+        
+        <h4 class="text-sm font-black text-slate-800 uppercase tracking-widest mb-2 relative z-10">Carnet de Identidad (C.I.)</h4>
+        <p class="text-xs text-slate-400 mb-6 relative z-10">Sube fotos legibles del anverso y reverso del documento de identidad</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
+            <!-- Anverso C.I. -->
+            <div class="flex flex-col items-center p-6 bg-slate-50 border border-slate-100 rounded-2xl relative group">
+                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Anverso (Frente)</label>
+                <div class="relative w-full max-w-[240px] h-36 rounded-xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400 bg-white overflow-hidden hover:border-blue-400 transition-colors">
+                    
+                    {{-- Placeholder --}}
+                    <div id="ci_anverso_placeholder" class="flex flex-col items-center justify-center p-4 text-center cursor-pointer w-full h-full {{ (isset($athlete) && $athlete->ci_anverso) ? 'hidden' : '' }}" onclick="document.getElementById('ci_anverso').click()">
+                        <svg class="h-8 w-8 mb-2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        <span class="text-[10px] font-black uppercase tracking-tight text-slate-500">Subir Anverso</span>
+                    </div>
+
+                    {{-- Preview --}}
+                    <div id="ci_anverso_preview_container" class="relative w-full h-full cursor-zoom-in {{ (isset($athlete) && $athlete->ci_anverso) ? '' : 'hidden' }}" onclick="verImagenGrande('ci_anverso_preview')">
+                        <img id="ci_anverso_preview" class="w-full h-full object-cover" src="{{ $athlete->ci_anverso ?? '' }}" alt="C.I. Anverso">
+                    </div>
+
+                </div>
+
+                {{-- Botones de Acción --}}
+                <div id="ci_anverso_actions" class="flex gap-2 mt-3 {{ (isset($athlete) && $athlete->ci_anverso) ? '' : 'hidden' }}">
+                    <button type="button" onclick="verImagenGrande('ci_anverso_preview')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold uppercase rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 shadow-sm">
+                        👁 Ver
+                    </button>
+                    <button type="button" onclick="document.getElementById('ci_anverso').click()" class="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 text-[10px] font-bold uppercase rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 shadow-sm">
+                        ✏ Cambiar
+                    </button>
+                </div>
+
+                <input type="file" name="ci_anverso" id="ci_anverso" class="hidden" accept="image/*" onchange="previewDocument(event, 'ci_anverso_preview', 'ci_anverso_placeholder', 'ci_anverso_preview_container', 'ci_anverso_actions')">
+                @error('ci_anverso')
+                    <p class="mt-2 text-xs font-bold text-red-500 bg-red-50 p-1.5 rounded-lg border border-red-100">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <!-- Reverso C.I. -->
+            <div class="flex flex-col items-center p-6 bg-slate-50 border border-slate-100 rounded-2xl relative group">
+                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Reverso (Atrás)</label>
+                <div class="relative w-full max-w-[240px] h-36 rounded-xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400 bg-white overflow-hidden hover:border-blue-400 transition-colors">
+                    
+                    {{-- Placeholder --}}
+                    <div id="ci_reverso_placeholder" class="flex flex-col items-center justify-center p-4 text-center cursor-pointer w-full h-full {{ (isset($athlete) && $athlete->ci_reverso) ? 'hidden' : '' }}" onclick="document.getElementById('ci_reverso').click()">
+                        <svg class="h-8 w-8 mb-2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        <span class="text-[10px] font-black uppercase tracking-tight text-slate-500">Subir Reverso</span>
+                    </div>
+
+                    {{-- Preview --}}
+                    <div id="ci_reverso_preview_container" class="relative w-full h-full cursor-zoom-in {{ (isset($athlete) && $athlete->ci_reverso) ? '' : 'hidden' }}" onclick="verImagenGrande('ci_reverso_preview')">
+                        <img id="ci_reverso_preview" class="w-full h-full object-cover" src="{{ $athlete->ci_reverso ?? '' }}" alt="C.I. Reverso">
+                    </div>
+
+                </div>
+
+                {{-- Botones de Acción --}}
+                <div id="ci_reverso_actions" class="flex gap-2 mt-3 {{ (isset($athlete) && $athlete->ci_reverso) ? '' : 'hidden' }}">
+                    <button type="button" onclick="verImagenGrande('ci_reverso_preview')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold uppercase rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 shadow-sm">
+                        👁 Ver
+                    </button>
+                    <button type="button" onclick="document.getElementById('ci_reverso').click()" class="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 text-[10px] font-bold uppercase rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 shadow-sm">
+                        ✏ Cambiar
+                    </button>
+                </div>
+
+                <input type="file" name="ci_reverso" id="ci_reverso" class="hidden" accept="image/*" onchange="previewDocument(event, 'ci_reverso_preview', 'ci_reverso_placeholder', 'ci_reverso_preview_container', 'ci_reverso_actions')">
+                @error('ci_reverso')
+                    <p class="mt-2 text-xs font-bold text-red-500 bg-red-50 p-1.5 rounded-lg border border-red-100">{{ $message }}</p>
+                @enderror
+            </div>
+        </div>
+    </div>
+
+    {{-- ── CARNET DE ATLETA ── --}}
+    <div class="md:col-span-2 bg-white p-8 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/40 relative overflow-hidden mb-4">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-blue-50/20 rounded-full -mr-32 -mt-32 blur-3xl"></div>
+        
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 relative z-10">
+            <div>
+                <h4 class="text-sm font-black text-slate-800 uppercase tracking-widest">Carnet de Atleta</h4>
+                <p class="text-xs text-slate-400 mt-1">Habilita y sube el carnet de afiliación de atleta del club</p>
+            </div>
+            <label class="relative flex items-center cursor-pointer group">
+                <input type="checkbox" name="tiene_carnet_atleta" id="tiene_carnet_atleta" value="1"
+                    {{ old('tiene_carnet_atleta', $athlete->tiene_carnet_atleta ?? false) ? 'checked' : '' }}
+                    class="sr-only peer" onchange="toggleCarnetAtleta(this.checked)">
+                <div class="w-14 h-7 bg-slate-100 border border-slate-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-100 peer-checked:bg-blue-600 peer-checked:border-blue-600 transition-all
+                    after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:rounded-full after:h-[20px] after:w-[20px] after:transition-all after:shadow-sm peer-checked:after:translate-x-7"></div>
+                <span class="ml-3 text-sm font-bold text-slate-700" id="carnet-atleta-label">
+                    {{ old('tiene_carnet_atleta', $athlete->tiene_carnet_atleta ?? false) ? 'Sí tiene' : 'No tiene' }}
+                </span>
+            </label>
+        </div>
+
+        <div id="carnet-atleta-detalle" class="{{ old('tiene_carnet_atleta', $athlete->tiene_carnet_atleta ?? false) ? '' : 'hidden' }} grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-slate-50 relative z-10">
+            <!-- Anverso Carnet Atleta -->
+            <div class="flex flex-col items-center p-6 bg-slate-50 border border-slate-100 rounded-2xl relative group">
+                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Anverso Carnet Atleta</label>
+                <div class="relative w-full max-w-[240px] h-36 rounded-xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400 bg-white overflow-hidden hover:border-blue-400 transition-colors">
+                    
+                    {{-- Placeholder --}}
+                    <div id="carnet_atleta_anverso_placeholder" class="flex flex-col items-center justify-center p-4 text-center cursor-pointer w-full h-full {{ (isset($athlete) && $athlete->carnet_atleta_anverso) ? 'hidden' : '' }}" onclick="document.getElementById('carnet_atleta_anverso').click()">
+                        <svg class="h-8 w-8 mb-2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        <span class="text-[10px] font-black uppercase tracking-tight text-slate-500">Subir Frente</span>
+                    </div>
+
+                    {{-- Preview --}}
+                    <div id="carnet_atleta_anverso_preview_container" class="relative w-full h-full cursor-zoom-in {{ (isset($athlete) && $athlete->carnet_atleta_anverso) ? '' : 'hidden' }}" onclick="verImagenGrande('carnet_atleta_anverso_preview')">
+                        <img id="carnet_atleta_anverso_preview" class="w-full h-full object-cover" src="{{ $athlete->carnet_atleta_anverso ?? '' }}" alt="Carnet Atleta Anverso">
+                    </div>
+
+                </div>
+
+                {{-- Botones de Acción --}}
+                <div id="carnet_atleta_anverso_actions" class="flex gap-2 mt-3 {{ (isset($athlete) && $athlete->carnet_atleta_anverso) ? '' : 'hidden' }}">
+                    <button type="button" onclick="verImagenGrande('carnet_atleta_anverso_preview')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold uppercase rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 shadow-sm">
+                        👁 Ver
+                    </button>
+                    <button type="button" onclick="document.getElementById('carnet_atleta_anverso').click()" class="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 text-[10px] font-bold uppercase rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 shadow-sm">
+                        ✏ Cambiar
+                    </button>
+                </div>
+
+                <input type="file" name="carnet_atleta_anverso" id="carnet_atleta_anverso" class="hidden" accept="image/*" onchange="previewDocument(event, 'carnet_atleta_anverso_preview', 'carnet_atleta_anverso_placeholder', 'carnet_atleta_anverso_preview_container', 'carnet_atleta_anverso_actions')">
+                @error('carnet_atleta_anverso')
+                    <p class="mt-2 text-xs font-bold text-red-500 bg-red-50 p-1.5 rounded-lg border border-red-100">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <!-- Reverso Carnet Atleta -->
+            <div class="flex flex-col items-center p-6 bg-slate-50 border border-slate-100 rounded-2xl relative group">
+                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Reverso Carnet Atleta</label>
+                <div class="relative w-full max-w-[240px] h-36 rounded-xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400 bg-white overflow-hidden hover:border-blue-400 transition-colors">
+                    
+                    {{-- Placeholder --}}
+                    <div id="carnet_atleta_reverso_placeholder" class="flex flex-col items-center justify-center p-4 text-center cursor-pointer w-full h-full {{ (isset($athlete) && $athlete->carnet_atleta_reverso) ? 'hidden' : '' }}" onclick="document.getElementById('carnet_atleta_reverso').click()">
+                        <svg class="h-8 w-8 mb-2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        <span class="text-[10px] font-black uppercase tracking-tight text-slate-500">Subir Atrás</span>
+                    </div>
+
+                    {{-- Preview --}}
+                    <div id="carnet_atleta_reverso_preview_container" class="relative w-full h-full cursor-zoom-in {{ (isset($athlete) && $athlete->carnet_atleta_reverso) ? '' : 'hidden' }}" onclick="verImagenGrande('carnet_atleta_reverso_preview')">
+                        <img id="carnet_atleta_reverso_preview" class="w-full h-full object-cover" src="{{ $athlete->carnet_atleta_reverso ?? '' }}" alt="Carnet Atleta Reverso">
+                    </div>
+
+                </div>
+
+                {{-- Botones de Acción --}}
+                <div id="carnet_atleta_reverso_actions" class="flex gap-2 mt-3 {{ (isset($athlete) && $athlete->carnet_atleta_reverso) ? '' : 'hidden' }}">
+                    <button type="button" onclick="verImagenGrande('carnet_atleta_reverso_preview')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold uppercase rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 shadow-sm">
+                        👁 Ver
+                    </button>
+                    <button type="button" onclick="document.getElementById('carnet_atleta_reverso').click()" class="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 text-[10px] font-bold uppercase rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 shadow-sm">
+                        ✏ Cambiar
+                    </button>
+                </div>
+
+                <input type="file" name="carnet_atleta_reverso" id="carnet_atleta_reverso" class="hidden" accept="image/*" onchange="previewDocument(event, 'carnet_atleta_reverso_preview', 'carnet_atleta_reverso_placeholder', 'carnet_atleta_reverso_preview_container', 'carnet_atleta_reverso_actions')">
+                @error('carnet_atleta_reverso')
+                    <p class="mt-2 text-xs font-bold text-red-500 bg-red-50 p-1.5 rounded-lg border border-red-100">{{ $message }}</p>
+                @enderror
+            </div>
+        </div>
+    </div>
+
     {{-- ── ESTADO Y HABILITACIÓN ── --}}
-    <div class="md:col-span-2 bg-white p-8 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/40 relative overflow-hidden">
-        <label class="relative flex items-center cursor-pointer group">
-            <input type="checkbox" name="habilitado_booleano" value="1"
-                {{ old('habilitado_booleano', $athlete->habilitado_booleano ?? true) ? 'checked' : '' }}
-                class="sr-only peer">
-            <div class="w-14 h-7 bg-slate-100 border border-slate-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-emerald-100 peer-checked:bg-emerald-600 peer-checked:border-emerald-600 transition-all
-                after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:rounded-full after:h-[20px] after:w-[20px] after:transition-all after:shadow-sm peer-checked:after:translate-x-7"></div>
-            <span class="ml-4 text-sm font-bold text-slate-700">habilitado para jugar</span>
-        </label>
+    <div class="md:col-span-1 bg-white p-8 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/40 relative overflow-hidden mb-4">
+        <h4 class="text-sm font-black text-slate-800 uppercase tracking-widest mb-4">Estatus Deportivo</h4>
+        <div class="space-y-4">
+            <label class="relative flex items-center cursor-pointer group">
+                <input type="checkbox" name="habilitado_booleano" id="habilitado_booleano" value="1"
+                    {{ old('habilitado_booleano', $athlete->habilitado_booleano ?? true) ? 'checked' : '' }}
+                    class="sr-only peer" onchange="toggleFechaHabilitacion(this.checked)">
+                <div class="w-14 h-7 bg-slate-100 border border-slate-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-emerald-100 peer-checked:bg-emerald-600 peer-checked:border-emerald-600 transition-all
+                    after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:rounded-full after:h-[20px] after:w-[20px] after:transition-all after:shadow-sm peer-checked:after:translate-x-7"></div>
+                <span class="ml-4 text-sm font-bold text-slate-700">Habilitado para jugar</span>
+            </label>
+
+            <div id="fecha-habilitacion-container" class="{{ old('habilitado_booleano', $athlete->habilitado_booleano ?? true) ? '' : 'hidden' }}">
+                <label for="fecha_habilitacion" class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Fecha de Habilitación</label>
+                <div class="relative">
+                    <input type="date" name="fecha_habilitacion" id="fecha_habilitacion"
+                        value="{{ old('fecha_habilitacion', isset($athlete->fecha_habilitacion) ? $athlete->fecha_habilitacion->format('Y-m-d') : '') }}"
+                        class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-sm font-semibold rounded-2xl px-4 py-3 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
+                </div>
+                @error('fecha_habilitacion')
+                    <p class="mt-2 text-xs font-bold text-red-500 bg-red-50 p-1.5 rounded-lg border border-red-100">{{ $message }}</p>
+                @enderror
+            </div>
+        </div>
+    </div>
+
+    {{-- ── CONTROL DE MENSUALIDAD ── --}}
+    <div class="md:col-span-2 bg-white p-8 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/40 relative overflow-hidden mb-4">
+        <h4 class="text-sm font-black text-slate-800 uppercase tracking-widest mb-2">Vigencia de Mensualidad</h4>
+        <p class="text-xs text-slate-400 mb-6">Fechas administrativas del último pago recibido y su caducidad</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2 border-t border-slate-50">
+            <x-admin.input label="Fecha de Pago" name="fecha_pago_habilitacion" type="date"
+                :value="isset($athlete->fecha_pago_habilitacion) ? $athlete->fecha_pago_habilitacion->format('Y-m-d') : old('fecha_pago_habilitacion')" />
+            <x-admin.input label="Vence el / Caduca" name="fecha_vencimiento_habilitacion" type="date"
+                :value="isset($athlete->fecha_vencimiento_habilitacion) ? $athlete->fecha_vencimiento_habilitacion->format('Y-m-d') : old('fecha_vencimiento_habilitacion')" />
+        </div>
     </div>
 </div>
 
@@ -302,6 +500,80 @@ function previewImage(event) {
             prev.src = previewUrl;
         }
     });
+}
+
+function toggleCarnetAtleta(checked) {
+    document.getElementById('carnet-atleta-detalle').classList.toggle('hidden', !checked);
+    document.getElementById('carnet-atleta-label').textContent = checked ? 'Sí tiene carnet' : 'No tiene carnet';
+    if (!checked) {
+        document.getElementById('carnet_atleta_anverso').value = '';
+        document.getElementById('carnet_atleta_reverso').value = '';
+        
+        const previewAnverso = document.getElementById('carnet_atleta_anverso_preview');
+        const placeholderAnverso = document.getElementById('carnet_atleta_anverso_placeholder');
+        const containerAnverso = document.getElementById('carnet_atleta_anverso_preview_container');
+        const actionsAnverso = document.getElementById('carnet_atleta_anverso_actions');
+        if (placeholderAnverso) {
+            placeholderAnverso.classList.remove('hidden');
+            if (containerAnverso) containerAnverso.classList.add('hidden');
+            if (actionsAnverso) actionsAnverso.classList.add('hidden');
+            previewAnverso.src = '';
+        }
+        
+        const previewReverso = document.getElementById('carnet_atleta_reverso_preview');
+        const placeholderReverso = document.getElementById('carnet_atleta_reverso_placeholder');
+        const containerReverso = document.getElementById('carnet_atleta_reverso_preview_container');
+        const actionsReverso = document.getElementById('carnet_atleta_reverso_actions');
+        if (placeholderReverso) {
+            placeholderReverso.classList.remove('hidden');
+            if (containerReverso) containerReverso.classList.add('hidden');
+            if (actionsReverso) actionsReverso.classList.add('hidden');
+            previewReverso.src = '';
+        }
+    }
+}
+
+function previewDocument(event, previewId, placeholderId, containerId, actionsId) {
+    const file = event.target.files[0];
+    if (!file) return;
+    compressAndPreviewImage(file, event.target, function(previewUrl) {
+        const previewImg = document.getElementById(previewId);
+        const placeholder = document.getElementById(placeholderId);
+        const container = document.getElementById(containerId);
+        const actions = document.getElementById(actionsId);
+        if (previewImg) {
+            previewImg.src = previewUrl;
+        }
+        if (placeholder) {
+            placeholder.classList.add('hidden');
+        }
+        if (container) {
+            container.classList.remove('hidden');
+        }
+        if (actions) {
+            actions.classList.remove('hidden');
+        }
+    });
+}
+
+function verImagenGrande(imgId) {
+    const img = document.getElementById(imgId);
+    if (img && img.src && img.src !== '') {
+        window.open(img.src, '_blank');
+    } else {
+        alert('No hay ninguna foto cargada para visualizar.');
+    }
+}
+
+function toggleFechaHabilitacion(checked) {
+    const container = document.getElementById('fecha-habilitacion-container');
+    if (container) {
+        container.classList.toggle('hidden', !checked);
+    }
+    if (!checked) {
+        const input = document.getElementById('fecha_habilitacion');
+        if (input) input.value = '';
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {

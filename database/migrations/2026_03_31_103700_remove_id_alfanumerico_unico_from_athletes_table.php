@@ -15,6 +15,11 @@ return new class extends Migration
     {
         Schema::table('athletes', function (Blueprint $table) {
             if (Schema::hasColumn('athletes', 'id_alfanumerico_unico')) {
+                try {
+                    $table->dropUnique('athletes_id_alfanumerico_unico_unique');
+                } catch (\Exception $e) {
+                    // Ignorar si el índice no existe o no se puede borrar en este driver
+                }
                 $table->dropColumn('id_alfanumerico_unico');
             }
         });

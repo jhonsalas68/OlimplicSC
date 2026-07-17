@@ -58,6 +58,14 @@ class Athlete extends Model
         'apellido_paterno',
         'apellido_materno',
         'foto',
+        'ci_anverso',
+        'ci_reverso',
+        'tiene_carnet_atleta',
+        'carnet_atleta_anverso',
+        'carnet_atleta_reverso',
+        'fecha_pago_habilitacion',
+        'fecha_vencimiento_habilitacion',
+        'fecha_habilitacion',
         'fecha_nacimiento',
         'habilitado_booleano',
         'contactos_padres',
@@ -83,7 +91,53 @@ class Athlete extends Model
         'fecha_nacimiento'   => 'date',
         'habilitado_booleano' => 'boolean',
         'tiene_seguro'       => 'boolean',
+        'tiene_carnet_atleta'=> 'boolean',
+        'fecha_pago_habilitacion'=> 'date',
+        'fecha_vencimiento_habilitacion'=> 'date',
+        'fecha_habilitacion'=> 'date',
     ];
+
+    /**
+     * Determina si la mensualidad del atleta ha vencido en base a su fecha de vencimiento.
+     */
+    public function estaMensualidadVencida(): bool
+    {
+        if (!$this->fecha_vencimiento_habilitacion) {
+            return true; // Si no tiene fecha, asumimos que debe o no hay registros
+        }
+        return $this->fecha_vencimiento_habilitacion->isPast() && !$this->fecha_vencimiento_habilitacion->isToday();
+    }
+
+    /**
+     * Retorna la información de estado, color y etiquetas sobre la mensualidad.
+     */
+    public function estadoMensualidadInfo(): array
+    {
+        if (!$this->fecha_pago_habilitacion || !$this->fecha_vencimiento_habilitacion) {
+            return [
+                'status' => 'debe',
+                'color'  => 'red',
+                'label'  => 'Debe',
+                'desc'   => 'Debe mensualidad (Sin registro de pago)',
+            ];
+        }
+
+        if ($this->estaMensualidadVencida()) {
+            return [
+                'status' => 'debe',
+                'color'  => 'red',
+                'label'  => 'Debe',
+                'desc'   => 'Debe mensualidad (Venció el ' . $this->fecha_vencimiento_habilitacion->format('d/m/Y') . ')',
+            ];
+        }
+
+        return [
+            'status' => 'al_dia',
+            'color'  => 'emerald',
+            'label'  => 'Al Día',
+            'desc'   => 'Mensualidad al día · Pagado: ' . $this->fecha_pago_habilitacion->format('d/m/Y') . ' · Vence: ' . $this->fecha_vencimiento_habilitacion->format('d/m/Y'),
+        ];
+    }
 
     public function category(): BelongsTo
     {
