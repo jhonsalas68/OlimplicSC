@@ -1,9 +1,13 @@
+@php
+    $primerPayment = $payments->first();
+    $idGrupo = $primerPayment->payment_group_id ?? $primerPayment->external_id;
+@endphp
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nota de Venta #{{ str_pad($payment->id, 5, "0", STR_PAD_LEFT) }}</title>
+    <title>Nota de Venta #{{ str_pad($primerPayment->id, 5, "0", STR_PAD_LEFT) }}</title>
     <style>
         /* ===== BASE ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -319,7 +323,7 @@
 @if(!isset($esPublico) || !$esPublico)
 <div class="action-bar">
     <div class="action-bar-title">
-        Nota de Venta <span>#{{ str_pad($payment->id, 5, "0", STR_PAD_LEFT) }}</span>
+        Nota de Venta <span>#{{ str_pad($primerPayment->id, 5, "0", STR_PAD_LEFT) }}</span>
     </div>
     <div class="action-btns">
         <a href="{{ route('payments.index') }}" class="btn-back" data-turbo="false">
@@ -328,19 +332,28 @@
         <button onclick="window.print()" class="btn-print">
             🖨 Imprimir
         </button>
-        @if($payment->whatsapp_number)
+        @if($primerPayment->whatsapp_number)
             @php
-                $atletaNombre = trim($payment->athlete->nombre . ' ' . $payment->athlete->apellido_paterno);
-                $conceptoLabel = $payment->concepto === 'mensualidad' ? 'Mensualidad' : 'Artículo Deportivo';
-                $montoFormatted = number_format($payment->monto, 2);
-                $publicUrl = route('cobros.download_pdf', $payment->external_id);
+                $atletaNombre = trim($primerPayment->athlete->nombre . ' ' . $primerPayment->athlete->apellido_paterno);
+                $detalles = [];
+                $totalTransaccion = 0;
+                foreach($payments as $pago) {
+                    $conceptoLabel = $pago->concepto === 'mensualidad' ? "Mensualidad (" . $pago->mes_correspondiente . ")" : 'Artículo Deportivo';
+                    if($pago->descripcion) {
+                        $conceptoLabel .= " - " . $pago->descripcion;
+                    }
+                    $detalles[] = "• {$conceptoLabel}: Bs. " . number_format($pago->monto, 2);
+                    $totalTransaccion += $pago->monto;
+                }
+                
+                $publicUrl = route('cobros.download_pdf', $idGrupo);
                 $mensaje = "Hola {$atletaNombre}, esta es su nota de venta de OlimpicSC.\n\n" .
-                           "*Detalle:* {$conceptoLabel}\n" .
-                           "*Monto:* Bs. {$montoFormatted}\n" .
-                           "*Fecha:* " . $payment->created_at->format('d/m/Y') . "\n\n" .
+                           "*Detalles de su pago:*\n" . implode("\n", $detalles) . "\n\n" .
+                           "*Total Pagado:* Bs. " . number_format($totalTransaccion, 2) . "\n" .
+                           "*Fecha:* " . $primerPayment->created_at->format('d/m/Y') . "\n\n" .
                            "*Descargar PDF:* {$publicUrl}\n\n" .
                            "¡Gracias por su pago!";
-                $waUrl = "https://wa.me/591" . $payment->whatsapp_number . "?text=" . urlencode($mensaje);
+                $waUrl = "https://wa.me/591" . $primerPayment->whatsapp_number . "?text=" . urlencode($mensaje);
             @endphp
             <a href="{{ $waUrl }}" target="_blank" class="btn-whatsapp">
                 <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
@@ -367,8 +380,8 @@
             </div>
             <div class="nota-header-right">
                 <div class="nota-num-label">Nota de Venta</div>
-                <div class="nota-num">#{{ str_pad($payment->id, 5, "0", STR_PAD_LEFT) }}</div>
-                <div class="nota-fecha">{{ $payment->created_at->format('d/m/Y H:i') }}</div>
+                <div class="nota-num">#{{ str_pad($primerPayment->id, 5, "0", STR_PAD_LEFT) }}</div>
+                <div class="nota-fecha">{{ $primerPayment->created_at->format('d/m/Y H:i') }}</div>
                 <div><span class="badge-pagado">PAGADO</span></div>
             </div>
         </div>
@@ -382,59 +395,71 @@
                 <div class="info-grid">
                     <div class="info-item">
                         <label>Nombre Completo</label>
-                        <span>{{ trim($payment->athlete->nombre . ' ' . $payment->athlete->apellido_paterno . ' ' . $payment->athlete->apellido_materno) }}</span>
+                        <span>{{ trim($primerPayment->athlete->nombre . ' ' . $primerPayment->athlete->apellido_paterno . ' ' . $primerPayment->athlete->apellido_materno) }}</span>
                     </div>
                     <div class="info-item">
                         <label>Cedula de Identidad</label>
-                        <span>{{ $payment->athlete->ci }}</span>
+                        <span>{{ $primerPayment->athlete->ci }}</span>
                     </div>
-                    <div class="info-item">
+                    <div class="info-item" style="grid-column: span 2;">
                         <label>Categoria</label>
-                        <span>{{ $payment->athlete->category->nombre ?? '—' }}</span>
-                    </div>
-                    <div class="info-item">
-                        <label>Concepto</label>
-                        <span class="text-blue-700">{{ $payment->concepto === 'mensualidad' ? 'Mensualidad' : 'Articulo Deportivo' }}</span>
+                        <span>{{ $primerPayment->athlete->category->nombre ?? '—' }}</span>
                     </div>
                 </div>
             </div>
 
-            {{-- Concepto + Monto --}}
-            <div class="concepto-box">
-                <div class="concepto-box-left">
-                    <div class="concepto-tipo-label">Concepto de Pago</div>
-                    <div class="concepto-tipo">
-                        {{ $payment->concepto === 'mensualidad' ? 'Mensualidad' : 'Articulo Deportivo' }}
-                    </div>
-                    @if($payment->descripcion)
-                        <div class="concepto-desc">{{ $payment->descripcion }}</div>
-                    @endif
-                    @if($payment->concepto === 'mensualidad' && $payment->mes_correspondiente)
-                        @php
-                            $mes = $payment->mes_correspondiente;
-                            try {
-                                // Handles both "2026-03" and "2026-03-01" formats
-                                $parsed = \Carbon\Carbon::createFromFormat('Y-m', substr($mes, 0, 7));
-                                $mesLabel = $parsed->translatedFormat('F Y');
-                            } catch(\Exception $e) {
-                                $mesLabel = $mes;
-                            }
-                        @endphp
-                        <div class="concepto-mes">Periodo: {{ $mesLabel }}</div>
-                    @endif
-                </div>
-                <div class="concepto-box-right">
-                    <div class="monto-label">Total</div>
-                    <div class="monto-valor">Bs. {{ number_format($payment->monto, 2) }}</div>
+            {{-- Detalle de Ítems (Tabla) --}}
+            <div class="section" style="margin-top: 15px;">
+                <div class="section-title">Detalle de Cobro</div>
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 12px; text-align: left;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid #e2e8f0; color: #64748b; font-weight: 700;">
+                            <th style="padding: 8px 4px;">Concepto</th>
+                            <th style="padding: 8px 4px;">Descripción / Periodo</th>
+                            <th style="padding: 8px 4px; text-align: right;">Monto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($payments as $pago)
+                            <tr style="border-bottom: 1px solid #f1f5f9;">
+                                <td style="padding: 10px 4px; font-weight: 700; color: #1e293b;">
+                                    {{ $pago->concepto === 'mensualidad' ? 'Mensualidad' : 'Artículo Deportivo' }}
+                                </td>
+                                <td style="padding: 10px 4px; color: #475569;">
+                                    {{ $pago->descripcion ?? '—' }}
+                                    @if($pago->concepto === 'mensualidad' && $pago->mes_correspondiente)
+                                        @php
+                                            $mes = $pago->mes_correspondiente;
+                                            try {
+                                                $parsed = \Carbon\Carbon::createFromFormat('Y-m', substr($mes, 0, 7));
+                                                $mesLabel = $parsed->translatedFormat('F Y');
+                                            } catch(\Exception $e) {
+                                                $mesLabel = $mes;
+                                            }
+                                        @endphp
+                                        <span style="font-size: 11px; color: #64748b; display: block; margin-top: 2px;">Periodo: {{ $mesLabel }}</span>
+                                    @endif
+                                </td>
+                                <td style="padding: 10px 4px; font-weight: 700; color: #1e293b; text-align: right;">
+                                    Bs. {{ number_format($pago->monto, 2) }}
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+
+                <div style="display: flex; justify-content: flex-end; align-items: center; gap: 15px; background: #c61c2c; color: white; padding: 12px 20px; border-radius: 8px; margin-top: 10px;">
+                    <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Total Recibido:</span>
+                    <span style="font-size: 20px; font-weight: 900;">Bs. {{ number_format($payments->sum('monto'), 2) }}</span>
                 </div>
             </div>
 
             {{-- Metodo de pago --}}
             @php
-                $metodoLabel = ['efectivo' => 'Efectivo', 'qr' => 'QR', 'tarjeta' => 'Tarjeta'][$payment->metodo_pago] ?? $payment->metodo_pago;
-                $metodoClass = ['efectivo' => 'metodo-efectivo', 'qr' => 'metodo-qr', 'tarjeta' => 'metodo-tarjeta'][$payment->metodo_pago] ?? '';
+                $metodoLabel = ['efectivo' => 'Efectivo', 'qr' => 'QR', 'tarjeta' => 'Tarjeta'][$primerPayment->metodo_pago] ?? $primerPayment->metodo_pago;
+                $metodoClass = ['efectivo' => 'metodo-efectivo', 'qr' => 'metodo-qr', 'tarjeta' => 'metodo-tarjeta'][$primerPayment->metodo_pago] ?? '';
             @endphp
-            <div class="metodo-row">
+            <div class="metodo-row" style="margin-top: 15px;">
                 <span class="metodo-row-label">Metodo de Pago</span>
                 <span class="metodo-badge {{ $metodoClass }}">{{ $metodoLabel }}</span>
             </div>
@@ -442,9 +467,9 @@
             {{-- Cobrador --}}
             @php
                 $cobradorNombre = trim(
-                    ($payment->cobrador?->name ?? '') . ' ' . 
-                    ($payment->cobrador?->apellido_paterno ?? '') . ' ' . 
-                    ($payment->cobrador?->apellido_materno ?? '')
+                    ($primerPayment->cobrador?->name ?? '') . ' ' . 
+                    ($primerPayment->cobrador?->apellido_paterno ?? '') . ' ' . 
+                    ($primerPayment->cobrador?->apellido_materno ?? '')
                 );
                 if(!$cobradorNombre) $cobradorNombre = 'Sistema';
             @endphp
@@ -454,7 +479,6 @@
                     <span>{{ $cobradorNombre }}</span>
                 </div>
             </div>
-
 
         </div>
 

@@ -52,7 +52,7 @@ Route::middleware(['auth', 'prevent-back-history'])->prefix('admin')->group(func
         Route::get('/cobros/search', [\App\Http\Controllers\Admin\CobrosController::class, 'search'])->name('cobros.search');
         Route::get('/cobros/atleta/{athlete}', [\App\Http\Controllers\Admin\CobrosController::class, 'getAtleta'])->name('cobros.atleta');
         Route::post('/cobros/cobrar', [\App\Http\Controllers\Admin\CobrosController::class, 'cobrar'])->name('cobros.cobrar');
-        Route::get('/cobros/nota/{payment}', [\App\Http\Controllers\Admin\CobrosController::class, 'nota'])->name('cobros.nota');
+        Route::get('/cobros/nota/{id}', [\App\Http\Controllers\Admin\CobrosController::class, 'nota'])->name('cobros.nota');
 
         // Acciones administrativas de atletas
         Route::get('/athletes/export', [\App\Http\Controllers\Admin\AthleteController::class, 'export'])->name('athletes.export');

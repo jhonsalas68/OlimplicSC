@@ -88,82 +88,129 @@ class CobrosController extends Controller
     public function cobrar(Request $request)
     {
         $validated = $request->validate([
-            'athlete_id'          => 'required|exists:athletes,id',
-            'concepto'            => 'required|in:mensualidad,articulo_deportivo',
-            'mes_correspondiente' => 'required_if:concepto,mensualidad|nullable|string|max:7',
-            'descripcion'         => 'nullable|string|max:255',
-            'monto'               => 'required|numeric|min:0.01',
-            'metodo_pago'         => 'required|in:efectivo,qr',
-            'whatsapp_number'     => 'nullable|string|max:20',
+            'athlete_id'      => 'required|exists:athletes,id',
+            'metodo_pago'     => 'required|in:efectivo,qr',
+            'whatsapp_number' => 'nullable|string|max:20',
+            'items_json'      => 'required|string',
         ]);
 
-        $payment = Payment::create([
-            'athlete_id'          => $validated['athlete_id'],
-            'concepto'            => $validated['concepto'],
-            'mes_correspondiente' => $validated['mes_correspondiente'] ?? now()->format('Y-m'),
-            'descripcion'         => $validated['descripcion'] ?? null,
-            'monto'               => $validated['monto'],
-            'metodo_pago'         => $validated['metodo_pago'],
-            'whatsapp_number'     => $validated['whatsapp_number'] ?? null,
-            'estado_pago'         => 'pagado',
-            'cobrado_por'         => Auth::id(),
-        ]);
+        $items = json_decode($validated['items_json'], true);
+        if (!is_array($items) || empty($items)) {
+            return redirect()->back()->withInput()->with('error', 'Debes agregar al menos un ítem al cobro.');
+        }
 
-        $atleta = Athlete::find($validated['athlete_id']);
+        $atleta = Athlete::findOrFail($validated['athlete_id']);
+        $paymentGroupId = (string) \Illuminate\Support\Str::uuid();
+        $totalMonto = 0;
+        $primerPayment = null;
 
-        // Si es una mensualidad, actualizamos automáticamente las fechas de habilitación del atleta
-        if ($validated['concepto'] === 'mensualidad') {
-            $mesCorrespondiente = $validated['mes_correspondiente'] ?? now()->format('Y-m');
-            try {
-                $fechaExpiracion = \Carbon\Carbon::createFromFormat('Y-m', $mesCorrespondiente)->endOfMonth()->format('Y-m-d');
-                $atleta->update([
-                    'habilitado_booleano' => true,
-                    'fecha_pago_habilitacion' => now()->format('Y-m-d'),
-                    'fecha_vencimiento_habilitacion' => $fechaExpiracion,
-                ]);
-            } catch (\Exception $e) {
-                \Illuminate\Support\Facades\Log::error("Error al calcular fecha de vencimiento de habilitación: " . $e->getMessage());
+        foreach ($items as $item) {
+            $monto = (float) ($item['monto'] ?? 0);
+            if ($monto <= 0) continue;
+
+            $payment = Payment::create([
+                'athlete_id'          => $atleta->id,
+                'concepto'            => $item['concepto'],
+                'mes_correspondiente' => $item['mes_correspondiente'] ?? now()->format('Y-m'),
+                'descripcion'         => $item['descripcion'] ?? null,
+                'monto'               => $monto,
+                'metodo_pago'         => $validated['metodo_pago'],
+                'whatsapp_number'     => $validated['whatsapp_number'] ?? null,
+                'estado_pago'         => 'pagado',
+                'cobrado_por'         => Auth::id(),
+                'payment_group_id'    => $paymentGroupId,
+            ]);
+
+            if (!$primerPayment) {
+                $primerPayment = $payment;
             }
+
+            $totalMonto += $monto;
+
+            // Si es una mensualidad, actualizamos automáticamente las fechas de habilitación del atleta
+            if ($item['concepto'] === 'mensualidad') {
+                $mesCorrespondiente = $item['mes_correspondiente'] ?? now()->format('Y-m');
+                try {
+                    $fechaExpiracion = \Carbon\Carbon::createFromFormat('Y-m', substr($mesCorrespondiente, 0, 7))->endOfMonth()->format('Y-m-d');
+                    $atleta->update([
+                        'habilitado_booleano' => true,
+                        'fecha_pago_habilitacion' => now()->format('Y-m-d'),
+                        'fecha_vencimiento_habilitacion' => $fechaExpiracion,
+                    ]);
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::error("Error al calcular fecha de vencimiento de habilitación en venta múltiple: " . $e->getMessage());
+                }
+            }
+        }
+
+        if (!$primerPayment) {
+            return redirect()->back()->withInput()->with('error', 'Error al procesar los ítems del cobro.');
         }
 
         \App\Services\ActivityLogger::log(
             'venta_realizada', 
-            "Cobro realizado a {$atleta->nombre} {$atleta->apellido_paterno} por un monto de Bs. {$validated['monto']}.",
-            $payment,
-            ['atleta_id' => $atleta->id, 'monto' => $validated['monto']]
+            "Cobro múltiple realizado a {$atleta->nombre} {$atleta->apellido_paterno} por un monto total de Bs. " . number_format($totalMonto, 2) . ".",
+            $primerPayment,
+            ['atleta_id' => $atleta->id, 'monto' => $totalMonto, 'group_id' => $paymentGroupId]
         );
 
-        return redirect()->route('cobros.nota', $payment->id);
+        return redirect()->route('cobros.nota', $paymentGroupId);
     }
 
     /** Nota de venta */
-    public function nota(Payment $payment)
+    public function nota($id)
     {
-        $payment->load('athlete.category', 'cobrador');
-        return view('admin.cobros.nota', compact('payment'));
+        $payments = Payment::where('payment_group_id', $id)->get();
+
+        if ($payments->isEmpty()) {
+            // Retrocompatibilidad: buscar por ID o external_id
+            $payment = Payment::where('id', $id)
+                ->orWhere('external_id', $id)
+                ->firstOrFail();
+            $payments = collect([$payment]);
+        }
+
+        $payments->load('athlete.category', 'cobrador');
+        return view('admin.cobros.nota', compact('payments'));
     }
 
     /** Nota de venta pública (sin auth) */
-    public function notaPublica($external_id)
+    public function notaPublica($id)
     {
-        $payment = Payment::where('external_id', $external_id)->firstOrFail();
-        $payment->load('athlete.category', 'cobrador');
+        $payments = Payment::where('payment_group_id', $id)
+            ->orWhere('external_id', $id)
+            ->get();
+
+        if ($payments->isEmpty()) {
+            // Retrocompatibilidad por ID primario
+            $payment = Payment::where('id', $id)->firstOrFail();
+            $payments = collect([$payment]);
+        }
+
+        $payments->load('athlete.category', 'cobrador');
         
-        // Pasamos una variable para ocultar botones administrativos en la vista pública si fuera necesario
         $esPublico = true;
-        return view('admin.cobros.nota', compact('payment', 'esPublico'));
+        return view('admin.cobros.nota', compact('payments', 'esPublico'));
     }
 
     /** Descargar PDF público */
-    public function downloadPublicPdf($external_id)
+    public function downloadPublicPdf($id)
     {
-        $payment = Payment::where('external_id', $external_id)->firstOrFail();
-        $payment->load('athlete.category', 'cobrador');
+        $payments = Payment::where('payment_group_id', $id)
+            ->orWhere('external_id', $id)
+            ->get();
+
+        if ($payments->isEmpty()) {
+            $payment = Payment::where('id', $id)->firstOrFail();
+            $payments = collect([$payment]);
+        }
+
+        $payments->load('athlete.category', 'cobrador');
         
         $esPublico = true;
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.cobros.nota', compact('payment', 'esPublico'))
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.cobros.nota', compact('payments', 'esPublico'))
                   ->setPaper([0, 0, 396, 612], 'portrait');
                   
-        return $pdf->stream('nota_venta_' . $payment->id . '.pdf');
+        return $pdf->stream('nota_venta_' . $id . '.pdf');
     }
 }

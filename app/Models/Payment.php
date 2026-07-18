@@ -21,6 +21,7 @@ class Payment extends Model
         'metodo_pago',
         'whatsapp_number',
         'external_id',
+        'payment_group_id',
     ];
 
     protected static function boot()

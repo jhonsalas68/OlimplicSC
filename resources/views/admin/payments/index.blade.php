@@ -152,11 +152,27 @@
     <tr class="hover:bg-slate-50/50 transition-colors">
         <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-900">
             {{ trim($payment->athlete->nombre . ' ' . $payment->athlete->apellido_paterno) }}
+            <span class="text-xs text-slate-400 block font-normal">{{ $payment->athlete->category->nombre ?? 'Sin Categoría' }}</span>
         </td>
         <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
-            <span class="font-medium">{{ $payment->concepto === 'mensualidad' ? 'Mensualidad' : 'Artículo Deportivo' }}</span>
-            @if($payment->mes_correspondiente)
-                <span class="text-slate-400 text-xs block">{{ $payment->mes_correspondiente }}</span>
+            @php
+                $conceptosUnicos = array_unique(array_filter(explode(', ', $payment->concepto)));
+                $conceptoLabels = array_map(function($c) {
+                    return $c === 'mensualidad' ? 'Mensualidad' : 'Artículo';
+                }, $conceptosUnicos);
+                
+                $descripciones = array_unique(array_filter(array_map('trim', explode(' | ', $payment->descripcion))));
+            @endphp
+            <span class="font-bold text-slate-700 bg-slate-100/80 border border-slate-200 px-2 py-0.5 rounded-md text-[10px] uppercase tracking-wider inline-block">
+                {{ implode(' + ', $conceptoLabels) }}
+            </span>
+            @if(!empty($descripciones))
+                <span class="text-slate-500 text-xs block mt-1 max-w-[250px] truncate" title="{{ implode(', ', $descripciones) }}">
+                    {{ implode(', ', $descripciones) }}
+                </span>
+            @endif
+            @if(in_array('mensualidad', $conceptosUnicos) && $payment->mes_correspondiente)
+                <span class="text-slate-400 text-[10px] block mt-0.5">Mes: {{ $payment->mes_correspondiente }}</span>
             @endif
         </td>
         <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-900">
@@ -174,7 +190,7 @@
         </td>
         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
             <div class="flex items-center justify-end space-x-3">
-                <a href="{{ route('cobros.nota', $payment) }}" class="text-blue-600 hover:text-blue-900 transition-colors" title="Ver nota">
+                <a href="{{ route('cobros.nota', $payment->payment_group_id ?? $payment->id) }}" class="text-blue-600 hover:text-blue-900 transition-colors" title="Ver nota">
                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                     </svg>

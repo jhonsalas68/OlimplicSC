@@ -14,7 +14,28 @@ class PaymentController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Payment::query()->with(['athlete.category', 'cobrador']);
+        $isSqlite = \DB::connection()->getDriverName() === 'sqlite';
+        $aggFunc = $isSqlite ? 'GROUP_CONCAT(concepto, ", ")' : 'STRING_AGG(concepto, \', \')';
+        $descFunc = $isSqlite ? 'GROUP_CONCAT(COALESCE(descripcion, ""), " | ")' : 'STRING_AGG(COALESCE(descripcion, \'\'), \' | \')';
+        $groupExpr = $isSqlite ? 'COALESCE(payment_group_id, id)' : 'COALESCE(CAST(payment_group_id AS varchar), CAST(id AS varchar))';
+
+        $query = Payment::query()
+            ->selectRaw("
+                MIN(id) as id,
+                MAX(CAST(payment_group_id AS varchar)) as payment_group_id,
+                MAX(athlete_id) as athlete_id,
+                SUM(monto) as monto,
+                MAX(mes_correspondiente) as mes_correspondiente,
+                MAX(estado_pago) as estado_pago,
+                {$aggFunc} as concepto,
+                {$descFunc} as descripcion,
+                MAX(cobrado_por) as cobrado_por,
+                MAX(metodo_pago) as metodo_pago,
+                MAX(whatsapp_number) as whatsapp_number,
+                MAX(created_at) as created_at
+            ")
+            ->with(['athlete.category', 'cobrador'])
+            ->groupByRaw($groupExpr);
 
         // Filtro por mes (default: mes actual)
         $mes = $request->get('mes', now()->format('Y-m'));
@@ -57,16 +78,38 @@ class PaymentController extends Controller
             $query->whereHas('athlete', fn($q) => $q->where('category_id', $request->category_id));
         }
 
-        $payments = $query->latest()->paginate(15);
+        $payments = $query->orderByRaw('MAX(created_at) DESC')->paginate(15);
         $categories = \App\Models\Category::all();
         return view('admin.payments.index', compact('payments', 'categories'));
     }
 
     public function exportPdf(Request $request)
     {
-        $query = Payment::with('athlete', 'cobrador');
+        $isSqlite = \DB::connection()->getDriverName() === 'sqlite';
+        $aggFunc = $isSqlite ? 'GROUP_CONCAT(concepto, ", ")' : 'STRING_AGG(concepto, \', \')';
+        $descFunc = $isSqlite ? 'GROUP_CONCAT(COALESCE(descripcion, ""), " | ")' : 'STRING_AGG(COALESCE(descripcion, \'\'), \' | \')';
+        $groupExpr = $isSqlite ? 'COALESCE(payment_group_id, id)' : 'COALESCE(CAST(payment_group_id AS varchar), CAST(id AS varchar))';
+
+        $query = Payment::query()
+            ->selectRaw("
+                MIN(id) as id,
+                MAX(CAST(payment_group_id AS varchar)) as payment_group_id,
+                MAX(athlete_id) as athlete_id,
+                SUM(monto) as monto,
+                MAX(mes_correspondiente) as mes_correspondiente,
+                MAX(estado_pago) as estado_pago,
+                {$aggFunc} as concepto,
+                {$descFunc} as descripcion,
+                MAX(cobrado_por) as cobrado_por,
+                MAX(metodo_pago) as metodo_pago,
+                MAX(whatsapp_number) as whatsapp_number,
+                MAX(created_at) as created_at
+            ")
+            ->with(['athlete', 'cobrador'])
+            ->groupByRaw($groupExpr);
+
         $this->applyFilters($query, $request);
-        $pagos   = $query->latest()->get();
+        $pagos   = $query->orderByRaw('MAX(created_at) DESC')->get();
         $filtros = $this->filtrosLabel($request);
 
         $pdf = Pdf::loadView('admin.superadmin.pdf.pagos', compact('pagos', 'filtros'))
@@ -76,9 +119,31 @@ class PaymentController extends Controller
 
     public function exportExcel(Request $request)
     {
-        $query = Payment::with('athlete', 'cobrador');
+        $isSqlite = \DB::connection()->getDriverName() === 'sqlite';
+        $aggFunc = $isSqlite ? 'GROUP_CONCAT(concepto, ", ")' : 'STRING_AGG(concepto, \', \')';
+        $descFunc = $isSqlite ? 'GROUP_CONCAT(COALESCE(descripcion, ""), " | ")' : 'STRING_AGG(COALESCE(descripcion, \'\'), \' | \')';
+        $groupExpr = $isSqlite ? 'COALESCE(payment_group_id, id)' : 'COALESCE(CAST(payment_group_id AS varchar), CAST(id AS varchar))';
+
+        $query = Payment::query()
+            ->selectRaw("
+                MIN(id) as id,
+                MAX(CAST(payment_group_id AS varchar)) as payment_group_id,
+                MAX(athlete_id) as athlete_id,
+                SUM(monto) as monto,
+                MAX(mes_correspondiente) as mes_correspondiente,
+                MAX(estado_pago) as estado_pago,
+                {$aggFunc} as concepto,
+                {$descFunc} as descripcion,
+                MAX(cobrado_por) as cobrado_por,
+                MAX(metodo_pago) as metodo_pago,
+                MAX(whatsapp_number) as whatsapp_number,
+                MAX(created_at) as created_at
+            ")
+            ->with(['athlete', 'cobrador'])
+            ->groupByRaw($groupExpr);
+
         $this->applyFilters($query, $request);
-        $pagos = $query->latest()->get();
+        $pagos = $query->orderByRaw('MAX(created_at) DESC')->get();
 
         return Excel::download(
             new PaymentExport($pagos),
@@ -130,7 +195,11 @@ class PaymentController extends Controller
 
     public function destroy(Payment $payment)
     {
-        $payment->delete();
-        return redirect()->route('payments.index')->with('success', 'Pago eliminado.');
+        if ($payment->payment_group_id) {
+            Payment::where('payment_group_id', $payment->payment_group_id)->delete();
+        } else {
+            $payment->delete();
+        }
+        return redirect()->route('payments.index')->with('success', 'Transacción eliminada.');
     }
 }
