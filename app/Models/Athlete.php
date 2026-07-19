@@ -54,6 +54,7 @@ class Athlete extends Model
     protected $fillable = [
         'category_id',
         'ci',
+        'telefono',
         'nombre',
         'apellido_paterno',
         'apellido_materno',

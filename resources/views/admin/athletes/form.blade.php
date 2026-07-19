@@ -122,6 +122,11 @@
             onchange="onFechaNacChange(this.value)" />
     </div>
 
+    <div class="md:col-span-1 bg-white p-6 rounded-[2rem] border border-slate-100 shadow-lg shadow-slate-200/30">
+        <x-admin.input label="Teléfono del Atleta" name="telefono"
+            :value="$athlete->telefono ?? old('telefono')" placeholder="Ej: 77700000 (Opcional)" />
+    </div>
+
     <div class="md:col-span-2 bg-white p-6 rounded-[2rem] border border-slate-100 shadow-lg shadow-slate-200/30">
         <x-admin.input label="Alergias u Observaciones Médicas" name="alergias"
             :value="$athlete->alergias ?? old('alergias')" placeholder="Ej: Penicilina, Asma, Lesión previa..." />

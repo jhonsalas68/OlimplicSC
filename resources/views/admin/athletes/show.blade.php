@@ -113,6 +113,10 @@
                 <p class="text-sm font-semibold text-slate-800">{{ $athlete->edadActual() }} años</p>
             </div>
             <div>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Teléfono</p>
+                <p class="text-sm font-semibold text-slate-800">{{ $athlete->telefono ?? '—' }}</p>
+            </div>
+            <div>
                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Género</p>
                 <p class="text-sm font-semibold text-slate-800">{{ $athlete->genero ?? '—' }}</p>
             </div>
