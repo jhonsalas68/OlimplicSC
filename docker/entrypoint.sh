@@ -6,6 +6,22 @@ php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
+# Esperar a que la base de datos esté lista
+if [ -n "$DB_HOST" ]; then
+  echo "Esperando a que la base de datos en $DB_HOST sea accesible..."
+  MAX_TRIES=15
+  TRY=1
+  while [ $TRY -le $MAX_TRIES ]; do
+    if nc -z -w 3 "$DB_HOST" "${DB_PORT:-5432}" 2>/dev/null; then
+      echo "Base de datos accesible."
+      break
+    fi
+    echo "Intento $TRY de $MAX_TRIES: No se pudo conectar a $DB_HOST. Reintentando en 2 segundos..."
+    sleep 2
+    TRY=$((TRY + 1))
+  done
+fi
+
 # ESTO CREARÁ TU ADMIN AUTOMÁTICAMENTE
 php artisan migrate --force
 php artisan db:seed --force
