@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="turbo-visit-control" content="reload">
     <title>OlimpicSC — Acceso</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -191,7 +192,7 @@
             <p>Ingresa tus credenciales para acceder al sistema</p>
         </div>
 
-        <form action="{{ route('login') }}" method="POST">
+        <form action="{{ route('login') }}" method="POST" data-turbo="false">
             @csrf
 
             <div class="form-group">

@@ -492,7 +492,7 @@
                     <p><strong>{{ Auth::user()->name }}</strong></p>
                     <p>{{ Auth::user()->email }}</p>
                 </div>
-                <form action="{{ route('logout') }}" method="POST" style="display:inline;">
+                <form action="{{ route('logout') }}" method="POST" style="display:inline;" data-turbo="false">
                     @csrf
                     <button type="submit" class="logout-btn">
                         <i class="fas fa-sign-out-alt"></i>

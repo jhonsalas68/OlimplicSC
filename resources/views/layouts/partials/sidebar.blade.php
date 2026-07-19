@@ -99,7 +99,7 @@
             <div class="ml-3 min-w-0 transition-all duration-300 flex-1"
                  :class="sidebarOpen ? 'opacity-100' : 'opacity-0 group-hover/sidebar:opacity-100'">
                 <p class="text-sm font-bold text-white truncate leading-none mb-1">{{ auth()->user()->name ?? 'Usuario' }}</p>
-                <form method="POST" action="{{ route('logout') }}">
+                <form method="POST" action="{{ route('logout') }}" data-turbo="false">
                     @csrf
                     <button type="submit" class="text-[10px] uppercase tracking-widest font-black text-red-400 hover:text-red-300 transition-colors cursor-pointer flex items-center">
                         Cerrar Sesión
