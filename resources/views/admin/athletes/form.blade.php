@@ -5,23 +5,56 @@
         <div class="absolute top-0 right-0 w-64 h-64 bg-blue-50/30 rounded-full -mr-32 -mt-32 blur-3xl"></div>
         
         <div class="relative z-10 flex flex-col md:flex-row items-center gap-8">
-            <div class="flex-shrink-0 relative group">
-                <div class="absolute inset-0 bg-blue-600 rounded-full blur-xl opacity-0 group-hover:opacity-20 transition-opacity"></div>
-                @if(isset($athlete) && $athlete->foto)
-                    <img id="preview" class="h-32 w-32 rounded-3xl object-cover border-4 border-white shadow-2xl relative z-10"
-                         src="{{ str_starts_with($athlete->foto, 'http') ? $athlete->foto : asset('storage/' . $athlete->foto) }}" alt="">
-                @else
-                    <div id="preview-placeholder" class="h-32 w-32 rounded-3xl bg-slate-50 border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400 relative z-10 transition-colors group-hover:border-blue-400 group-hover:bg-blue-50">
-                        <svg class="h-10 w-10 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                        </svg>
-                        <span class="text-[10px] font-black uppercase tracking-tighter">Sin Foto</span>
+            <div class="flex-shrink-0 flex flex-col items-center gap-4">
+                @if(isset($athlete))
+                    <!-- Foto del Formulario (solo al editar) -->
+                    <div class="flex flex-col items-center p-3 bg-slate-50 border border-slate-100 rounded-2xl relative group w-full">
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Foto del Formulario</label>
+                        <div class="relative w-32 h-20 rounded-xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400 bg-white overflow-hidden hover:border-blue-400 transition-colors">
+                            {{-- Placeholder --}}
+                            <div id="foto_formulario_placeholder" class="flex flex-col items-center justify-center p-2 text-center cursor-pointer w-full h-full {{ $athlete->foto_formulario ? 'hidden' : '' }}" onclick="document.getElementById('foto_formulario').click()">
+                                <svg class="h-6 w-6 mb-1 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                <span class="text-[8px] font-black uppercase tracking-tight text-slate-500">Subir Formulario</span>
+                            </div>
+                            {{-- Preview --}}
+                            <div id="foto_formulario_preview_container" class="relative w-full h-full cursor-zoom-in {{ $athlete->foto_formulario ? '' : 'hidden' }}" onclick="verImagenGrande('foto_formulario_preview')">
+                                <img id="foto_formulario_preview" class="w-full h-full object-cover" src="{{ $athlete->foto_formulario ?? '' }}" alt="Foto del Formulario">
+                            </div>
+                        </div>
+                        {{-- Botones de Acción --}}
+                        <div id="foto_formulario_actions" class="flex gap-2 mt-2 {{ $athlete->foto_formulario ? '' : 'hidden' }}">
+                            <button type="button" onclick="verImagenGrande('foto_formulario_preview')" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[8px] font-bold uppercase rounded-lg transition-colors cursor-pointer flex items-center gap-1 shadow-sm">
+                                👁 Ver
+                            </button>
+                            <button type="button" onclick="document.getElementById('foto_formulario').click()" class="px-2 py-1 bg-blue-50 hover:bg-blue-100 text-blue-600 text-[8px] font-bold uppercase rounded-lg transition-colors cursor-pointer flex items-center gap-1 shadow-sm">
+                                ✏ Cambiar
+                            </button>
+                        </div>
+                        <input type="file" name="foto_formulario" id="foto_formulario" class="hidden" accept="image/*" onchange="previewDocument(event, 'foto_formulario_preview', 'foto_formulario_placeholder', 'foto_formulario_preview_container', 'foto_formulario_actions')">
+                        @error('foto_formulario')
+                            <p class="mt-1 text-xs font-bold text-red-500 bg-red-50 p-1 rounded-lg border border-red-100">{{ $message }}</p>
+                        @enderror
                     </div>
                 @endif
-                <button type="button" onclick="document.getElementById('foto').click()" 
-                        class="absolute -bottom-2 -right-2 bg-blue-600 text-white p-2.5 rounded-xl shadow-lg hover:bg-blue-700 transition-all z-20 group-hover:scale-110">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                </button>
+
+                <div class="relative group">
+                    <div class="absolute inset-0 bg-blue-600 rounded-full blur-xl opacity-0 group-hover:opacity-20 transition-opacity"></div>
+                    @if(isset($athlete) && $athlete->foto)
+                        <img id="preview" class="h-32 w-32 rounded-3xl object-cover border-4 border-white shadow-2xl relative z-10"
+                             src="{{ str_starts_with($athlete->foto, 'http') ? $athlete->foto : asset('storage/' . $athlete->foto) }}" alt="">
+                    @else
+                        <div id="preview-placeholder" class="h-32 w-32 rounded-3xl bg-slate-50 border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400 relative z-10 transition-colors group-hover:border-blue-400 group-hover:bg-blue-50">
+                            <svg class="h-10 w-10 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                            <span class="text-[10px] font-black uppercase tracking-tighter">Sin Foto</span>
+                        </div>
+                    @endif
+                    <button type="button" onclick="document.getElementById('foto').click()" 
+                            class="absolute -bottom-2 -right-2 bg-blue-600 text-white p-2.5 rounded-xl shadow-lg hover:bg-blue-700 transition-all z-20 group-hover:scale-110">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                </div>
             </div>
 
             <div class="flex-1 w-full space-y-6">
@@ -254,14 +287,14 @@
         </div>
     </div>
 
-    {{-- ── CARNET DE ATLETA ── --}}
+    {{-- ── CARNET DE HABILITACIÓN ── --}}
     <div class="md:col-span-2 bg-white p-8 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/40 relative overflow-hidden mb-4">
         <div class="absolute top-0 right-0 w-64 h-64 bg-blue-50/20 rounded-full -mr-32 -mt-32 blur-3xl"></div>
         
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 relative z-10">
             <div>
-                <h4 class="text-sm font-black text-slate-800 uppercase tracking-widest">Carnet de Atleta</h4>
-                <p class="text-xs text-slate-400 mt-1">Habilita y sube el carnet de afiliación de atleta del club</p>
+                <h4 class="text-sm font-black text-slate-800 uppercase tracking-widest">Carnet de Habilitación</h4>
+                <p class="text-xs text-slate-400 mt-1">Habilita y sube el carnet de habilitación del atleta</p>
             </div>
             <label class="relative flex items-center cursor-pointer group">
                 <input type="checkbox" name="tiene_carnet_atleta" id="tiene_carnet_atleta" value="1"
@@ -276,9 +309,12 @@
         </div>
 
         <div id="carnet-atleta-detalle" class="{{ old('tiene_carnet_atleta', $athlete->tiene_carnet_atleta ?? false) ? '' : 'hidden' }} grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-slate-50 relative z-10">
+            <div class="md:col-span-2">
+                <x-admin.input label="Número de Carnet de Habilitación" name="nro_carnet_atleta" id="nro_carnet_atleta" :value="$athlete->nro_carnet_atleta ?? old('nro_carnet_atleta')" placeholder="Ej: H-12345 (Opcional)" />
+            </div>
             <!-- Anverso Carnet Atleta -->
             <div class="flex flex-col items-center p-6 bg-slate-50 border border-slate-100 rounded-2xl relative group">
-                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Anverso Carnet Atleta</label>
+                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Anverso Carnet de Habilitación</label>
                 <div class="relative w-full max-w-[240px] h-36 rounded-xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400 bg-white overflow-hidden hover:border-blue-400 transition-colors">
                     
                     {{-- Placeholder --}}
@@ -289,7 +325,7 @@
 
                     {{-- Preview --}}
                     <div id="carnet_atleta_anverso_preview_container" class="relative w-full h-full cursor-zoom-in {{ (isset($athlete) && $athlete->carnet_atleta_anverso) ? '' : 'hidden' }}" onclick="verImagenGrande('carnet_atleta_anverso_preview')">
-                        <img id="carnet_atleta_anverso_preview" class="w-full h-full object-cover" src="{{ $athlete->carnet_atleta_anverso ?? '' }}" alt="Carnet Atleta Anverso">
+                        <img id="carnet_atleta_anverso_preview" class="w-full h-full object-cover" src="{{ $athlete->carnet_atleta_anverso ?? '' }}" alt="Carnet de Habilitación Anverso">
                     </div>
 
                 </div>
@@ -312,7 +348,7 @@
 
             <!-- Reverso Carnet Atleta -->
             <div class="flex flex-col items-center p-6 bg-slate-50 border border-slate-100 rounded-2xl relative group">
-                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Reverso Carnet Atleta</label>
+                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Reverso Carnet de Habilitación</label>
                 <div class="relative w-full max-w-[240px] h-36 rounded-xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400 bg-white overflow-hidden hover:border-blue-400 transition-colors">
                     
                     {{-- Placeholder --}}
@@ -323,7 +359,7 @@
 
                     {{-- Preview --}}
                     <div id="carnet_atleta_reverso_preview_container" class="relative w-full h-full cursor-zoom-in {{ (isset($athlete) && $athlete->carnet_atleta_reverso) ? '' : 'hidden' }}" onclick="verImagenGrande('carnet_atleta_reverso_preview')">
-                        <img id="carnet_atleta_reverso_preview" class="w-full h-full object-cover" src="{{ $athlete->carnet_atleta_reverso ?? '' }}" alt="Carnet Atleta Reverso">
+                        <img id="carnet_atleta_reverso_preview" class="w-full h-full object-cover" src="{{ $athlete->carnet_atleta_reverso ?? '' }}" alt="Carnet de Habilitación Reverso">
                     </div>
 
                 </div>
@@ -504,10 +540,12 @@ function previewImage(event) {
 
 function toggleCarnetAtleta(checked) {
     document.getElementById('carnet-atleta-detalle').classList.toggle('hidden', !checked);
-    document.getElementById('carnet-atleta-label').textContent = checked ? 'Sí tiene carnet' : 'No tiene carnet';
+    document.getElementById('carnet-atleta-label').textContent = checked ? 'Sí tiene' : 'No tiene';
     if (!checked) {
         document.getElementById('carnet_atleta_anverso').value = '';
         document.getElementById('carnet_atleta_reverso').value = '';
+        const nroInput = document.getElementById('nro_carnet_atleta');
+        if (nroInput) nroInput.value = '';
         
         const previewAnverso = document.getElementById('carnet_atleta_anverso_preview');
         const placeholderAnverso = document.getElementById('carnet_atleta_anverso_placeholder');

@@ -140,9 +140,11 @@ class AthleteController extends Controller
             'fecha_nacimiento'        => 'required|date',
             'genero'                  => 'nullable|in:Masculino,Femenino',
             'foto'                    => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+            'foto_formulario'         => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
             'ci_anverso'              => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
             'ci_reverso'              => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
             'tiene_carnet_atleta'     => 'nullable|boolean',
+            'nro_carnet_atleta'       => 'nullable|string|max:255',
             'carnet_atleta_anverso'   => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
             'carnet_atleta_reverso'   => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
             'alergias'                => 'nullable|string',
@@ -178,6 +180,14 @@ class AthleteController extends Controller
                 $filename = "perfil_" . uniqid() . '.' . $file->getClientOriginalExtension();
                 $path = Storage::disk('r2')->putFileAs($folder, $file, $filename);
                 $validated['foto'] = Storage::disk('r2')->url($path);
+            }
+
+            // Subida de foto de formulario
+            if ($request->hasFile('foto_formulario')) {
+                $file = $request->file('foto_formulario');
+                $filename = "formulario_" . uniqid() . '.' . $file->getClientOriginalExtension();
+                $path = Storage::disk('r2')->putFileAs($folder, $file, $filename);
+                $validated['foto_formulario'] = Storage::disk('r2')->url($path);
             }
 
             // Subida de CI Anverso
@@ -263,9 +273,11 @@ class AthleteController extends Controller
             'fecha_nacimiento'        => 'required|date',
             'genero'                  => 'nullable|in:Masculino,Femenino',
             'foto'                    => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+            'foto_formulario'         => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
             'ci_anverso'              => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
             'ci_reverso'              => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
             'tiene_carnet_atleta'     => 'nullable|boolean',
+            'nro_carnet_atleta'       => 'nullable|string|max:255',
             'carnet_atleta_anverso'   => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
             'carnet_atleta_reverso'   => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
             'alergias'                => 'nullable|string',
@@ -312,7 +324,7 @@ class AthleteController extends Controller
                         $oldBaseUrl = Storage::disk('r2')->url($oldFolder);
                         $newBaseUrl = Storage::disk('r2')->url($folder);
                         
-                        foreach (['foto', 'ci_anverso', 'ci_reverso', 'carnet_atleta_anverso', 'carnet_atleta_reverso'] as $field) {
+                        foreach (['foto', 'foto_formulario', 'ci_anverso', 'ci_reverso', 'carnet_atleta_anverso', 'carnet_atleta_reverso'] as $field) {
                             if ($athlete->$field) {
                                 $athlete->$field = str_replace($oldBaseUrl, $newBaseUrl, $athlete->$field);
                             }
@@ -334,6 +346,17 @@ class AthleteController extends Controller
                 $filename = "perfil_" . uniqid() . '.' . $file->getClientOriginalExtension();
                 $path = Storage::disk('r2')->putFileAs($folder, $file, $filename);
                 $validated['foto'] = Storage::disk('r2')->url($path);
+            }
+
+            // Subida y reemplazo de foto del formulario
+            if ($request->hasFile('foto_formulario')) {
+                if ($athlete->foto_formulario) {
+                    $this->deleteFile($athlete->foto_formulario);
+                }
+                $file = $request->file('foto_formulario');
+                $filename = "formulario_" . uniqid() . '.' . $file->getClientOriginalExtension();
+                $path = Storage::disk('r2')->putFileAs($folder, $file, $filename);
+                $validated['foto_formulario'] = Storage::disk('r2')->url($path);
             }
 
             // 3. Subida y reemplazo de CI Anverso
@@ -413,7 +436,7 @@ class AthleteController extends Controller
     public function destroy(Athlete $athlete)
     {
         // Eliminar todas las imágenes del atleta de Cloudflare R2
-        foreach (['foto', 'ci_anverso', 'ci_reverso', 'carnet_atleta_anverso', 'carnet_atleta_reverso'] as $field) {
+        foreach (['foto', 'foto_formulario', 'ci_anverso', 'ci_reverso', 'carnet_atleta_anverso', 'carnet_atleta_reverso'] as $field) {
             if ($athlete->$field) {
                 $this->deleteFile($athlete->$field);
             }

@@ -225,14 +225,14 @@
                 </div>
             </div>
 
-            {{-- Tarjeta Carnet Atleta --}}
+            {{-- Tarjeta Carnet Habilitación --}}
             <div class="bg-slate-50 border border-slate-100 rounded-2xl p-4 flex flex-col">
                 <div class="flex items-center justify-between mb-3">
                     <div class="flex items-center gap-2">
                         <span class="p-1.5 bg-red-50 text-red-600 rounded-lg">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 009 11V5.071c.0-2.147-1.442-4.043-3.558-4.571m11.116 20.407A13.916 13.916 0 0015 11V5.071c0-2.147 1.442-4.043 3.558-4.571M12 11v6m0-6V5"/></svg>
                         </span>
-                        <h3 class="text-xs font-black text-slate-700 uppercase tracking-wider">Carnet de Atleta</h3>
+                        <h3 class="text-xs font-black text-slate-700 uppercase tracking-wider">Carnet de Habilitación</h3>
                     </div>
                     @if($athlete->tiene_carnet_atleta)
                         <span class="px-2 py-0.5 text-[9px] font-bold bg-emerald-100 text-emerald-700 rounded border border-emerald-200">Activo</span>
@@ -241,13 +241,20 @@
                     @endif
                 </div>
 
+                @if($athlete->tiene_carnet_atleta && $athlete->nro_carnet_atleta)
+                    <div class="mb-3 px-1">
+                        <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Número de Carnet</span>
+                        <span class="text-sm font-bold text-slate-800">{{ $athlete->nro_carnet_atleta }}</span>
+                    </div>
+                @endif
+
                 <div class="grid grid-cols-2 gap-3 mt-1 flex-1">
                     @if($athlete->tiene_carnet_atleta)
                         @if($athlete->carnet_atleta_anverso || $athlete->carnet_atleta_reverso)
                             <div class="flex flex-col items-center">
                                 @if($athlete->carnet_atleta_anverso)
                                     <div class="relative w-full h-24 rounded-lg overflow-hidden border border-slate-200 shadow-sm hover:shadow-md transition-shadow cursor-zoom-in group bg-white">
-                                        <img src="{{ $athlete->carnet_atleta_anverso }}" data-ci="{{ $athlete->ci }}" class="w-full h-full object-contain lightbox-trigger group-hover:scale-105 transition-transform duration-300" alt="Carnet Atleta Anverso">
+                                        <img src="{{ $athlete->carnet_atleta_anverso }}" data-ci="{{ $athlete->ci }}" class="w-full h-full object-contain lightbox-trigger group-hover:scale-105 transition-transform duration-300" alt="Carnet de Habilitación Anverso">
                                         <div class="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors pointer-events-none"></div>
                                     </div>
                                 @else
@@ -261,7 +268,7 @@
                             <div class="flex flex-col items-center">
                                 @if($athlete->carnet_atleta_reverso)
                                     <div class="relative w-full h-24 rounded-lg overflow-hidden border border-slate-200 shadow-sm hover:shadow-md transition-shadow cursor-zoom-in group bg-white">
-                                        <img src="{{ $athlete->carnet_atleta_reverso }}" data-ci="{{ $athlete->ci }}" class="w-full h-full object-contain lightbox-trigger group-hover:scale-105 transition-transform duration-300" alt="Carnet Atleta Reverso">
+                                        <img src="{{ $athlete->carnet_atleta_reverso }}" data-ci="{{ $athlete->ci }}" class="w-full h-full object-contain lightbox-trigger group-hover:scale-105 transition-transform duration-300" alt="Carnet de Habilitación Reverso">
                                         <div class="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors pointer-events-none"></div>
                                     </div>
                                 @else
@@ -278,11 +285,30 @@
                         @endif
                     @else
                         <div class="col-span-2 py-6 text-center text-xs text-slate-400 italic">
-                            Este atleta no cuenta con carnet de afiliado.
+                            Este atleta no cuenta con carnet de habilitación.
                         </div>
                     @endif
                 </div>
             </div>
+
+            @if($athlete->foto_formulario)
+            {{-- Tarjeta Foto del Formulario --}}
+            <div class="bg-slate-50 border border-slate-100 rounded-2xl p-4 flex flex-col col-span-1 md:col-span-2">
+                <div class="flex items-center gap-2 mb-3">
+                    <span class="p-1.5 bg-blue-50 text-blue-600 rounded-lg">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    </span>
+                    <h3 class="text-xs font-black text-slate-700 uppercase tracking-wider">Foto del Formulario</h3>
+                </div>
+
+                <div class="flex justify-center mt-1">
+                    <div class="relative w-full max-w-sm h-48 rounded-lg overflow-hidden border border-slate-200 shadow-sm hover:shadow-md transition-shadow cursor-zoom-in group bg-white">
+                        <img src="{{ $athlete->foto_formulario }}" data-ci="{{ $athlete->ci }}" class="w-full h-full object-contain lightbox-trigger group-hover:scale-105 transition-transform duration-300" alt="Foto del Formulario">
+                        <div class="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors pointer-events-none"></div>
+                    </div>
+                </div>
+            </div>
+            @endif
         </div>
     </div>
 
