@@ -17,6 +17,11 @@ class Athlete extends Model
      */
     public function isAlDia(): bool
     {
+        // Si el atleta se registró este mes, se considera al día por defecto
+        if ($this->created_at && $this->created_at->format('Y-m') === now()->format('Y-m')) {
+            return true;
+        }
+
         $mesActual = now()->format('Y-m');
         return $this->payments()
             ->where('concepto', 'mensualidad')
@@ -26,28 +31,36 @@ class Athlete extends Model
     }
 
     /**
-     * Scope para atletas que están al día (pago realizado en el mes actual).
+     * Scope para atletas que están al día (pago realizado en el mes actual o creados este mes).
      */
     public function scopeAlDia($query)
     {
         $mesActual = now()->format('Y-m');
-        return $query->whereHas('payments', function ($q) use ($mesActual) {
-            $q->where('concepto', 'mensualidad')
-              ->where('mes_correspondiente', $mesActual)
-              ->where('estado_pago', 'pagado');
+        return $query->where(function ($q) use ($mesActual) {
+            $q->whereHas('payments', function ($sub) use ($mesActual) {
+                $sub->where('concepto', 'mensualidad')
+                    ->where('mes_correspondiente', $mesActual)
+                    ->where('estado_pago', 'pagado');
+            })->orWhere(function ($sub) {
+                $sub->whereMonth('created_at', now()->month)
+                    ->whereYear('created_at', now()->year);
+            });
         });
     }
 
     /**
-     * Scope para atletas que deben (sin pago realizado en el mes actual).
+     * Scope para atletas que deben (sin pago realizado en el mes actual y no creados este mes).
      */
     public function scopeDebe($query)
     {
         $mesActual = now()->format('Y-m');
-        return $query->whereDoesntHave('payments', function ($q) use ($mesActual) {
-            $q->where('concepto', 'mensualidad')
-              ->where('mes_correspondiente', $mesActual)
-              ->where('estado_pago', 'pagado');
+        return $query->whereDoesntHave('payments', function ($sub) use ($mesActual) {
+            $sub->where('concepto', 'mensualidad')
+                ->where('mes_correspondiente', $mesActual)
+                ->where('estado_pago', 'pagado');
+        })->where(function ($q) {
+            $q->whereMonth('created_at', '!=', now()->month)
+              ->orWhereYear('created_at', '!=', now()->year);
         });
     }
 
@@ -116,7 +129,17 @@ class Athlete extends Model
      */
     public function estadoMensualidadInfo(): array
     {
+        $fueCreadoEsteMes = $this->created_at && $this->created_at->format('Y-m') === now()->format('Y-m');
+
         if (!$this->fecha_pago_habilitacion || !$this->fecha_vencimiento_habilitacion) {
+            if ($fueCreadoEsteMes) {
+                return [
+                    'status' => 'al_dia',
+                    'color'  => 'emerald',
+                    'label'  => 'Al Día',
+                    'desc'   => 'Atleta nuevo (Inscrito en el mes actual)',
+                ];
+            }
             return [
                 'status' => 'debe',
                 'color'  => 'red',
@@ -126,6 +149,14 @@ class Athlete extends Model
         }
 
         if ($this->estaMensualidadVencida()) {
+            if ($fueCreadoEsteMes) {
+                return [
+                    'status' => 'al_dia',
+                    'color'  => 'emerald',
+                    'label'  => 'Al Día',
+                    'desc'   => 'Atleta nuevo (Inscrito en el mes actual)',
+                ];
+            }
             return [
                 'status' => 'debe',
                 'color'  => 'red',
@@ -177,7 +208,20 @@ class Athlete extends Model
             if ($athlete->fecha_nacimiento) {
                 $athlete->asignarCategoriaPorEdad();
             }
-
+            
+            // Inicializar habilitación y mensualidad al registrar nuevo atleta (se considera pagada la primera)
+            if ($athlete->habilitado_booleano === null) {
+                $athlete->habilitado_booleano = true;
+            }
+            if (!$athlete->fecha_habilitacion) {
+                $athlete->fecha_habilitacion = now();
+            }
+            if (!$athlete->fecha_pago_habilitacion) {
+                $athlete->fecha_pago_habilitacion = now();
+            }
+            if (!$athlete->fecha_vencimiento_habilitacion) {
+                $athlete->fecha_vencimiento_habilitacion = now()->endOfMonth();
+            }
         });
 
         // Recalcular categoría si cambia la fecha de nacimiento
