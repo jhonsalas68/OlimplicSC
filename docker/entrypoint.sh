@@ -23,8 +23,8 @@ if [ -n "$DB_HOST" ]; then
 fi
 
 # ESTO CREARÁ TU ADMIN AUTOMÁTICAMENTE
-php artisan migrate --force
-php artisan db:seed --force
+php artisan migrate --force || echo "ADVERTENCIA: Las migraciones fallaron. Verifica la conexión a la base de datos."
+php artisan db:seed --force || echo "ADVERTENCIA: El seeding falló."
 
 # CORRECCIÓN VITAL PARA POSTGRESQL Y LOGS EN RAILWAY/DOCKER
 # Asignar propiedad a www-data (el usuario del servidor web) para que pueda leer/escribir en la base de datos y logs.
