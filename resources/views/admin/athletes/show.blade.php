@@ -361,60 +361,92 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    const triggers = document.querySelectorAll('.lightbox-trigger');
-    const modal = document.getElementById('lightbox-modal');
-    const modalImg = document.getElementById('lightbox-img');
-    const caption = document.getElementById('lightbox-caption');
-    const closeBtn = document.getElementById('lightbox-close');
-    const downloadBtn = document.getElementById('lightbox-download');
-
-    if (triggers.length && modal && modalImg) {
-        triggers.forEach(trigger => {
-            trigger.addEventListener('click', (e) => {
-                const src = e.target.src;
-                const alt = e.target.alt || 'Documento';
+// Usar delegación de eventos para evitar duplicación y soportar navegación Turbo
+if (!window.lightboxInitialized) {
+    window.lightboxInitialized = true;
+    
+    document.addEventListener('click', (e) => {
+        // 1. Mostrar/abrir el Lightbox al hacer click en un disparador
+        const trigger = e.target.closest('.lightbox-trigger');
+        if (trigger) {
+            const modal = document.getElementById('lightbox-modal');
+            const modalImg = document.getElementById('lightbox-img');
+            const caption = document.getElementById('lightbox-caption');
+            const downloadBtn = document.getElementById('lightbox-download');
+            
+            if (modal && modalImg) {
+                const src = trigger.src;
+                const alt = trigger.alt || 'Documento';
                 
                 modalImg.src = src;
                 caption.textContent = alt;
                 
                 if (downloadBtn) {
                     downloadBtn.href = src;
-                    // Genera un nombre de archivo limpio para la descarga
                     const fileExtension = src.split('.').pop().split('?')[0] || 'jpg';
                     const formattedName = alt.toLowerCase().replace(/[^a-z0-9]/g, '_');
-                    downloadBtn.download = `atleta_${formattedName}_${e.target.dataset.ci || 'doc'}.${fileExtension}`;
+                    const filename = `atleta_${formattedName}_${trigger.dataset.ci || 'doc'}.${fileExtension}`;
+                    downloadBtn.download = filename;
+
+                    // Forzar descarga para dominios externos (R2/S3) usando Blobs
+                    downloadBtn.onclick = (event) => {
+                        event.preventDefault();
+                        fetch(src)
+                            .then(response => response.blob())
+                            .then(blob => {
+                                const blobUrl = URL.createObjectURL(blob);
+                                const tempLink = document.createElement('a');
+                                tempLink.href = blobUrl;
+                                tempLink.download = filename;
+                                document.body.appendChild(tempLink);
+                                tempLink.click();
+                                document.body.removeChild(tempLink);
+                                URL.revokeObjectURL(blobUrl);
+                            })
+                            .catch(err => {
+                                // Plan B: si falla por CORS, abrir en pestaña nueva
+                                window.open(src, '_blank');
+                            });
+                    };
                 }
                 
-                // Mostrar con transiciones fijas
                 modal.classList.remove('hidden');
                 modal.classList.add('flex');
                 modal.style.opacity = '1';
                 modalImg.classList.remove('scale-95');
                 modalImg.classList.add('scale-100');
-            });
-        });
+            }
+            return;
+        }
 
-        const closeModal = () => {
+        // 2. Cerrar el Lightbox al hacer click fuera o en el botón de cerrar
+        const modal = document.getElementById('lightbox-modal');
+        if (modal && !modal.classList.contains('hidden')) {
+            if (e.target === modal || e.target.closest('#lightbox-close')) {
+                closeLightbox();
+            }
+        }
+    });
+
+    // Cerrar al presionar Escape
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeLightbox();
+        }
+    });
+
+    function closeLightbox() {
+        const modal = document.getElementById('lightbox-modal');
+        const modalImg = document.getElementById('lightbox-img');
+        const caption = document.getElementById('lightbox-caption');
+        if (modal && modalImg) {
             modal.classList.add('hidden');
             modal.classList.remove('flex');
             modalImg.src = '';
             caption.textContent = '';
-        };
-
-        closeBtn.addEventListener('click', closeModal);
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal || e.target.closest('#lightbox-close')) {
-                closeModal();
-            }
-        });
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
-                closeModal();
-            }
-        });
+        }
     }
-});
+}
 </script>
 
 @if(auth()->user()->hasRole('Admin') || auth()->user()->hasRole('SuperAdmin'))
