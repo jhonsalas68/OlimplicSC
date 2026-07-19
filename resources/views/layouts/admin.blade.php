@@ -28,6 +28,7 @@
     <meta name="turbo-refresh-method" content="morph">
     <meta name="turbo-refresh-scroll" content="preserve">
     <meta name="view-transition" content="same-origin">
+    <meta name="turbo-cache-control" content="no-preview">
     
     <style>
         body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
