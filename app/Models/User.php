@@ -32,6 +32,8 @@ class User extends Authenticatable
         'ci',
         'category_id',
         'avatar',
+        'telefono',
+        'foto_carnet',
     ];
 
     /**

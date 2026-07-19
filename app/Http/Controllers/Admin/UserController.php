@@ -63,6 +63,8 @@ class UserController extends Controller
             'category_ids'    => 'nullable|array',
             'category_ids.*'  => 'exists:categories,id',
             'avatar'          => 'nullable|image|max:5120',
+            'telefono'        => 'nullable|string|max:20',
+            'foto_carnet'     => 'nullable|image|max:5120',
         ]);
 
         $initials = collect([$validated['name'], $validated['apellido_paterno'], $validated['apellido_materno']])
@@ -85,6 +87,12 @@ class UserController extends Controller
             $avatarUrl = Storage::disk('r2')->url($path);
         }
 
+        $fotoCarnetUrl = null;
+        if ($request->hasFile('foto_carnet')) {
+            $path = Storage::disk('r2')->putFile('user_cis', $request->file('foto_carnet'));
+            $fotoCarnetUrl = Storage::disk('r2')->url($path);
+        }
+
         $user = User::create([
             'name'             => $validated['name'],
             'apellido_paterno' => $validated['apellido_paterno'],
@@ -96,6 +104,8 @@ class UserController extends Controller
             'is_active'        => $request->boolean('is_active', true),
             'category_id'      => $validated['category_ids'][0] ?? null,
             'avatar'           => $avatarUrl,
+            'telefono'         => $validated['telefono'] ?? null,
+            'foto_carnet'      => $fotoCarnetUrl,
         ]);
 
         $user->syncRoles([$validated['role']]);
@@ -144,6 +154,8 @@ class UserController extends Controller
             'category_ids'     => 'nullable|array',
             'category_ids.*'   => 'exists:categories,id',
             'avatar'           => 'nullable|image|max:5120',
+            'telefono'         => 'nullable|string|max:20',
+            'foto_carnet'      => 'nullable|image|max:5120',
         ]);
 
         $userData = [
@@ -154,6 +166,7 @@ class UserController extends Controller
             'ci'               => $validated['ci'],
             'is_active'        => $request->has('is_active'),
             'category_id'      => $validated['category_ids'][0] ?? null,
+            'telefono'         => $validated['telefono'] ?? null,
         ];
         
         if ($request->hasFile('avatar')) {
@@ -162,6 +175,14 @@ class UserController extends Controller
             }
             $path = Storage::disk('r2')->putFile('avatars', $request->file('avatar'));
             $userData['avatar'] = Storage::disk('r2')->url($path);
+        }
+
+        if ($request->hasFile('foto_carnet')) {
+            if ($user->foto_carnet) {
+                $this->deleteFile($user->foto_carnet);
+            }
+            $path = Storage::disk('r2')->putFile('user_cis', $request->file('foto_carnet'));
+            $userData['foto_carnet'] = Storage::disk('r2')->url($path);
         }
 
         if ($request->filled('password')) {
@@ -196,6 +217,9 @@ class UserController extends Controller
         }
         if ($user->avatar) {
             $this->deleteFile($user->avatar);
+        }
+        if ($user->foto_carnet) {
+            $this->deleteFile($user->foto_carnet);
         }
         
         \App\Services\ActivityLogger::log(

@@ -74,7 +74,22 @@
                     </div>
                     <div class="ml-3">
                         <div class="text-sm font-semibold text-slate-900">{{ $user->name }} {{ $user->apellido_paterno }} {{ $user->apellido_materno }}</div>
-                        <div class="text-xs text-slate-500">{{ $user->email }}</div>
+                        <div class="text-xs text-slate-500 flex flex-col">
+                            <span>{{ $user->email }}</span>
+                            @if($user->telefono || $user->foto_carnet)
+                                <span class="text-slate-400 mt-0.5">
+                                    @if($user->telefono)
+                                        Tel: {{ $user->telefono }}
+                                    @endif
+                                    @if($user->telefono && $user->foto_carnet)
+                                        &middot;
+                                    @endif
+                                    @if($user->foto_carnet)
+                                        <a href="{{ $user->foto_carnet }}" target="_blank" class="text-blue-500 hover:underline font-semibold" data-turbo="false">Ver Carnet</a>
+                                    @endif
+                                </span>
+                            @endif
+                        </div>
                     </div>
                 </div>
             </td>

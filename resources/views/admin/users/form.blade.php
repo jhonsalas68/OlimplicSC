@@ -34,6 +34,33 @@
     
     <x-admin.input label="C.I. (Contraseña inicial)" name="ci" :value="old('ci', $user->ci ?? '')" required placeholder="Contraseña por defecto" />
     <x-admin.input label="Correo Electrónico" name="email" type="email" :value="old('email', $user->email ?? '')" required placeholder="correo@ejemplo.com" />
+    <x-admin.input label="Teléfono" name="telefono" :value="old('telefono', $user->telefono ?? '')" placeholder="Ej: 77700000 (Opcional)" />
+
+    {{-- Foto del Carnet (Opcional) --}}
+    <div class="md:col-span-2 flex items-center space-x-6 mt-2 mb-2">
+        <div class="shrink-0">
+            @if(isset($user) && $user->foto_carnet)
+                <img id="preview-foto-carnet" class="h-16 w-32 object-contain rounded-lg border-2 border-slate-100 shadow-sm bg-white" src="{{ $user->foto_carnet }}" alt="Foto del Carnet">
+            @else
+                <div id="preview-placeholder-carnet" class="h-16 w-32 rounded-lg bg-slate-100 flex items-center justify-center text-slate-400 border-2 border-dashed border-slate-200">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                </div>
+            @endif
+        </div>
+        <label class="block">
+            <span class="block text-sm font-semibold text-slate-700 mb-1">Foto del Carnet (Opcional)</span>
+            <input type="file" name="foto_carnet" accept="image/*" onchange="handleFotoCarnetChange(event, '{{ isset($user) && $user->foto_carnet ? 'preview-foto-carnet' : 'preview-placeholder-carnet' }}')" class="block w-full text-sm text-slate-500
+                file:mr-4 file:py-2 file:px-4
+                file:rounded-full file:border-0
+                file:text-sm file:font-semibold
+                file:bg-blue-50 file:text-blue-700
+                hover:file:bg-blue-100
+            "/>
+        </label>
+        @error('foto_carnet')
+            <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+        @enderror
+    </div>
 
     @if(isset($user))
         <div class="md:col-span-2 bg-slate-50 p-4 rounded-xl border border-slate-100 italic text-xs text-slate-500">
@@ -193,6 +220,26 @@ function handleAvatarChange(event, previewId) {
             img.id = previewId;
             img.src = e.target.result;
             img.className = "h-16 w-16 object-cover rounded-full border-2 border-slate-100 shadow-sm";
+            preview.parentNode.replaceChild(img, preview);
+        }
+    };
+    reader.readAsDataURL(file);
+}
+
+function handleFotoCarnetChange(event, previewId) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const preview = document.getElementById(previewId);
+        if (preview.tagName === 'IMG') {
+            preview.src = e.target.result;
+        } else {
+            const img = document.createElement('img');
+            img.id = previewId;
+            img.src = e.target.result;
+            img.className = "h-16 w-32 object-contain rounded-lg border-2 border-slate-100 shadow-sm bg-white";
             preview.parentNode.replaceChild(img, preview);
         }
     };
