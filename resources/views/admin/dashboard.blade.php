@@ -193,10 +193,15 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', () => {
+function initDashboardCharts() {
     // 1. Chart: Recaudación Histórica (Líneas con Área)
     const ctxRecaudacion = document.getElementById('recaudacionChart');
     if (ctxRecaudacion) {
+        const existing = Chart.getChart(ctxRecaudacion);
+        if (existing) {
+            existing.destroy();
+        }
+
         const months = @json($meses);
         const amounts = @json($recaudaciones);
         
@@ -264,6 +269,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // 2. Chart: Mensualidad Al Día vs Debe (Dona)
     const ctxMensualidad = document.getElementById('mensualidadChart');
     if (ctxMensualidad) {
+        const existing = Chart.getChart(ctxMensualidad);
+        if (existing) {
+            existing.destroy();
+        }
+
         new Chart(ctxMensualidad, {
             type: 'doughnut',
             data: {
@@ -302,6 +312,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // 3. Chart: Atletas por Categoría (Barras)
     const ctxCategorias = document.getElementById('categoriasChart');
     if (ctxCategorias) {
+        const existing = Chart.getChart(ctxCategorias);
+        if (existing) {
+            existing.destroy();
+        }
+
         const catLabels = @json($categoriasLabels);
         const catCounts = @json($categoriasCounts);
 
@@ -350,6 +365,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-});
+}
+
+// Ejecutar en la carga inicial y en cada navegación de Turbo
+document.addEventListener('DOMContentLoaded', initDashboardCharts);
+document.addEventListener('turbo:load', initDashboardCharts);
 </script>
 @endpush
