@@ -53,7 +53,7 @@
 
             <x-sidebar-link href="{{ route('admin.dashboard') }}" icon="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" label="Dashboard" :active="request()->routeIs('admin.dashboard')" />
 
-            <x-sidebar-link href="{{ route('athletes.index') }}" icon="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" label="Atletas Olimpic" :active="request()->routeIs('athletes.*')" />
+            <x-sidebar-link href="{{ route('athletes.index') }}" icon="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" label="Atletas Olympic" :active="request()->routeIs('athletes.*')" />
 
             <x-sidebar-link href="{{ route('users.index') }}" icon="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" label="Usuarios y Roles" :active="request()->routeIs('users.*')" />
 
