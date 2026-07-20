@@ -136,7 +136,79 @@
             </main>
         </div>
     </div>
+    <script>
+    (function() {
+        if (window.__unsavedChangesInitialized) return;
+        window.__unsavedChangesInitialized = true;
+
+        let isSubmitting = false;
+
+        function hasUnsavedChanges() {
+            if (isSubmitting) return false;
+            const dirtyForm = document.querySelector('form[data-dirty="true"]');
+            return !!dirtyForm;
+        }
+
+        function markDirty(target) {
+            if (!target || !target.form) return;
+            const form = target.form;
+
+            if (form.method && form.method.toUpperCase() === 'GET') return;
+            if (form.hasAttribute('data-no-warn') || target.hasAttribute('data-no-warn')) return;
+            if (target.name === '_token' || target.name === '_method' || target.type === 'submit' || target.type === 'button') return;
+
+            form.dataset.dirty = "true";
+        }
+
+        document.addEventListener('input', (e) => markDirty(e.target), true);
+        document.addEventListener('change', (e) => markDirty(e.target), true);
+
+        document.addEventListener('submit', (e) => {
+            const form = e.target;
+            if (form) {
+                form.dataset.dirty = "false";
+            }
+            isSubmitting = true;
+        }, true);
+
+        document.addEventListener('turbo:load', () => {
+            isSubmitting = false;
+            document.querySelectorAll('form[data-dirty="true"]').forEach(f => f.dataset.dirty = "false");
+        });
+
+        window.addEventListener('beforeunload', (e) => {
+            if (hasUnsavedChanges()) {
+                e.preventDefault();
+                e.returnValue = '';
+                return '';
+            }
+        });
+
+        document.addEventListener('turbo:before-visit', (e) => {
+            if (hasUnsavedChanges()) {
+                const confirmed = window.confirm('Tienes cambios sin guardar en el formulario. ¿Estás seguro de que deseas salir sin guardar?');
+                if (!confirmed) {
+                    e.preventDefault();
+                }
+            }
+        });
+
+        window.markFormDirty = function(formOrElement) {
+            const form = formOrElement?.form || formOrElement;
+            if (form && form.tagName === 'FORM') {
+                form.dataset.dirty = "true";
+            }
+        };
+        window.clearFormDirty = function(formOrElement) {
+            const form = formOrElement?.form || formOrElement;
+            if (form && form.tagName === 'FORM') {
+                form.dataset.dirty = "false";
+            }
+        };
+    })();
+    </script>
     @stack('scripts')
 </body>
 </html>
+
 
