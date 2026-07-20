@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <title>Lista de Convocados - OlimpicSC</title>
     <style>
-        body { font-family: sans-serif; font-size: 12px; color: #333; }
+        body { font-family: DejaVu Sans, Arial, sans-serif; font-size: 11px; color: #333; }
         .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #0b2d69; padding-bottom: 10px; }
         .logo-text { font-size: 24px; font-weight: bold; color: #0b2d69; }
         .title { font-size: 18px; margin-top: 5px; color: #c61c2c; text-transform: uppercase; }

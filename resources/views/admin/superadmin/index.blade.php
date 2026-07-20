@@ -55,12 +55,12 @@
             </div>
         </div>
         <div class="space-y-2">
-            <a href="{{ route('superadmin.export.atletas.pdf') }}"
+            <a href="{{ route('superadmin.export.atletas.pdf') }}" data-turbo="false"
                class="flex items-center justify-between w-full px-4 py-3 bg-red-50 hover:bg-red-100 text-red-700 rounded-xl text-sm font-semibold transition-colors">
                 <span>Atletas (PDF)</span>
                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
             </a>
-            <a href="{{ route('superadmin.export.pagos.pdf') }}"
+            <a href="{{ route('superadmin.export.pagos.pdf') }}" data-turbo="false"
                class="flex items-center justify-between w-full px-4 py-3 bg-red-50 hover:bg-red-100 text-red-700 rounded-xl text-sm font-semibold transition-colors">
                 <span>Pagos (PDF)</span>
                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>

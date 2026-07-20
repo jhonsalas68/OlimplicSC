@@ -64,7 +64,7 @@
         </div>
 
         {{-- Hidden Export Form --}}
-        <form x-ref="exportForm" action="{{ route('athletes.export.selected') }}" method="POST" class="hidden">
+        <form x-ref="exportForm" action="{{ route('athletes.export.selected') }}" method="POST" data-turbo="false" class="hidden">
             @csrf
             <input type="hidden" name="ids" id="export-ids-input">
         </form>

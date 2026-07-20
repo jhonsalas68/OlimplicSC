@@ -20,7 +20,7 @@
             <svg class="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
             Excel
         </a>
-        <a href="{{ route('admin.reports.export.pdf', request()->all()) }}" 
+        <a href="{{ route('admin.reports.export.pdf', request()->all()) }}" data-turbo="false"
            class="inline-flex items-center px-6 py-3 bg-white text-rose-600 hover:bg-rose-50 rounded-2xl text-sm font-black transition-all shadow-xl shadow-slate-200/50 border border-slate-100 group">
             <svg class="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 9h1.5m1.5 0H13m-4 4h4m-4 4h4" /></svg>
             PDF (Imprimible)

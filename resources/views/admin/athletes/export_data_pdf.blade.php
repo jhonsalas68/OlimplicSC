@@ -5,7 +5,7 @@
     <title>Reporte de Atletas - OlimpicSC</title>
     <style>
         @page { margin: 20px; size: landscape; }
-        body { font-family: 'Helvetica', sans-serif; font-size: 8px; color: #333; line-height: 1.2; }
+        body { font-family: DejaVu Sans, Arial, sans-serif; font-size: 8px; color: #333; line-height: 1.2; }
         .header { text-align: center; margin-bottom: 15px; border-bottom: 2px solid #1e3a5f; padding-bottom: 10px; }
         .logo-text { font-size: 18px; font-weight: bold; color: #1e3a5f; }
         .title { font-size: 14px; margin-top: 3px; color: #666; text-transform: uppercase; letter-spacing: 1px; }

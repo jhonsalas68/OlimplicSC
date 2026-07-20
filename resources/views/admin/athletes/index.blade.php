@@ -377,7 +377,12 @@ function exportToExcel() {
 
 function exportToPdf() { 
     const urlParams = new URLSearchParams(window.location.search);
-    window.location.href = "{{ route('athletes.export.pdf') }}?" + urlParams.toString(); 
+    const link = document.createElement('a');
+    link.href = "{{ route('athletes.export.pdf') }}?" + urlParams.toString();
+    link.setAttribute('data-turbo', 'false');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
 
 function exportSelected() {
@@ -387,6 +392,7 @@ function exportSelected() {
     const form = document.createElement('form');
     form.method = 'POST';
     form.action = "{{ route('athletes.export.selected') }}";
+    form.setAttribute('data-turbo', 'false');
     
     const csrf = document.createElement('input');
     csrf.type = 'hidden';
@@ -402,6 +408,7 @@ function exportSelected() {
     
     document.body.appendChild(form);
     form.submit();
+    document.body.removeChild(form);
 }
 
 @if(auth()->user()->hasRole('Admin') || auth()->user()->hasRole('SuperAdmin'))

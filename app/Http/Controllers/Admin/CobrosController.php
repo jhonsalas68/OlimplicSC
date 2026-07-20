@@ -208,9 +208,9 @@ class CobrosController extends Controller
         $payments->load('athlete.category', 'cobrador');
         
         $esPublico = true;
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.cobros.nota', compact('payments', 'esPublico'))
-                  ->setPaper([0, 0, 396, 612], 'portrait');
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.cobros.pdf_nota', compact('payments', 'esPublico'))
+                  ->setPaper('letter', 'portrait');
                   
-        return $pdf->stream('nota_venta_' . $id . '.pdf');
+        return $pdf->download('nota_venta_' . $id . '.pdf');
     }
 }

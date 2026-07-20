@@ -118,7 +118,7 @@
         @endif
     </div>
     <div class="flex gap-2">
-        <a href="{{ route('payments.export.pdf') }}?{{ $queryString }}"
+        <a href="{{ route('payments.export.pdf') }}?{{ $queryString }}" data-turbo="false"
            class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 text-xs font-bold rounded-xl transition-colors border border-red-200">
             <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
             PDF

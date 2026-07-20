@@ -379,6 +379,9 @@
         <button onclick="window.print()" class="btn-print">
             🖨 Imprimir
         </button>
+        <a href="{{ route('cobros.download_pdf', $idGrupo) }}" class="btn-back" data-turbo="false" style="background:#1e3a8a; border-color:#3b82f6;">
+            📄 PDF
+        </a>
         @if($primerPayment->whatsapp_number)
             @php
                 $atletaNombre = trim($primerPayment->athlete->nombre . ' ' . $primerPayment->athlete->apellido_paterno);
