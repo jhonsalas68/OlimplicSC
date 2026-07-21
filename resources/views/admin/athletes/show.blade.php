@@ -139,43 +139,49 @@
         </div>
     </div>
 
-    {{-- Contacto de emergencia --}}
-    @php $esMenor = $athlete->edadActual() < 18; @endphp
+    {{-- Contacto de emergencia y tutor --}}
+    @php 
+        $esMenor = $athlete->edadActual() < 18; 
+        $nombreTutor = trim(($athlete->nombre_padre ?? '') . ' ' . ($athlete->apellido_paterno_padre ?? '') . ' ' . ($athlete->apellido_materno_padre ?? ''));
+    @endphp
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 mb-4">
         <h2 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">
-            {{ $esMenor ? 'Padre / Tutor' : 'Contacto de Referencia' }}
+            Contacto de Emergencia
         </h2>
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-4">
-            @if($esMenor)
-                <div>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Nombre</p>
-                    <p class="text-sm font-semibold text-slate-800">
-                        {{ trim(($athlete->nombre_padre ?? '') . ' ' . ($athlete->apellido_paterno_padre ?? '') . ' ' . ($athlete->apellido_materno_padre ?? '')) ?: '—' }}
-                    </p>
-                </div>
-                <div>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Teléfono</p>
-                    <p class="text-sm font-semibold text-slate-800">{{ $athlete->telefono_padre ?? '—' }}</p>
-                </div>
-                <div>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Relación</p>
-                    <p class="text-sm font-semibold text-slate-800">{{ $athlete->relacion_contacto ?? '—' }}</p>
-                </div>
-            @else
-                <div>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Nombre</p>
-                    <p class="text-sm font-semibold text-slate-800">{{ $athlete->contacto_nombre ?? '—' }}</p>
-                </div>
-                <div>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Teléfono</p>
-                    <p class="text-sm font-semibold text-slate-800">{{ $athlete->contacto_telefono ?? '—' }}</p>
-                </div>
-                <div>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Relación</p>
-                    <p class="text-sm font-semibold text-slate-800">{{ $athlete->contacto_relacion ?? '—' }}</p>
-                </div>
-            @endif
+            <div>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Nombre Contacto</p>
+                <p class="text-sm font-semibold text-slate-800">{{ $athlete->contacto_nombre ?? '—' }}</p>
+            </div>
+            <div>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Teléfono Emergencia</p>
+                <p class="text-sm font-semibold text-slate-800">{{ $athlete->contacto_telefono ?? '—' }}</p>
+            </div>
+            <div>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Relación</p>
+                <p class="text-sm font-semibold text-slate-800">{{ $athlete->contacto_relacion ?? '—' }}</p>
+            </div>
         </div>
+
+        @if($esMenor || $nombreTutor || $athlete->telefono_padre)
+            <div class="border-t border-slate-100 pt-4 mt-4">
+                <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-3">Información del Tutor / Padre</h3>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-4">
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Nombre Tutor</p>
+                        <p class="text-sm font-semibold text-slate-800">{{ $nombreTutor ?: '—' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Teléfono Tutor</p>
+                        <p class="text-sm font-semibold text-slate-800">{{ $athlete->telefono_padre ?? '—' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Relación</p>
+                        <p class="text-sm font-semibold text-slate-800">{{ $athlete->relacion_contacto ?? '—' }}</p>
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
 
     {{-- Documentos y Credenciales --}}

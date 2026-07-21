@@ -129,9 +129,32 @@
         </div>
     </div>
 
-    {{-- ── CONTACTO DE EMERGENCIA (se muestra según edad) ── --}}
-
     {{-- ── CONTACTO DE EMERGENCIA ── --}}
+    <div id="bloque-mayor" class="md:col-span-2 bg-slate-50/50 p-8 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/40 space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <h4 class="text-sm font-black text-slate-800 uppercase tracking-widest">Contacto de Emergencia</h4>
+                <p class="text-[11px] text-slate-400 font-bold mt-1 uppercase">Información de contacto en caso de emergencia (Todas las categorías)</p>
+            </div>
+            
+            <div class="w-full sm:w-64">
+                <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">Relación</label>
+                <select name="contacto_relacion" class="block w-full px-4 py-3 border border-slate-200 rounded-xl shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 text-sm font-bold bg-white text-slate-700 cursor-pointer">
+                    <option value="">Seleccionar...</option>
+                    @foreach(['Padre','Madre','Tutor legal','Cónyuge','Hermano','Hermana','Amigo/a','Compañero/a de equipo','Otro'] as $rel)
+                        <option value="{{ $rel }}" {{ old('contacto_relacion', $athlete->contacto_relacion ?? '') == $rel ? 'selected' : '' }}>{{ $rel }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-slate-100">
+            <x-admin.input label="Nombre completo del contacto" name="contacto_nombre" :value="$athlete->contacto_nombre ?? old('contacto_nombre')" placeholder="Nombre completo" />
+            <x-admin.input label="Teléfono de Emergencia" name="contacto_telefono" :value="$athlete->contacto_telefono ?? old('contacto_telefono')" placeholder="Ej: 77700000" />
+        </div>
+    </div>
+
+    {{-- ── INFORMACIÓN DEL TUTOR (Para menores de edad) ── --}}
     <div id="bloque-menor" class="md:col-span-2 bg-blue-50/50 p-8 rounded-[2rem] border border-blue-100 shadow-xl shadow-blue-600/5 space-y-6 {{ $esMenor ?? false ? '' : 'hidden' }}">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
@@ -157,30 +180,6 @@
         </div>
         <div class="pt-2">
             <x-admin.input label="Teléfono de Emergencia Tutor" name="telefono_padre" :value="$athlete->telefono_padre ?? old('telefono_padre')" placeholder="Ej: 77700000" />
-        </div>
-    </div>
-
-    <div id="bloque-mayor" class="md:col-span-2 bg-slate-50/50 p-8 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/40 space-y-6 {{ $esMenor ?? true ? 'hidden' : '' }}">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-                <h4 class="text-sm font-black text-slate-800 uppercase tracking-widest">Contacto de Emergencia</h4>
-                <p class="text-[11px] text-slate-400 font-bold mt-1 uppercase">Opcional para mayores de edad</p>
-            </div>
-            
-            <div class="w-full sm:w-64">
-                <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">Relación</label>
-                <select name="contacto_relacion" class="block w-full px-4 py-3 border border-slate-200 rounded-xl shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 text-sm font-bold bg-white text-slate-700 cursor-pointer">
-                    <option value="">Seleccionar...</option>
-                    @foreach(['Padre','Madre','Cónyuge','Hermano','Hermana','Amigo/a','Compañero/a de equipo','Otro'] as $rel)
-                        <option value="{{ $rel }}" {{ old('contacto_relacion', $athlete->contacto_relacion ?? '') == $rel ? 'selected' : '' }}>{{ $rel }}</option>
-                    @endforeach
-                </select>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-slate-100">
-            <x-admin.input label="Nombre completo del contacto" name="contacto_nombre" :value="$athlete->contacto_nombre ?? old('contacto_nombre')" placeholder="Nombre completo" />
-            <x-admin.input label="Teléfono de Emergencia" name="contacto_telefono" :value="$athlete->contacto_telefono ?? old('contacto_telefono')" placeholder="Ej: 77700000" />
         </div>
     </div>
 
@@ -429,10 +428,12 @@ function onFechaNacChange(fechaNac) {
     if (cat) {
         display.innerHTML = `<strong>${cat.nombre}</strong> <span style="font-weight:normal;opacity:.7">(${cat.min}–${cat.max} años · ${edad} años cumplidos)</span>`;
     }
-    // Mostrar bloque de contacto según si es menor (< 18)
+    // Mostrar bloque de tutor solo si es menor (< 18)
     const esMenor = edad < 18;
-    document.getElementById('bloque-menor').classList.toggle('hidden', !esMenor);
-    document.getElementById('bloque-mayor').classList.toggle('hidden', esMenor);
+    const bloqueMenor = document.getElementById('bloque-menor');
+    if (bloqueMenor) {
+        bloqueMenor.classList.toggle('hidden', !esMenor);
+    }
 }
 
 function toggleSeguro(checked) {
