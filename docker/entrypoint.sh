@@ -26,9 +26,12 @@ fi
 php artisan migrate --force || echo "ADVERTENCIA: Las migraciones fallaron. Verifica la conexión a la base de datos."
 php artisan db:seed --force || echo "ADVERTENCIA: El seeding falló."
 
+# Enlace de almacenamiento público
+php artisan storage:link --force || echo "ADVERTENCIA: No se pudo crear el enlace simbólico de storage."
+
 # CORRECCIÓN VITAL PARA POSTGRESQL Y LOGS EN RAILWAY/DOCKER
 # Asignar propiedad a www-data (el usuario del servidor web) para que pueda leer/escribir en la base de datos y logs.
-chown -R www-data:www-data /var/www/html/database /var/www/html/storage /var/www/html/bootstrap/cache
+chown -R www-data:www-data /var/www/html/database /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/public/storage 2>/dev/null || true
 
 # Arrancar el servidor
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
