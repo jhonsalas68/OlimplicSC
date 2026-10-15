@@ -35,4 +35,22 @@ return Application::configure(basePath: dirname(__DIR__))
             }
             return redirect()->route('admin.dashboard')->with('error', 'No tienes permiso para acceder a esa sección.');
         });
+
+        // Mostrar detalle exacto del error en lugar de la pantalla genérica 500
+        $exceptions->render(function (\Throwable $e, \Illuminate\Http\Request $request) {
+            if ($e instanceof \Illuminate\Validation\ValidationException) {
+                return null;
+            }
+            \Illuminate\Support\Facades\Log::error($e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return response(
+                "<div style='background:#1e1e2f;color:#fff;padding:30px;font-family:monospace;border-left:6px solid #e11d48;margin:20px;border-radius:10px;line-height:1.5;'>"
+                . "<h2 style='color:#f43f5e;margin-top:0;'>DETALLE DEL ERROR 500: " . htmlspecialchars($e->getMessage()) . "</h2>"
+                . "<p><b>Excepción:</b> " . get_class($e) . "</p>"
+                . "<p><b>Archivo:</b> " . $e->getFile() . " (Línea: " . $e->getLine() . ")</p>"
+                . "<details open style='margin-top:15px;'><summary style='cursor:pointer;color:#38bdf8;font-weight:bold;margin-bottom:10px;'>Pila de Ejecución (Stack Trace)</summary>"
+                . "<pre style='background:#0f172a;color:#cbd5e1;padding:15px;border-radius:6px;overflow-x:auto;white-space:pre-wrap;font-size:12px;'>" . htmlspecialchars($e->getTraceAsString()) . "</pre></details>"
+                . "</div>",
+                500
+            );
+        });
     })->create();
